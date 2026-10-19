@@ -29,7 +29,7 @@
   .gate-small button{background:none;border:0;color:#9fb0b3;text-decoration:underline;cursor:pointer;font:inherit}
   .gate-err{color:#de6b58;font-size:13.5px}
   .acc-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto}
-  .acc-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:#111b1f;border:1px solid rgba(196,214,216,.13)}
+  .acc-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:#111b1f;border:1px solid rgba(196,214,216,.13)}
   .acc-row img,.acc-row .ph{width:30px;height:30px;border-radius:50%;flex:none;background:#22353b}
   .acc-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
   @media (max-width:520px){.pl-mode .pl-ic span{display:none}.pl-mode .pl-ic{padding:0 10px}}
@@ -121,7 +121,8 @@
         rtdb.ref('users/' + u.uid).set({ nome: u.displayName || u.email || 'Sem nome', foto: u.photoURL || '', visto: Date.now() }).catch(() => {});
         const ms = (await rtdb.ref('mesa/mestres').once('value')).val() || {};
         FB.mestres = ms; FB.isGM = ms[u.uid] === true;
-        if (!Object.keys(ms).length) { askGM(start); return; }
+        let asPlayer = false; try { asPlayer = sessionStorage.getItem('apogeu.asPlayer') === u.uid; sessionStorage.removeItem('apogeu.asPlayer'); } catch {}
+        if (!Object.keys(ms).length && !asPlayer) { askGM(start); return; }
         go(start);
       } catch (e) { showLogin(start, e); }
     });
@@ -169,28 +170,46 @@
   }
 
   /* ---------- conta e jogadores (usa o modal da mesa) ---------- */
+  /* sair do posto: tira o próprio nome da lista de mestres e reabre a mesa como jogador */
+  async function stepDown(handTo) {
+    const u = FB.user;
+    if (handTo) await rtdb.ref('mesa/mestres/' + handTo).set(true);
+    await rtdb.ref('mesa/mestres/' + u.uid).remove();
+    try { sessionStorage.setItem('apogeu.asPlayer', u.uid); } catch {}
+    location.reload();
+  }
   FB.account = async function () {
     const u = FB.user; if (!u || typeof modal !== 'function') return;
     let close;
+    const me = h('div', { class: 'acc-row' }, u.photoURL ? h('img', { src: u.photoURL, alt: '' }) : h('span', { class: 'ph' }), h('span', { class: 'nm' }, u.displayName || u.email, h('small', null, (FB.isGM ? 'Mestre' : 'Jogador') + ' · ' + (u.email || ''))));
     const list = h('div', { class: 'acc-list' }, h('p', { class: 'hint' }, 'Carregando…'));
+    let armed = false;
+    const leave = h('button', { class: 'btn danger', type: 'button', style: { width: '100%' }, onclick: async () => {
+      if (!armed) { armed = true; leave.textContent = 'Tem certeza? Toque de novo para virar jogador'; return; }
+      leave.disabled = true; leave.textContent = 'Saindo…';
+      try { await stepDown(null); } catch (e) { leave.disabled = false; armed = false; leave.textContent = 'Deixar de ser mestre e virar jogador'; UI.toast('Não foi possível sair do posto agora. Tente de novo.', 'err'); }
+    } }, 'Deixar de ser mestre e virar jogador');
     close = modal(
       h('h2', null, FB.isGM ? 'Mestre e jogadores' : 'Sua conta'),
-      FB.isGM ? null : h('div', { class: 'acc-row' }, u.photoURL ? h('img', { src: u.photoURL, alt: '' }) : h('span', { class: 'ph' }), h('span', { class: 'nm' }, u.displayName || u.email, h('small', null, (FB.isGM ? 'Mestre' : 'Jogador') + ' · ' + (u.email || '')))),
-      FB.isGM ? h('p', null, 'Quem já entrou na mesa aparece aqui. Você pode dar o posto de mestre a outra pessoa; ela precisa recarregar a página depois.') : h('p', null, 'Você está na mesa como jogador. Só o mestre mexe no mapa, no mural e nas notas.'),
+      me,
+      FB.isGM ? h('p', null, 'Para outra pessoa assumir, toque em ', h('b', null, 'Passar o posto'), ' ao lado do nome dela: ela vira mestre e você vira jogador. ', h('b', null, 'Tornar mestre'), ' deixa vocês dois como mestres.') : h('p', null, 'Você está na mesa como jogador. Só o mestre mexe no mapa, no mural e nas notas.'),
       FB.isGM ? list : null,
+      FB.isGM ? leave : null,
+      FB.isGM ? h('p', { class: 'hint', style: { margin: '0' } }, 'Se não sobrar nenhum mestre, a próxima pessoa que entrar no site pode assumir a mesa.') : null,
       h('div', { class: 'acts' }, DISCORD ? h('a', { class: 'btn', href: DISCORD, target: '_blank', rel: 'noopener', style: { marginRight: 'auto', textDecoration: 'none' } }, 'Discord da mesa') : null, h('button', { class: 'btn ghost', type: 'button', onclick: async () => { await auth.signOut(); } }, 'Sair da conta'), h('button', { class: 'btn primary', type: 'button', onclick: () => close() }, 'Fechar')));
     if (!FB.isGM) return;
     const draw = async () => {
       const [us, ms] = await Promise.all([rtdb.ref('users').once('value'), rtdb.ref('mesa/mestres').once('value')]);
       const users = us.val() || {}, mest = ms.val() || {};
-      list.replaceChildren(...Object.entries(users).sort((a, b) => (b[1].visto || 0) - (a[1].visto || 0)).map(([uid, x]) => {
-        const isM = mest[uid] === true, me = uid === u.uid;
+      const rows = Object.entries(users).filter(([uid]) => uid !== u.uid).sort((a, b) => (b[1].visto || 0) - (a[1].visto || 0));
+      if (!rows.length) { list.replaceChildren(h('p', { class: 'hint', style: { margin: '0' } }, 'Ninguém mais entrou na mesa ainda. Quando os jogadores fizerem login, eles aparecem aqui.')); return; }
+      const act = (label, cls, fn) => h('button', { class: 'btn sm' + cls, type: 'button', onclick: async e => { e.currentTarget.disabled = true; try { await fn(); } catch (err) { UI.toast('Não foi possível mudar o mestre agora.', 'err'); } draw(); } }, label);
+      list.replaceChildren(...rows.map(([uid, x]) => {
+        const isM = mest[uid] === true;
         return h('div', { class: 'acc-row' }, x.foto ? h('img', { src: x.foto, alt: '' }) : h('span', { class: 'ph' }),
-          h('span', { class: 'nm' }, x.nome || 'Sem nome', h('small', null, (isM ? 'Mestre' : 'Jogador') + (me ? ' · você' : ''))),
-          me && Object.keys(mest).length < 2 ? null : h('button', { class: 'btn sm' + (isM ? ' danger' : ''), type: 'button', onclick: async () => {
-            try { if (isM) await rtdb.ref('mesa/mestres/' + uid).remove(); else await rtdb.ref('mesa/mestres/' + uid).set(true); draw(); if (me && isM) location.reload(); }
-            catch (e) { UI.toast('Não foi possível mudar o mestre agora.', 'err'); }
-          } }, isM ? (me ? 'Deixar de ser mestre' : 'Tirar de mestre') : 'Tornar mestre'));
+          h('span', { class: 'nm' }, x.nome || 'Sem nome', h('small', null, isM ? 'Mestre' : 'Jogador')),
+          isM ? act('Tirar de mestre', ' danger', () => rtdb.ref('mesa/mestres/' + uid).remove())
+              : [act('Tornar mestre', '', () => rtdb.ref('mesa/mestres/' + uid).set(true)), act('Passar o posto', ' primary', () => stepDown(uid))]);
       }));
     };
     draw();

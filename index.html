@@ -5751,6 +5751,7 @@ function pickMode(mode) {
     UI.toast('Você é mestre só neste navegador: nada do que fizer aqui vai para a mesa salva.');
   }
   setViewMode(mode);
+  if (mode === 'players' && ROLE === 'gm' && window.APOGEU_FB?.ready) UI.toast('Esta é só a visão dos jogadores: você continua mestre. Para virar jogador de verdade, toque em Conta e depois em Deixar de ser mestre.');
 }
 function setViewMode(mode) {
   if (mode === 'players' && VIEWMODE === 'gm') { GM_BACK = { cur: CUR, trail: TRAIL.slice(), view: { x: View.x, y: View.y, z: View.z } }; SS.set('gmBack', GM_BACK); }
