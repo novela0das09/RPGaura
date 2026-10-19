@@ -570,6 +570,8 @@ textarea.notes:focus { border-color: var(--lamp); }
 .mu-types button.on { background: var(--lamp); color: var(--lamp-ink); }
 @media (max-width: 760px) { .mu-dwrap { grid-template-columns: minmax(0, 1fr); } .mu-poster { max-width: 340px; justify-self: center; width: 100%; } .mu-detail { padding: 16px 12px; } .mu-dclose { right: 0; top: 0; } }
 
+.sh-locked { display: flex; gap: 12px; align-items: flex-start; text-align: left; max-width: 62ch; margin-top: 14px; }
+.sh-locked svg { width: 20px; height: 20px; flex: none; color: var(--lamp); margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -5864,6 +5866,14 @@ function blankSheet() {
     rolls: [], token: '', criado: Date.now(), upd: Date.now(),
   };
 }
+/* parte pública da ficha (todos veem) e parte privada (só o dono e o mestre) */
+const PUB_KEYS = ['nome', 'idade', 'conceito', 'jogador', 'aparencia', 'retrato', 'cor', 'token', 'criado', 'upd'];
+function splitSheet(s) {
+  const pub = {}, priv = {};
+  for (const [k, v] of Object.entries(s)) { if (k[0] === '_') continue; (PUB_KEYS.includes(k) ? pub : priv)[k] = v; }
+  return [pub, priv];
+}
+const hasPrivKeys = d => !!d && Object.keys(d).some(k => k[0] !== '_' && !PUB_KEYS.includes(k));
 function normSheet(d) {
   const b = blankSheet();
   if (!d || typeof d !== 'object') return b;
@@ -5896,24 +5906,56 @@ const Sheets = {
   db: null, data: {}, cur: null, open: false, ready: false, built: null,
   timers: {}, inflight: new Set(), opt: { mode: 'norm', rp: 0, dt: 0 }, armed: null,
   canWrite(id = this.cur) { if (ROLE === 'gm' && Store.writable) return true; return !!(PLAYER_CAN && ME && id && id === ME); },
+  pub: {}, priv: {},
+  /* junta a parte pública com a privada (quando esta tela pode ler a privada) */
+  merge(id) {
+    const p = this.pub[id], q = this.priv[id];
+    if (!p && !q) { delete this.data[id]; return; }
+    const pubOnly = {}; for (const k of PUB_KEYS) if (p && p[k] !== undefined) pubOnly[k] = p[k];
+    const sh = normSheet(Object.assign({}, p || {}, q || {}, pubOnly));
+    sh._full = !!q;
+    this.data[id] = sh;
+  },
+  limited(id = this.cur) { const sh = this.data[id]; return !!(sh && this.db && !sh._full && !this.canWrite(id)); },
+  /* fichas antigas guardavam tudo na parte pública: reescreve separando */
+  migrate() {
+    for (const [id, p] of Object.entries(this.pub)) if (hasPrivKeys(p) && this.canWrite(id) && this.data[id]) { this.data[id]._full = true; this.save(id, 0); }
+  },
   init(db) {
     this.db = db;
     if (db) {
-      const listen = () => db.collection('fichas').onSnapshot(snap => {
-        for (const ch of snap.docChanges()) {
-          const id = ch.doc.id;
-          if (this.timers[id] || this.inflight.has(id)) continue;
-          if (ch.type === 'removed') delete this.data[id];
-          else this.data[id] = normSheet(clone(ch.doc.data()));
+      let gotPub = false, gotPriv = false;
+      const skip = id => this.timers[id] || this.inflight.has(id);
+      const done = () => {
+        if (gotPub && gotPriv && !this.ready) {
+          this.ready = true; this.migrate();
+          if (PLAYER_CAN && ME && !this.data[ME]) setTimeout(() => UI.toast('Bem-vindo à mesa! Toque em Fichas, no canto de cima, para criar a sua.'), 900);
         }
-        if (!this.ready && PLAYER_CAN && ME && !this.data[ME]) setTimeout(() => UI.toast('Bem-vindo à mesa! Toque em Fichas, no canto de cima, para criar a sua.'), 900);
-        this.ready = true; this.refresh();
-      }, err => {
-        console.warn('fichas: assinatura encerrada', err?.code);
-        if (err?.code === 'unavailable') setTimeout(listen, 3000);
-        else { this.ready = true; this.refresh(); }
-      });
-      listen();
+        this.refresh();
+      };
+      const watchCol = (col, bag, flag) => {
+        const listen = () => db.collection(col).onSnapshot(snap => {
+          for (const ch of snap.docChanges()) {
+            const id = ch.doc.id; if (skip(id)) continue;
+            if (ch.type === 'removed') delete bag[id]; else bag[id] = clone(ch.doc.data());
+            this.merge(id);
+          }
+          flag(); done();
+        }, err => {
+          console.warn('fichas: assinatura encerrada', col, err?.code);
+          if (err?.code === 'unavailable') setTimeout(listen, 3000); else { flag(); done(); }
+        });
+        listen();
+      };
+      watchCol('fichas', this.pub, () => { gotPub = true; });
+      if (ROLE === 'gm') watchCol('fichas_priv', this.priv, () => { gotPriv = true; });
+      else if (ME && typeof db.doc('fichas_priv/' + ME).onSnapshot === 'function') {
+        const listen = () => db.doc('fichas_priv/' + ME).onSnapshot(d => {
+          if (!skip(ME)) { if (d.exists) this.priv[ME] = clone(d.data()); else delete this.priv[ME]; this.merge(ME); }
+          gotPriv = true; done();
+        }, err => { if (err?.code === 'unavailable') setTimeout(listen, 3000); else { gotPriv = true; done(); } });
+        listen();
+      } else gotPriv = true;
     } else {
       const saved = LS.get('fichas.v1', {});
       if (saved && typeof saved === 'object') for (const id of Object.keys(saved)) this.data[id] = normSheet(saved[id]);
@@ -5932,7 +5974,17 @@ const Sheets = {
     delete this.timers[id];
     const s = this.data[id];
     this.inflight.add(id); UI.saving(true);
-    try { if (s) await this.db.doc('fichas/' + id).set(clone(s)); else await this.db.doc('fichas/' + id).delete(); }
+    try {
+      if (s) {
+        const [pub, priv] = splitSheet(clone(s));
+        await this.db.doc('fichas_priv/' + id).set(priv);
+        await this.db.doc('fichas/' + id).set(pub);
+        this.pub[id] = pub; this.priv[id] = priv; s._full = true;
+      } else {
+        delete this.pub[id]; delete this.priv[id];
+        await Promise.all([this.db.doc('fichas_priv/' + id).delete(), this.db.doc('fichas/' + id).delete()]);
+      }
+    }
     catch (e) {
       const code = e?.code || 'unavailable';
       if (code === 'unavailable' || code === 'resource_exhausted') { this.inflight.delete(id); this.timers[id] = setTimeout(() => this.flush(id), 2500); return; }
@@ -5978,23 +6030,26 @@ const Sheets = {
   renderList() {
     const list = this.sorted(), cw = ROLE === 'gm' && Store.writable, canMine = !cw && PLAYER_CAN && ME && !this.data[ME];
     const cards = list.map(([id, s]) => {
+      const lim = this.limited(id);
       const vm = vidaMax(s), va = vidaAt(s), st = stageOf(s.estresse);
       const chips = [];
-      if (s.estresse < 8) chips.push(`<span class="sh-chip" style="--c:${st.c}">${esc(st.name)}</span>`);
-      if (va === 0) chips.push('<span class="sh-chip" style="--c:#de6b58">Agonia</span>');
-      else if (s.sangrando) chips.push('<span class="sh-chip" style="--c:#de6b58">Sangrando</span>');
+      if (lim) { /* ficha de outro jogador: só o básico */ }
+      else if (s.estresse < 8) chips.push(`<span class="sh-chip" style="--c:${st.c}">${esc(st.name)}</span>`);
+      if (!lim && va === 0) chips.push('<span class="sh-chip" style="--c:#de6b58">Agonia</span>');
+      else if (!lim && s.sangrando) chips.push('<span class="sh-chip" style="--c:#de6b58">Sangrando</span>');
       const sub = [String(s.idade || '').trim() && (/^\d+$/.test(String(s.idade).trim()) ? s.idade + ' anos' : s.idade), s.conceito, s.jogador && 'jogador: ' + s.jogador].filter(Boolean).join(' · ') || 'Ficha em branco';
       return `<button type="button" class="sh-pc${id === this.cur ? ' cur' : ''}" data-open="${esc(id)}">
         <span class="sh-av" style="--c:${esc(s.cor || '#4fa3a5')}">${s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome || '?'))}</span>
         <span style="min-width:0"><span class="nm">${esc(s.nome || 'Persona sem nome')}</span><span class="sub">${id === ME ? '<b style="color:var(--lamp)">sua ficha</b> · ' : ''}${esc(sub)}</span>
-          <span class="sh-mini"><span>Vida</span><span class="sh-mbar"><b style="width:${vm ? (va / vm) * 100 : 0}%;--c:#4fa3a5"></b></span><span class="v">${va}/${vm}</span>
-          <span>Estresse</span><span class="sh-mbar"><b style="width:${(s.estresse / s.estresseMax) * 100}%;--c:${st.c}"></b></span><span class="v">${s.estresse}/${s.estresseMax}</span></span>
+          ${lim ? '' : `<span class="sh-mini"><span>Vida</span><span class="sh-mbar"><b style="width:${vm ? (va / vm) * 100 : 0}%;--c:#4fa3a5"></b></span><span class="v">${va}/${vm}</span>
+          <span>Estresse</span><span class="sh-mbar"><b style="width:${(s.estresse / s.estresseMax) * 100}%;--c:${st.c}"></b></span><span class="v">${s.estresse}/${s.estresseMax}</span></span>`}
           ${chips.length ? `<span class="sh-chips">${chips.join('')}</span>` : ''}</span></button>`;
     }).join('');
     const rolls = [];
-    for (const [, s] of list) for (const r of s.rolls || []) rolls.push(Object.assign({ who: firstName(s) }, r));
+    const full = list.filter(([id]) => !this.limited(id));
+    for (const [, s] of full) for (const r of s.rolls || []) rolls.push(Object.assign({ who: firstName(s) }, r));
     rolls.sort((a, b) => (b.t || 0) - (a.t || 0));
-    const places = list.filter(([, s]) => String(s.localNome || '').trim() || String(s.localMisterio || '').trim());
+    const places = full.filter(([, s]) => String(s.localNome || '').trim() || String(s.localMisterio || '').trim());
     $('#sh-list').innerHTML = `
       <div class="sh-lhead"><div><div class="eyebrow">Névoa Sobre Apogeu</div><h2>Fichas</h2></div>${cw ? `<button type="button" class="btn sm primary" data-act="new">${icon('plus')}Nova</button>` : canMine ? `<button type="button" class="btn sm primary" data-act="new">${icon('plus')}Criar minha ficha</button>` : ''}</div>
       ${!cw && !PLAYER_CAN && Store.mode === 'db' ? '<p class="hint" style="margin:0">Para criar e editar a sua ficha, entre no site com a sua conta do Google.</p>' : ''}
@@ -6014,9 +6069,31 @@ const Sheets = {
       return;
     }
     const ro = !this.canWrite(), dis = ro ? 'disabled' : '';
+    this.limitedView = this.limited();
     const fld = (id, k, label, ph, extra = '') => `<label class="sh-fld" for="${id}"><span class="sh-lbl">${label}</span><input class="sh-in" id="${id}" data-k="${k}" placeholder="${ro ? '' : ph}" autocomplete="off" ${extra} ${dis}></label>`;
     const ta = (id, k, label, ph, rows = 3, hint = '') => `<label class="sh-fld" for="${id}"><span class="sh-lbl">${label}</span><textarea class="sh-ta" id="${id}" data-k="${k}" rows="${rows}" placeholder="${ro ? '—' : ph}" ${dis}></textarea>${hint ? `<span class="hint">${hint}</span>` : ''}</label>`;
     const step = (k, lbl) => ro ? '' : `<span class="sh-step"><button type="button" data-step="${k}" data-d="-1" aria-label="Diminuir ${lbl}">−</button><button type="button" data-step="${k}" data-d="1" aria-label="Aumentar ${lbl}">+</button></span>`;
+    if (this.limitedView) {
+      main.innerHTML = `
+      <div class="sh-top"><button type="button" class="btn sm ghost sh-back" data-act="back">${icon('back')}Todas as fichas</button><span class="sp"></span></div>
+      <header class="sh-head">
+        <div class="sh-pwrap"><div class="sh-portrait" id="sh-portrait"></div></div>
+        <div style="min-width:0">
+          <label class="sh-lbl" for="sh-nome">Nome completo</label>
+          <input class="sh-name" id="sh-nome" data-k="nome" maxlength="80" autocomplete="off" disabled>
+          <div class="sh-fields">
+            ${fld('sh-idade', 'idade', 'Idade', '')}
+            ${fld('sh-conc', 'conceito', 'Conceito / Ocupação', '')}
+            ${fld('sh-jog', 'jogador', 'Jogador', '')}
+          </div>
+          <div class="sh-wide">${ta('sh-apar', 'aparencia', 'Aparência e estilo', '', 3)}</div>
+        </div>
+      </header>
+      <div class="sh-empty sh-locked">${icon('lock')}<span><b>O resto desta ficha é segredo.</b> Atributos, habilidades, Vida, Estresse, rolagens e anotações ficam só com quem criou a ficha e com o mestre.</span></div>`;
+      this.fill();
+      main.scrollTop = 0; $('#sheets').scrollTop = 0;
+      return;
+    }
     const maps = allMapIds();
     main.innerHTML = `
     <div class="sh-top">
@@ -6070,7 +6147,7 @@ const Sheets = {
             <div class="nm"><b>${n}<em hidden>Destaque</em></b><span>${d}</span></div>
             ${ro ? `<output class="val" id="sh-a-${k}"></output>` : `<span class="sh-step sm"><button type="button" data-step="atr.${k}" data-d="-1" aria-label="Diminuir ${n}">−</button><output id="sh-a-${k}"></output><button type="button" data-step="atr.${k}" data-d="1" aria-label="Aumentar ${n}">+</button></span>`}
             <button type="button" class="btn sm sh-test" data-test="${k}">${icon('dice')}Testar</button></div>`).join('')}</div>
-          <p class="hint">Todo teste é 1D20 + atributo contra a DT do Mestre. 1 natural é Fracasso Crítico e 20 natural é Sucesso Perfeito. Atributo 0 não soma nada e falha nas exigências mínimas daquela área. ${ro ? '' : 'As rolagens também aparecem na tela dos jogadores.'}</p>
+          <p class="hint">Todo teste é 1D20 + atributo contra a DT do Mestre. 1 natural é Fracasso Crítico e 20 natural é Sucesso Perfeito. Atributo 0 não soma nada e falha nas exigências mínimas daquela área. ${ro ? '' : 'As rolagens desta ficha aparecem só para você e para o mestre.'}</p>
         </section>
         <section class="sh-card" id="s-pod"><h3>Poderes do Destaque<span class="aside">custos saem do Estresse atual</span></h3><div id="sh-powers"></div></section>
         <section class="sh-card" id="s-adr">
@@ -6129,6 +6206,7 @@ const Sheets = {
   },
   fill() {
     const s = this.data[this.cur]; if (!s || this.built !== this.cur) return;
+    if (this.limitedView !== this.limited()) { this.build(); return; }
     const main = $('#sh-main');
     for (const el of main.querySelectorAll('[data-k]')) {
       if (el === document.activeElement) continue;
@@ -6145,6 +6223,7 @@ const Sheets = {
     p.style.setProperty('--c', s.cor || '#4fa3a5');
     if (p.dataset.k !== want) { p.dataset.k = want; p.innerHTML = s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="Retrato de ${esc(s.nome || 'persona')}">` : esc(initials(s.nome || '?')); }
     for (const b of document.querySelectorAll('#sh-main [data-cor]')) b.classList.toggle('on', b.dataset.cor === (s.cor || TOKEN_COLORS[0]));
+    if (this.limitedView) return;
     // vida
     const vm = vidaMax(s), va = vidaAt(s);
     $('#sh-vida').innerHTML = `${va}<small> / ${vm}</small>`;
@@ -6208,7 +6287,7 @@ const Sheets = {
     // rolagens
     const rolls = (s.rolls || []).slice().reverse().slice(0, 12);
     $('#sh-log').innerHTML = rolls.length ? rolls.map(r => `<div><span class="l">${esc(r.l || 'Rolagem')}</span>${r.total != null ? `<span class="tot">${esc(r.total)}</span>` : '<span></span>'}<span class="m">${[(r.o || r.txt) ? `<span class="${r.k === 'crit' ? 'o-crit' : r.k === 'fail' ? 'o-fail' : ''}">${esc(r.o || r.txt)}</span>` : '', r.expr ? esc(r.expr) : '', fmtTime(r.t)].filter(Boolean).join(' · ')}</span></div>`).join('')
-      : `<div class="sh-empty" style="display:block">${ro ? 'Nenhuma rolagem ainda.' : 'Toque em Testar ao lado de um atributo. A rolagem fica aqui e aparece para a mesa.'}</div>`;
+      : `<div class="sh-empty" style="display:block">${ro ? 'Nenhuma rolagem ainda.' : 'Toque em Testar ao lado de um atributo. A rolagem fica aqui e aparece para o mestre.'}</div>`;
   },
 
   /* ---------- regras ---------- */
@@ -6232,9 +6311,9 @@ const Sheets = {
     const why = (firstName(s) + ' · ' + label + (outcome ? ' · ' + outcome : '')).slice(0, 60);
     const r = { id: uid('r'), expr: normExpr(expr), why, total: res.total, parts: res.parts, success: false, t: Date.now(), secret: false };
     if (ROLE === 'gm' && Store.writable) {
-      ROLLS_SEEN.add(r.id);
-      Store.put('vtt/rolls', { list: [r, ...(Store.data.vtt.rolls?.list || [])].slice(0, 20) }, 0);
-      Live.emit('roll', r);
+      ROLLS_SEEN.add(r.id); r.secret = true;
+      SECRET_ROLLS.unshift(r); SECRET_ROLLS = SECRET_ROLLS.slice(0, 30); LS.set('secretRolls', SECRET_ROLLS);
+      if (UI.tab === 'dados') UI.renderRightSoon();
     } else if (this.canWrite()) {
       ROLLS_SEEN.add(r.id);
       try { Live.bc?.postMessage({ topic: 'roll', data: r }); } catch {}
@@ -6886,7 +6965,7 @@ function wireStore() {
   });
   Live.on('fog', d => { if (!d || d.map !== CUR || Input.mode === 'fog' || Input.mode === 'fogrect') return; Fog.applyRemote(d); });
   Live.on('ping', d => { if (d && d.map === CUR && isFinite(d.x) && isFinite(d.y)) showPing(+d.x, +d.y, String(d.id || '')); });
-  Live.on('roll', d => { if (d && d.id && !ROLLS_SEEN.has(d.id)) { ROLLS_SEEN.add(d.id); UI.rollToast(sanitizeRoll(d)); if (UI.tab === 'dados') UI.renderRightSoon(); } });
+  Live.on('roll', d => { if (d && d.id && !ROLLS_SEEN.has(d.id)) { ROLLS_SEEN.add(d.id); if (ROLE === 'gm') { SECRET_ROLLS.unshift(Object.assign(sanitizeRoll(d), { secret: true })); SECRET_ROLLS = SECRET_ROLLS.slice(0, 30); LS.set('secretRolls', SECRET_ROLLS); } UI.rollToast(sanitizeRoll(d)); if (UI.tab === 'dados') UI.renderRightSoon(); } });
 }
 
 /* ---------- inicialização ---------- */

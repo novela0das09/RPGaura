@@ -13,23 +13,48 @@
     },
     "users": {
       ".read": "auth != null",
-      "$uid": { ".write": "auth != null && auth.uid === $uid" }
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
     },
     "fichas": {
       ".read": "auth != null",
-      "$id": { ".write": "auth != null && (auth.uid === $id || root.child('mesa/mestres/' + auth.uid).val() === true)" }
+      "$id": {
+        ".write": "auth != null && (auth.uid === $id || root.child('mesa/mestres/' + auth.uid).val() === true)"
+      }
+    },
+    "fichas_priv": {
+      ".read": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true",
+      "$id": {
+        ".read": "auth != null && (auth.uid === $id || root.child('mesa/mestres/' + auth.uid).val() === true)",
+        ".write": "auth != null && (auth.uid === $id || root.child('mesa/mestres/' + auth.uid).val() === true)"
+      }
     },
     "live": {
-      ".read": "auth != null",
-      "$topic": { ".write": "auth != null && ($topic === 'roll' || root.child('mesa/mestres/' + auth.uid).val() === true)" }
+      "$topic": {
+        ".read": "auth != null && ($topic !== 'roll' || root.child('mesa/mestres/' + auth.uid).val() === true)",
+        ".write": "auth != null && ($topic === 'roll' || root.child('mesa/mestres/' + auth.uid).val() === true)"
+      }
     },
     "secret": {
       ".read": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true",
       ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
     },
-    "maps":   { ".read": "auth != null", ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true" },
-    "tokens": { ".read": "auth != null", ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true" },
-    "vtt":    { ".read": "auth != null", ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true" },
-    "mural":  { ".read": "auth != null", ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true" }
+    "maps": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
+    },
+    "tokens": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
+    },
+    "vtt": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
+    },
+    "mural": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
+    }
   }
 }

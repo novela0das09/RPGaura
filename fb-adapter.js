@@ -86,6 +86,11 @@
       return {
         set: v => ref.set(pack(v)).catch(e => { throw errOf(e); }),
         delete: () => ref.remove().catch(e => { throw errOf(e); }),
+        onSnapshot(next, onErr) {
+          let dead = false;
+          const cb = ref.on('value', s => { if (!dead) next({ id: s.key, exists: s.exists(), data: () => (s.exists() ? unpack(s.val()) : undefined) }); }, e => { if (dead) return; dead = true; if (onErr) onErr(errOf(e)); });
+          return () => { dead = true; ref.off('value', cb); };
+        },
         get: () => ref.once('value').then(s => ({ id: s.key, exists: s.exists(), data: () => (s.exists() ? unpack(s.val()) : undefined) })),
       };
     },
