@@ -7,7 +7,8 @@
   'use strict';
   const CFG = window.APOGEU_FIREBASE || null;
   const ready = !!(CFG && CFG.apiKey && CFG.databaseURL && typeof firebase !== 'undefined' && !/COLE|SEU_/i.test(CFG.apiKey));
-  const FB = (window.APOGEU_FB = { ready, user: null, isGM: false, mestres: {} });
+  const DISCORD = /^https:\/\/(discord\.gg|discord\.com\/invite)\/[\w-]+$/.test(window.APOGEU_DISCORD || '') ? window.APOGEU_DISCORD : '';
+  const FB = (window.APOGEU_FB = { ready, user: null, isGM: false, mestres: {}, discord: DISCORD });
 
   /* ---------- tela de entrada ---------- */
   const css = `
@@ -16,7 +17,7 @@
   .gate-ov{font:600 11px/1 "Barlow",sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#e9b45a}
   .gate h1{margin:0;font:600 clamp(40px,9vw,58px)/1 "Cormorant Garamond",Georgia,serif;color:#f4ecd8;text-wrap:balance}
   .gate p{margin:0;color:#9fb0b3;max-width:38ch}
-  .gate-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 20px;border-radius:10px;border:1px solid rgba(196,214,216,.22);background:#1a2a2f;color:#d3dcdd;font:600 15px "Barlow",sans-serif;cursor:pointer;width:100%}
+  .gate-btn{text-decoration:none;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 20px;border-radius:10px;border:1px solid rgba(196,214,216,.22);background:#1a2a2f;color:#d3dcdd;font:600 15px "Barlow",sans-serif;cursor:pointer;width:100%}
   .gate-btn:hover{background:#22353b}
   .gate-btn.primary{background:#e9b45a;border-color:#e9b45a;color:#2a1c06}
   .gate-btn.primary:hover{background:#f3cd85}
@@ -31,10 +32,13 @@
   .acc-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:#111b1f;border:1px solid rgba(196,214,216,.13)}
   .acc-row img,.acc-row .ph{width:30px;height:30px;border-radius:50%;flex:none;background:#22353b}
   .acc-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  @media (max-width:520px){.pl-mode .pl-ic span{display:none}.pl-mode .pl-ic{padding:0 10px}}
   .acc-row .nm small{display:block;font-weight:400;color:#6f8387;font-size:12px}`;
   function addCss() { if (document.getElementById('gate-css')) return; const s = document.createElement('style'); s.id = 'gate-css'; s.textContent = css; document.head.appendChild(s); }
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const GOOGLE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.3-1.6 3.9-5.4 3.9-3.3 0-5.9-2.7-5.9-6s2.6-6 5.9-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6H12z"/></svg>';
+  const CHAT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/><path d="M9 12h.01M12 12h.01M15 12h.01"/></svg>';
+  const discordBtn = () => (DISCORD ? `<a class="gate-btn" href="${esc(DISCORD)}" target="_blank" rel="noopener">${CHAT}Entrar no Discord da mesa</a>` : '');
   let gateEl = null;
   function gate(html) {
     addCss();
@@ -128,7 +132,7 @@
   }
   function showLogin(start, err) {
     const g = gate(`<p>Entre com a sua conta do Google para abrir o mapa, as fichas e o mural da mesa.</p>
-      <div class="gate-row"><button class="gate-btn primary" type="button" id="g-in">${GOOGLE}Entrar com Google</button></div>
+      <div class="gate-row"><button class="gate-btn primary" type="button" id="g-in">${GOOGLE}Entrar com Google</button>${discordBtn()}</div>
       ${err ? `<p class="gate-err">${esc(friendly(err))}</p>` : ''}
       <p class="gate-small">O Google só informa seu nome e foto para a mesa.</p>`);
     g.querySelector('#g-in').onclick = async () => {
@@ -151,7 +155,7 @@
     const u = FB.user;
     const g = gate(`<div class="gate-who">${u.photoURL ? `<img src="${esc(u.photoURL)}" alt="">` : ''}${esc(u.displayName || u.email)}</div>
       <p>Esta mesa ainda não tem mestre. Quem vai narrar a campanha toca no primeiro botão; os jogadores entram pelo segundo.</p>
-      <div class="gate-row"><button class="gate-btn primary" type="button" id="g-gm">Eu sou o mestre desta mesa</button><button class="gate-btn" type="button" id="g-pl">Sou jogador</button></div>
+      <div class="gate-row"><button class="gate-btn primary" type="button" id="g-gm">Eu sou o mestre desta mesa</button><button class="gate-btn" type="button" id="g-pl">Sou jogador</button>${discordBtn()}</div>
       <p class="gate-small">O mestre pode passar o posto para outra pessoa depois, no botão de conta.</p>`);
     g.querySelector('#g-gm').onclick = async () => {
       try { await rtdb.ref('mesa/mestres/' + u.uid).set(true); FB.isGM = true; FB.mestres = { [u.uid]: true }; go(start); }
@@ -174,7 +178,7 @@
       FB.isGM ? null : h('div', { class: 'acc-row' }, u.photoURL ? h('img', { src: u.photoURL, alt: '' }) : h('span', { class: 'ph' }), h('span', { class: 'nm' }, u.displayName || u.email, h('small', null, (FB.isGM ? 'Mestre' : 'Jogador') + ' · ' + (u.email || '')))),
       FB.isGM ? h('p', null, 'Quem já entrou na mesa aparece aqui. Você pode dar o posto de mestre a outra pessoa; ela precisa recarregar a página depois.') : h('p', null, 'Você está na mesa como jogador. Só o mestre mexe no mapa, no mural e nas notas.'),
       FB.isGM ? list : null,
-      h('div', { class: 'acts' }, h('button', { class: 'btn ghost', type: 'button', onclick: async () => { await auth.signOut(); } }, 'Sair da conta'), h('button', { class: 'btn primary', type: 'button', onclick: () => close() }, 'Fechar')));
+      h('div', { class: 'acts' }, DISCORD ? h('a', { class: 'btn', href: DISCORD, target: '_blank', rel: 'noopener', style: { marginRight: 'auto', textDecoration: 'none' } }, 'Discord da mesa') : null, h('button', { class: 'btn ghost', type: 'button', onclick: async () => { await auth.signOut(); } }, 'Sair da conta'), h('button', { class: 'btn primary', type: 'button', onclick: () => close() }, 'Fechar')));
     if (!FB.isGM) return;
     const draw = async () => {
       const [us, ms] = await Promise.all([rtdb.ref('users').once('value'), rtdb.ref('mesa/mestres').once('value')]);

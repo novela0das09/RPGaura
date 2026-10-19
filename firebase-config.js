@@ -9,3 +9,6 @@ window.APOGEU_FIREBASE = {
   messagingSenderId: "289819921401",
   appId: "1:289819921401:web:2a859a6c743e2202ff0b28"
 };
+
+/* Convite do servidor do Discord da mesa (aparece como botão no site). Deixe "" para esconder. */
+window.APOGEU_DISCORD = "https://discord.gg/UQPBxQJGQ";
