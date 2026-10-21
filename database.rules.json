@@ -55,6 +55,14 @@
     "mural": {
       ".read": "auth != null",
       ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
+    },
+    "sons": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
+    },
+    "sons_arq": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
     }
   }
 }

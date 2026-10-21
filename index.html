@@ -572,6 +572,45 @@ textarea.notes:focus { border-color: var(--lamp); }
 
 .sh-locked { display: flex; gap: 12px; align-items: flex-start; text-align: left; max-width: 62ch; margin-top: 14px; }
 .sh-locked svg { width: 20px; height: 20px; flex: none; color: var(--lamp); margin-top: 2px; }
+/* ---------- sons ---------- */
+#som-host { position: fixed; right: 0; bottom: 0; width: 200px; height: 200px; overflow: hidden; opacity: 0.01; pointer-events: none; z-index: -1; }
+#som-host > div { position: absolute; inset: 0; }
+.som-pill { position: absolute; left: 50%; top: 64px; transform: translateX(-50%); z-index: 16; box-shadow: var(--shadow); height: 38px; padding: 0 16px; border-radius: 999px; animation: somPulse 2.4s ease-in-out infinite; }
+.som-pill svg { width: 18px; height: 18px; }
+@keyframes somPulse { 50% { box-shadow: 0 0 0 6px rgba(233, 180, 90, 0.18), var(--shadow); } }
+@media (prefers-reduced-motion: reduce) { .som-pill { animation: none; } }
+.som-pads { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+.som-pad { --c: var(--lamp); position: relative; border-radius: 10px; border: 1px solid var(--line-2); background: var(--panel-2); overflow: hidden; }
+.som-pad.amb { --c: var(--sea); }
+.som-pad[style*="--c"] { }
+.som-pad::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--c); opacity: 0.9; }
+.som-hit { all: unset; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%; min-height: 72px; padding: 9px 30px 9px 12px; cursor: pointer; }
+.som-hit:hover { background: var(--panel-3); }
+.som-hit:focus-visible { outline: 2px solid var(--lamp); outline-offset: -2px; }
+.som-ic { color: var(--c); display: inline-flex; }
+.som-ic svg { width: 16px; height: 16px; }
+.som-nm { font-weight: 600; font-size: 13px; color: var(--mist); line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.som-sub { font-size: 11px; color: var(--mist-3); }
+.som-pad.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 14%, var(--panel-2)); }
+.som-pad.on .som-ic { animation: somBlink 1.6s ease-in-out infinite; }
+@keyframes somBlink { 50% { opacity: 0.45; } }
+.som-ed { all: unset; position: absolute; right: 4px; top: 4px; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 6px; color: var(--mist-3); cursor: pointer; }
+.som-ed:hover, .som-ed:focus-visible { color: var(--mist); background: var(--panel-3); }
+.som-ed svg { width: 14px; height: 14px; }
+.som-now { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--ink-2); }
+.som-now-h, .som-rule-h { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.som-now-h b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.som-now-h .sp, .som-rule-h .sp { flex: 1; }
+.som-tag { font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; color: var(--sea); border: 1px solid color-mix(in srgb, var(--sea) 45%, transparent); padding: 1px 6px; border-radius: 999px; white-space: nowrap; }
+.som-rule { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--ink-2); }
+.som-rule.live { border-color: color-mix(in srgb, var(--sea) 55%, transparent); }
+.som-rule.off { opacity: 0.6; }
+.som-rule-h b { font-size: 13px; }
+.som-rule-q { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.som-rule-q .inp { width: auto; flex: 1 1 120px; min-width: 0; }
+.som-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.som-chip { border: 1px solid var(--line-2); background: var(--panel-2); color: var(--mist-2); border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.som-chip.on { background: color-mix(in srgb, var(--sea) 22%, var(--panel-2)); border-color: var(--sea); color: var(--mist); }
 </style>
 </head>
 <body>
@@ -4321,11 +4360,11 @@ const KINDS = { pj: 'Jogador', npc: 'NPC', inimigo: 'Inimigo' };
 
 /* ---------- estado sincronizado ---------- */
 /* caminhos: maps/<id>, tokens/<id>, vtt/scene, vtt/rolls, secret/gm/tokens/<id>, secret/gm/notes/<id> */
-const BUCKETS = { maps: 'maps', tokens: 'tokens', vtt: 'vtt', mural: 'mural', 'secret/gm/tokens': 'htokens', 'secret/gm/notes': 'notes', 'secret/gm/mural': 'hmural' };
+const BUCKETS = { maps: 'maps', tokens: 'tokens', vtt: 'vtt', mural: 'mural', sons: 'sons', sons_arq: 'sonsarq', 'secret/gm/tokens': 'htokens', 'secret/gm/notes': 'notes', 'secret/gm/mural': 'hmural' };
 function splitPath(path) { const i = path.lastIndexOf('/'); return [BUCKETS[path.slice(0, i)], path.slice(i + 1)]; }
 const Store = {
   mode: 'local', db: null, writable: true,
-  data: { maps: {}, tokens: {}, htokens: {}, notes: {}, vtt: {}, mural: {}, hmural: {} },
+  data: { maps: {}, tokens: {}, htokens: {}, notes: {}, vtt: {}, mural: {}, hmural: {}, sons: {}, sonsarq: {} },
   subs: new Set(), dirty: new Set(), pending: new Map(), inflight: new Set(), timers: {}, bc: null,
   get(path) { const [b, k] = splitPath(path); return this.data[b]?.[k]; },
   on(fn) { this.subs.add(fn); },
@@ -4387,7 +4426,7 @@ const Store = {
   },
   initDb(db, gm) {
     this.mode = 'db'; this.db = db;
-    const cols = ['maps', 'tokens', 'vtt', 'mural'].concat(gm ? ['secret/gm/tokens', 'secret/gm/notes', 'secret/gm/mural'] : []);
+    const cols = ['maps', 'tokens', 'vtt', 'mural', 'sons'].concat(gm ? ['secret/gm/tokens', 'secret/gm/notes', 'secret/gm/mural'] : []);
     const firsts = cols.map(col => new Promise(resolve => {
       let done = false;
       const listen = () => db.collection(col).onSnapshot(snap => {
@@ -4411,7 +4450,7 @@ const Store = {
 };
 
 /* ---------- canal ao vivo (sala + abas do mesmo navegador) ---------- */
-const LIVE_TOPICS = ['ping', 'tok', 'fog', 'roll', 'cam', 'scene'];
+const LIVE_TOPICS = ['ping', 'tok', 'fog', 'roll', 'cam', 'scene', 'sfx'];
 const Live = {
   room: null, bc: null, handlers: {},
   init(room) {
@@ -5211,6 +5250,7 @@ function onKey(e) {
   if (VIEWMODE !== 'gm') return;
   const map = { v: 'move', r: 'fog-reveal', c: 'fog-hide', m: 'measure', p: 'ping', a: 'areas', l: 'light' };
   if (map[k]) { setTool(map[k]); e.preventDefault(); return; }
+  if (/^[1-9]$/.test(k) && ROLE === 'gm') { const s = somList()[+k - 1]; if (s) { Som.pad(s.id); e.preventDefault(); } return; }
   if (k === 'escape') { Measure.clear(); SEL_AREA = null; if (TOOL !== 'move') setTool('move'); else selectToken(null); return; }
   if (k === 'delete' || k === 'backspace') {
     if (TOOL === 'areas' && SEL_AREA) { setHotspots(WORLD_INFO.hotspots.filter(a => a.id !== SEL_AREA)); SEL_AREA = null; UI.renderSubbar(); }
@@ -5352,7 +5392,7 @@ const UI = {
     const act = document.activeElement, keep = act && pane.contains(act) && act.id ? act.id : null;
     if (keep === 'notes-ta' && UI.tab === 'notas' && pane.dataset.map === CUR) return;
     const sel = keep && typeof act.selectionStart === 'number' ? [act.selectionStart, act.selectionEnd] : null;
-    const build = { fichas: paneTokens, dados: paneDice, notas: paneNotes, mapa: paneMap }[UI.tab] || paneTokens;
+    const build = { fichas: paneTokens, dados: paneDice, notas: paneNotes, mapa: paneMap, sons: paneSons }[UI.tab] || paneTokens;
     pane.replaceChildren(...build().filter(Boolean));
     pane.dataset.map = CUR;
     if (keep) { const el = document.getElementById(keep); if (el) { el.focus({ preventScroll: true }); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch {} } }
@@ -6877,6 +6917,375 @@ const Mist = {
 
 
 /* ---------- casca da página ---------- */
+/* ==========================================================
+   Sons · soundpad do mestre (YouTube ou arquivo), ambientes que
+   repetem, efeitos de uma vez e sons automáticos por hora/mapa.
+   Tudo toca no aparelho de cada pessoa que está com a mesa aberta.
+   ========================================================== */
+ICONS.sound = '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>';
+ICONS.soundoff = '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6M22 9l-6 6"/>';
+ICONS.play = '<path d="M7 5.5v13l11-6.5z"/>';
+ICONS.stop = '<rect x="6.5" y="6.5" width="11" height="11" rx="1.5"/>';
+ICONS.repeat = '<path d="M17 3l3 3-3 3"/><path d="M4 11V9a3 3 0 0 1 3-3h13"/><path d="M7 21l-3-3 3-3"/><path d="M20 13v2a3 3 0 0 1-3 3H4"/>';
+const SOM_TIPOS = [['efeito', 'Efeito (toca 1 vez)'], ['ambiente', 'Ambiente (repete)']];
+const SOM_MAX_BYTES = 4 * 1024 * 1024;
+const SOM_FADE = 1400;
+
+function ytParse(u) {
+  u = String(u || '').trim(); if (!u) return null;
+  const secs = v => { v = String(v || ''); if (/^\d+$/.test(v)) return +v; const m = v.match(/(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/); return m ? (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0) : 0; };
+  let id = null, t = 0;
+  if (/^[\w-]{11}$/.test(u)) return { id: u, t: 0 };
+  try {
+    const x = new URL(u.includes('://') ? u : 'https://' + u), host = x.hostname.replace(/^(www|m|music)\./, '');
+    if (host === 'youtu.be') id = x.pathname.slice(1).split('/')[0];
+    else if (/(^|\.)youtube(-nocookie)?\.com$/.test(host)) id = x.searchParams.get('v') || (x.pathname.match(/\/(embed|shorts|live|v)\/([\w-]{11})/) || [])[2];
+    t = secs(x.searchParams.get('t') || x.searchParams.get('start'));
+  } catch {}
+  return id && /^[\w-]{11}$/.test(id) ? { id, t } : null;
+}
+const somList = () => Object.values(Store.data.sons || {}).filter(s => s && s.id).sort((a, b) => (a.ordem ?? a.criado ?? 0) - (b.ordem ?? b.criado ?? 0));
+const somLoops = () => Store.data.vtt.audio?.loops || {};
+const somAuto = () => Store.data.vtt.sonsauto || { on: true, regras: [] };
+const somSceneMap = () => (Store.data.vtt.scene?.map && mapExists(Store.data.vtt.scene.map) ? Store.data.vtt.scene.map : CUR);
+
+const Som = {
+  vol: clampN(LS.get('somVol', 0.8), 0, 1), mudo: !!LS.get('somMudo', false),
+  playing: new Map(), urls: new Map(), loading: new Map(), blocked: false, ytP: null,
+  active() { return navigator.userActivation ? navigator.userActivation.hasBeenActive : true; },
+  level(s, e) { return this.mudo ? 0 : clampN(e?.vol ?? s.vol ?? 0.8, 0, 1) * this.vol; },
+
+  /* ---------- fontes ---------- */
+  yt() {
+    if (window.YT?.Player) return Promise.resolve(window.YT);
+    if (!this.ytP) this.ytP = new Promise((res, rej) => {
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => { try { prev?.(); } catch {} res(window.YT); };
+      const sc = document.createElement('script'); sc.src = 'https://www.youtube.com/iframe_api'; sc.async = true;
+      sc.onerror = () => { this.ytP = null; rej(new Error('O YouTube não carregou.')); };
+      document.head.appendChild(sc);
+    });
+    return this.ytP;
+  },
+  async fileUrl(id) {
+    if (this.urls.has(id)) return this.urls.get(id);
+    if (this.loading.has(id)) return this.loading.get(id);
+    const p = (async () => {
+      let d = Store.data.sonsarq?.[id];
+      if (!d && Store.mode === 'db' && Store.db?.doc) { try { const g = await Store.db.doc('sons_arq/' + id).get(); d = g?.exists ? g.data() : null; } catch {} }
+      if (!d?.data) throw new Error('O arquivo deste som não foi encontrado.');
+      const blob = await (await fetch(d.data)).blob(), url = URL.createObjectURL(blob);
+      this.urls.set(id, url); return url;
+    })();
+    this.loading.set(id, p);
+    try { return await p; } finally { this.loading.delete(id); }
+  },
+  host() {
+    let el = document.getElementById('som-host');
+    if (!el) { el = h('div', { id: 'som-host', 'aria-hidden': 'true' }); document.body.append(el); }
+    return el;
+  },
+
+  /* ---------- um tocador (arquivo ou YouTube) ---------- */
+  make(s, loop, onEnd) {
+    const P = { s, loop, cur: 0, target: 0, timer: 0, dead: false, ok: null };
+    P.apply = v => { P.cur = v; try { if (P.a) P.a.volume = clampN(v, 0, 1); if (P.y?.setVolume) P.y.setVolume(Math.round(clampN(v, 0, 1) * 100)); } catch {} };
+    P.fade = (to, ms = SOM_FADE, then) => {
+      clearInterval(P.timer); P.target = to;
+      if (ms <= 0 || REDUCED) { P.apply(to); then?.(); return; }
+      const from = P.cur, t0 = performance.now();
+      P.timer = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / ms); P.apply(from + (to - from) * k); if (k >= 1) { clearInterval(P.timer); then?.(); } }, 50);
+    };
+    P.kill = () => { if (P.dead) return; P.dead = true; clearInterval(P.timer); try { P.a?.pause(); if (P.a) P.a.src = ''; } catch {} try { P.y?.destroy(); } catch {} P.box?.remove(); };
+    P.stop = (ms = SOM_FADE) => P.fade(0, ms, () => P.kill());
+    P.resume = () => { try { if (P.a) P.a.play().then(() => { P.ok = true; }).catch(() => {}); if (P.y?.playVideo) P.y.playVideo(); } catch {} };
+    const blocked = () => { P.ok = false; Som.setBlocked(true); };
+    if (s.fonte === 'yt') {
+      P.box = h('div'); this.host().append(P.box);
+      const holder = h('div'); P.box.append(holder);
+      this.yt().then(YT => {
+        if (P.dead) return;
+        P.y = new YT.Player(holder, {
+          width: 200, height: 200, videoId: s.yt,
+          playerVars: { autoplay: 1, controls: 0, disablekb: 1, playsinline: 1, rel: 0, fs: 0, iv_load_policy: 3, start: Math.max(0, Math.floor(s.ini || 0)), origin: location.origin },
+          events: {
+            onReady: e => { if (P.dead) return; P.apply(P.cur); e.target.playVideo(); setTimeout(() => { if (!P.dead && P.y?.getPlayerState && P.y.getPlayerState() !== 1 && P.y.getPlayerState() !== 3 && !Som.active()) blocked(); }, 1500); },
+            onStateChange: e => {
+              if (P.dead) return;
+              if (e.data === 1) { P.ok = true; if (Som.blocked && Som.allOk()) Som.setBlocked(false); }
+              if (e.data === 0) { if (P.loop) { e.target.seekTo(Math.max(0, s.ini || 0), true); e.target.playVideo(); } else { P.kill(); onEnd?.(); } }
+            },
+            onError: e => { if (P.dead) return; P.kill(); onEnd?.(); if (ROLE === 'gm') UI.toast(`"${s.nome}": ${[101, 150].includes(e.data) ? 'o dono do vídeo não deixa ele tocar fora do YouTube. Tente outro link.' : 'o YouTube não conseguiu tocar este vídeo.'}`, 'err'); },
+          },
+        });
+      }).catch(err => { P.kill(); if (ROLE === 'gm') UI.toast(err.message, 'err'); });
+    } else {
+      this.fileUrl(s.id).then(url => {
+        if (P.dead) return;
+        const a = new Audio(url); a.loop = loop; a.preload = 'auto'; P.a = a; P.apply(P.cur);
+        a.addEventListener('ended', () => { if (!loop) { P.kill(); onEnd?.(); } });
+        a.play().then(() => { P.ok = true; }).catch(e => { if (e?.name === 'NotAllowedError') blocked(); });
+      }).catch(err => { P.kill(); if (ROLE === 'gm') UI.toast(`"${s.nome}": ${err.message}`, 'err'); });
+    }
+    return P;
+  },
+  allOk() { for (const P of this.playing.values()) if (P.ok === false) return false; return true; },
+  setBlocked(v) { if (this.blocked === v) return; this.blocked = v; this.renderPill(); },
+  unlock() {
+    if (!this.blocked) return;
+    this.blocked = false; this.renderPill();
+    for (const P of this.playing.values()) if (!P.dead) P.resume();
+  },
+
+  /* ---------- seguir o estado da mesa ---------- */
+  apply() {
+    const want = somLoops(), sons = Store.data.sons || {};
+    for (const [id, e] of Object.entries(want)) {
+      const s = sons[id]; if (!s || !e) continue;
+      const key = 'L:' + id, P = this.playing.get(key), v = this.level(s, e);
+      if (!P || P.dead || P.s.fonte !== s.fonte || P.s.yt !== s.yt) {
+        P?.kill();
+        const np = this.make(s, true); np.s = s; this.playing.set(key, np); np.fade(v);
+      } else { P.s = s; if (Math.abs(P.target - v) > 0.001) P.fade(v, 300); }
+    }
+    for (const [key, P] of [...this.playing]) {
+      if (!key.startsWith('L:')) continue;
+      const id = key.slice(2);
+      if (!want[id] || !sons[id]) { this.playing.delete(key); P.stop(); }
+    }
+    this.renderPill();
+  },
+  once(id, onlyHere) {
+    const s = Store.data.sons?.[id]; if (!s) return;
+    const key = 'O:' + uid(), P = this.make(s, false, () => this.playing.delete(key));
+    this.playing.set(key, P); P.apply(this.level(s));
+    const ones = [...this.playing.keys()].filter(k => k.startsWith('O:'));
+    if (ones.length > 8) { const old = this.playing.get(ones[0]); this.playing.delete(ones[0]); old?.kill(); }
+    if (!onlyHere && ROLE === 'gm' && Store.writable) Live.emit('sfx', { id, n: uid() });
+  },
+  stopOnes() { for (const [k, P] of [...this.playing]) if (k.startsWith('O:')) { this.playing.delete(k); P.stop(500); } },
+  setVol(v) { this.vol = clampN(v, 0, 1); LS.set('somVol', this.vol); this.refreshLevels(); },
+  setMudo(v) { this.mudo = !!v; LS.set('somMudo', this.mudo); this.refreshLevels(); UI.renderPlayerChrome(); },
+  refreshLevels() {
+    const want = somLoops(), sons = Store.data.sons || {};
+    for (const [key, P] of this.playing) {
+      if (P.dead) continue;
+      if (key.startsWith('L:')) { const s = sons[key.slice(2)]; if (s) P.fade(this.level(s, want[key.slice(2)]), 150); }
+      else P.apply(this.level(P.s));
+    }
+  },
+  renderPill() {
+    const b = $('#som-pill'); if (!b) return;
+    const need = this.blocked && (Object.keys(somLoops()).length || [...this.playing.keys()].some(k => k.startsWith('O:')));
+    b.hidden = !need;
+  },
+
+  /* ---------- ações do mestre (vão para todos) ---------- */
+  isLoop(id) { return !!somLoops()[id]; },
+  putLoops(fn) {
+    if (ROLE !== 'gm' || !Store.writable) return;
+    const a = clone(Store.data.vtt.audio || {}); a.loops = a.loops || {}; a.skip = a.skip || {};
+    fn(a); a.t = Date.now();
+    Store.put('vtt/audio', a, 0);
+  },
+  pad(id) {
+    const s = Store.data.sons?.[id]; if (!s) return;
+    if (s.tipo === 'ambiente') {
+      if (this.isLoop(id)) this.stopLoop(id);
+      else this.putLoops(a => { a.loops[id] = { t: Date.now() }; delete a.skip[id]; });
+    } else this.once(id);
+    if (UI.tab === 'sons') UI.renderRightSoon();
+  },
+  stopLoop(id) {
+    this.putLoops(a => { if (a.loops[id]?.auto) a.skip[id] = this.sig(); delete a.loops[id]; });
+    if (UI.tab === 'sons') UI.renderRightSoon();
+  },
+  stopAll() {
+    this.putLoops(a => { for (const [id, e] of Object.entries(a.loops)) if (e?.auto) a.skip[id] = this.sig(); a.loops = {}; });
+    this.stopOnes(); Live.emit('sfx', { stop: true, n: uid() });
+    if (UI.tab === 'sons') UI.renderRightSoon();
+  },
+  loopVol(id, v) { this.putLoops(a => { if (a.loops[id]) a.loops[id].vol = clampN(v, 0, 1); }); },
+
+  /* ---------- sons automáticos (só a tela do mestre decide) ---------- */
+  sig() { const m = somSceneMap(); return timeOf(m) + '|' + m; },
+  rulesNow() {
+    const cfg = somAuto(), m = somSceneMap(), hora = timeOf(m);
+    if (cfg.on === false) return [];
+    return (cfg.regras || []).filter(r => r && r.on !== false && (!r.hora || r.hora === hora) && (!r.mapa || r.mapa === m));
+  },
+  auto() {
+    if (ROLE !== 'gm' || !Store.writable || Store.mode === 'loading') return;
+    const sig = this.sig(), want = new Set(), sons = Store.data.sons || {};
+    for (const r of this.rulesNow()) for (const id of r.sons || []) if (sons[id]) want.add(id);
+    const cur = Store.data.vtt.audio || {}, loops = cur.loops || {}, skip = cur.skip || {};
+    let changed = false;
+    const next = clone(loops), nskip = {};
+    for (const [id, s] of Object.entries(skip)) if (s === sig && want.has(id)) nskip[id] = s; // pulado à mão: só volta quando a hora ou o mapa mudarem
+    if (Object.keys(nskip).length !== Object.keys(skip).length) changed = true;
+    for (const [id, e] of Object.entries(next)) if (e?.auto && (!want.has(id) || nskip[id])) { delete next[id]; changed = true; }
+    for (const id of want) if (!next[id] && !nskip[id]) { next[id] = { t: Date.now(), auto: true }; changed = true; }
+    if (changed) Store.put('vtt/audio', { loops: next, skip: nskip, t: Date.now() }, 0);
+  },
+  putAuto(fn) { const c = clone(somAuto()); c.regras = c.regras || []; fn(c); Store.put('vtt/sonsauto', c, 0); },
+  remove(id) {
+    Store.put('sons/' + id, null, 0); Store.put('sons_arq/' + id, null, 0);
+    this.putLoops(a => { delete a.loops[id]; delete a.skip[id]; });
+    if ((somAuto().regras || []).some(r => (r.sons || []).includes(id))) this.putAuto(c => { for (const r of c.regras) r.sons = (r.sons || []).filter(x => x !== id); });
+    const u = this.urls.get(id); if (u) { URL.revokeObjectURL(u); this.urls.delete(id); }
+  },
+};
+Som.applySoon = rafOnce(() => Som.apply());
+/* redesenha a aba Sons sem atrapalhar quem está arrastando um volume */
+Som.paneSoon = () => { if (UI.tab !== 'sons') return; const a = document.activeElement; if (a && a.type === 'range' && $('#pane')?.contains(a)) return; UI.renderRightSoon(); };
+Som.autoSoon = (() => { let t = 0; return () => { clearTimeout(t); t = setTimeout(() => Som.auto(), 250); }; })();
+function clampN(v, a, b) { v = Number(v); return isFinite(v) ? Math.min(b, Math.max(a, v)) : a; }
+['pointerdown', 'keydown', 'touchend'].forEach(ev => addEventListener(ev, () => Som.unlock(), { capture: true, passive: true }));
+
+/* ---------- volume neste aparelho (jogadores e mestre) ---------- */
+function openSomModal() {
+  let close;
+  const pct = v => Math.round(v * 100) + '%';
+  close = modal(
+    h('h2', null, 'Som da mesa'),
+    h('p', null, 'O mestre escolhe o que toca. Aqui você ajusta só o volume deste aparelho.'),
+    rangeField('Volume', 'som-vol-m', 0, 1, 0.05, Som.vol, v => Som.setVol(v), pct),
+    kvSwitch('Silenciar tudo neste aparelho', Som.mudo, v => Som.setMudo(v), 'som-mudo-m'),
+    h('div', { class: 'acts' }, h('button', { class: 'btn primary', type: 'button', onclick: () => close() }, 'Fechar')));
+}
+
+/* ---------- aba Sons do mestre ---------- */
+function somBadge(s) { return (s.tipo === 'ambiente' ? 'Ambiente' : 'Efeito') + ' · ' + (s.fonte === 'yt' ? 'YouTube' : 'Arquivo'); }
+function paneSons() {
+  const out = [], sons = somList(), loops = somLoops(), map = somSceneMap();
+  const nf = (UI.newSom ||= { nome: '', link: '', tipo: 'efeito', file: null });
+  out.push(h('div', null, h('h2', { class: 'loc-title' }, 'Sons'), h('p', { class: 'loc-blurb' }, 'Toca no aparelho de cada pessoa que está com a mesa aberta. Cada jogador ajusta o próprio volume.')));
+  out.push(h('div', { class: 'row' },
+    h('button', { class: 'btn sm danger', type: 'button', html: icon('stop') + 'Parar tudo', onclick: () => Som.stopAll() }),
+    h('span', { class: 'sp', style: { flex: '1' } }),
+    h('button', { class: 'btn sm ghost', type: 'button', html: icon(Som.mudo ? 'soundoff' : 'sound') + (Som.mudo ? 'Mudo aqui' : 'Volume aqui'), onclick: () => openSomModal() })));
+
+  // tocando agora
+  const act = Object.entries(loops).filter(([id]) => Store.data.sons?.[id]);
+  out.push(h('h4', null, 'Tocando agora'));
+  if (!act.length) out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Nenhum ambiente tocando. Toque num som de Ambiente abaixo para ele ficar repetindo.'));
+  for (const [id, e] of act) {
+    const s = Store.data.sons[id], idr = 'som-lv-' + id;
+    const out2 = h('span', { class: 'saved' }, Math.round((e.vol ?? s.vol ?? 0.8) * 100) + '%');
+    out.push(h('div', { class: 'som-now' },
+      h('div', { class: 'som-now-h' }, h('b', null, s.nome), e.auto ? h('span', { class: 'som-tag' }, 'automático') : null, h('span', { class: 'sp' }), out2,
+        h('button', { class: 'iconbtn', type: 'button', title: 'Parar', 'aria-label': 'Parar ' + s.nome, html: icon('stop'), onclick: () => Som.stopLoop(id) })),
+      h('input', { type: 'range', id: idr, min: 0, max: 1, step: 0.05, value: e.vol ?? s.vol ?? 0.8, 'aria-label': 'Volume de ' + s.nome, style: { width: '100%', accentColor: 'var(--lamp)' },
+        oninput: ev => { out2.textContent = Math.round(ev.target.value * 100) + '%'; const P = Som.playing.get('L:' + id); if (P) P.fade(Som.level(s, { vol: +ev.target.value }), 80); },
+        onchange: ev => Som.loopVol(id, +ev.target.value) })));
+  }
+
+  // soundpad
+  out.push(h('h4', null, 'Soundpad', h('span', { class: 'sp' }), sons.length ? h('span', { class: 'saved' }, 'teclas 1–9') : null));
+  if (!sons.length) out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Ainda não há sons. Adicione o primeiro logo abaixo, com um link do YouTube ou um arquivo de áudio.'));
+  else out.push(h('div', { class: 'som-pads' }, sons.map((s, i) => {
+    const on = !!loops[s.id];
+    return h('div', { class: 'som-pad' + (on ? ' on' : '') + (s.tipo === 'ambiente' ? ' amb' : ''), style: s.cor ? { '--c': s.cor } : null },
+      h('button', { class: 'som-hit', type: 'button', title: s.tipo === 'ambiente' ? (on ? 'Parar para todos' : 'Tocar para todos (repete)') : 'Tocar para todos',
+        onclick: () => Som.pad(s.id) },
+        h('span', { class: 'som-ic', html: icon(on ? 'stop' : s.tipo === 'ambiente' ? 'repeat' : 'play') }),
+        h('span', { class: 'som-nm' }, s.nome),
+        h('span', { class: 'som-sub' }, (i < 9 ? (i + 1) + ' · ' : '') + somBadge(s))),
+      h('button', { class: 'som-ed', type: 'button', title: 'Editar', 'aria-label': 'Editar ' + s.nome, html: icon('edit'), onclick: () => openSomEditor(s.id) }));
+  })));
+
+  // adicionar
+  out.push(h('h4', null, 'Adicionar som'));
+  const fname = h('span', { class: 'hint' }, nf.file ? nf.file.name : 'Nenhum arquivo escolhido.');
+  const fileIn = h('input', { type: 'file', accept: 'audio/*,.mp3,.ogg,.wav,.m4a,.webm', hidden: true, onchange: e => {
+    const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+    if (f.size > SOM_MAX_BYTES) { UI.toast(`Esse arquivo tem ${(f.size / 1048576).toFixed(1)} MB. O limite é 4 MB: para músicas longas, use um link do YouTube.`, 'err'); return; }
+    nf.file = f; nf.link = ''; if (!nf.nome) nf.nome = f.name.replace(/\.[a-z0-9]+$/i, '').replace(/[-_]+/g, ' ').slice(0, 40);
+    UI.renderRight();
+  } });
+  out.push(h('label', { class: 'field', for: 'som-nome' }, h('span', null, 'Nome'), h('input', { class: 'inp', id: 'som-nome', maxlength: 40, placeholder: 'Ex.: Trovão, Chuva no telhado', value: nf.nome, oninput: e => { nf.nome = e.target.value; } })));
+  out.push(h('label', { class: 'field', for: 'som-link' }, h('span', null, 'Link do YouTube'), h('input', { class: 'inp', id: 'som-link', placeholder: 'https://youtu.be/…', value: nf.link, oninput: e => { nf.link = e.target.value; if (nf.file && e.target.value) { nf.file = null; fname.textContent = 'Nenhum arquivo escolhido.'; } } })));
+  out.push(h('div', { class: 'row' }, h('span', { class: 'hint' }, 'ou'), h('button', { class: 'btn sm', type: 'button', html: icon('upload') + 'Enviar arquivo de áudio', onclick: () => fileIn.click() }), fileIn, fname));
+  out.push(h('div', { class: 'field' }, h('span', null, 'Tipo'), seg(SOM_TIPOS, nf.tipo, v => { nf.tipo = v; UI.renderRight(); }, 'som-tipo')));
+  const add = h('button', { class: 'btn primary', type: 'button', html: icon('plus') + 'Adicionar ao soundpad' });
+  add.addEventListener('click', async () => {
+    const yt = nf.link ? ytParse(nf.link) : null;
+    if (nf.link && !yt) { UI.toast('Esse link não parece ser de um vídeo do YouTube.', 'err'); return; }
+    if (!yt && !nf.file) { UI.toast('Cole um link do YouTube ou escolha um arquivo de áudio.', 'err'); return; }
+    add.disabled = true; add.textContent = 'Adicionando…';
+    try {
+      const id = uid('s'), base = { id, nome: (nf.nome || '').trim().slice(0, 40), tipo: nf.tipo, vol: 0.8, criado: Date.now(), ordem: Date.now() };
+      if (yt) {
+        Object.assign(base, { fonte: 'yt', yt: yt.id, ini: yt.t || 0 });
+        if (!base.nome) { try { const r = await fetch('https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent('https://www.youtube.com/watch?v=' + yt.id)); if (r.ok) base.nome = String((await r.json()).title || '').slice(0, 40); } catch {} }
+        if (!base.nome) base.nome = 'Som do YouTube';
+      } else {
+        const data = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(new Error('Não deu para ler o arquivo.')); fr.readAsDataURL(nf.file); });
+        Object.assign(base, { fonte: 'arq', mime: nf.file.type || 'audio/mpeg', bytes: nf.file.size });
+        if (!base.nome) base.nome = 'Som';
+        Store.put('sons_arq/' + id, { data, mime: base.mime, bytes: base.bytes }, 0);
+      }
+      Store.put('sons/' + id, base, 0);
+      UI.newSom = { nome: '', link: '', tipo: nf.tipo, file: null };
+      UI.toast(`"${base.nome}" entrou no soundpad.`);
+    } catch (e) { UI.toast(e.message || 'Não deu para adicionar o som.', 'err'); }
+    UI.renderRight();
+  });
+  out.push(add);
+  out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Arquivos até 4 MB (mp3, ogg, wav, m4a). Para músicas longas, prefira o YouTube. Alguns vídeos não deixam tocar fora do YouTube: se um não tocar, tente outro.'));
+
+  // automáticos
+  const cfg = somAuto(), regras = cfg.regras || [], ambs = sons.filter(s => s.tipo === 'ambiente');
+  out.push(h('h4', null, 'Sons automáticos'));
+  out.push(kvSwitch('Ligados', cfg.on !== false, v => { Som.putAuto(c => { c.on = v; }); UI.renderRight(); }, 'som-auto-on'));
+  out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Tocam sozinhos conforme a hora do dia e o mapa que os jogadores estão vendo. Agora: ', h('b', null, (TIMES.find(t => t[0] === timeOf(map)) || [, ''])[1]), ' em ', h('b', null, mapName(map)), '.'));
+  const maps = allMapIds();
+  regras.forEach((r, i) => {
+    const upd = fn => { Som.putAuto(c => { const x = c.regras.find(y => y.id === r.id); if (x) fn(x); }); UI.renderRight(); };
+    const live = Som.rulesNow().some(x => x.id === r.id);
+    out.push(h('div', { class: 'som-rule' + (r.on === false ? ' off' : '') + (live ? ' live' : '') },
+      h('div', { class: 'som-rule-h' }, h('b', null, 'Regra ' + (i + 1)), live ? h('span', { class: 'som-tag' }, 'tocando agora') : null, h('span', { class: 'sp' }),
+        sw('som-r-on-' + r.id, r.on !== false, v => upd(x => { x.on = v; })),
+        h('button', { class: 'iconbtn', type: 'button', title: 'Apagar regra', 'aria-label': 'Apagar regra ' + (i + 1), html: icon('trash'), onclick: () => { Som.putAuto(c => { c.regras = c.regras.filter(y => y.id !== r.id); }); UI.renderRight(); } })),
+      h('div', { class: 'som-rule-q' },
+        h('span', { class: 'hint' }, 'Quando for'),
+        h('select', { class: 'inp', 'aria-label': 'Hora do dia', onchange: e => upd(x => { x.hora = e.target.value; }) },
+          [['', 'qualquer hora'], ...TIMES.map(([v, l]) => [v, l.toLowerCase()])].map(([v, l]) => h('option', { value: v, selected: (r.hora || '') === v || null }, l))),
+        h('span', { class: 'hint' }, 'em'),
+        h('select', { class: 'inp', 'aria-label': 'Mapa', onchange: e => upd(x => { x.mapa = e.target.value; }) },
+          [h('option', { value: '', selected: !r.mapa || null }, 'qualquer mapa'), ...maps.map(m => h('option', { value: m, selected: r.mapa === m || null }, mapName(m)))])),
+      h('span', { class: 'hint' }, 'tocar:'),
+      ambs.length ? h('div', { class: 'som-chips' }, ambs.map(s => {
+        const on = (r.sons || []).includes(s.id);
+        return h('button', { type: 'button', class: 'som-chip' + (on ? ' on' : ''), 'aria-pressed': String(on), onclick: () => upd(x => { x.sons = on ? (x.sons || []).filter(y => y !== s.id) : [...(x.sons || []), s.id]; }) }, s.nome);
+      })) : h('p', { class: 'hint', style: { margin: '0' } }, 'Adicione um som do tipo Ambiente para usar aqui.')));
+  });
+  out.push(h('button', { class: 'btn sm', type: 'button', html: icon('plus') + 'Nova regra', onclick: () => { Som.putAuto(c => { c.regras.push({ id: uid('r'), hora: 'dia', mapa: '', sons: [], on: true }); }); UI.renderRight(); } }));
+  return out;
+}
+function openSomEditor(id) {
+  const s0 = Store.data.sons?.[id]; if (!s0) return;
+  const st = clone(s0);
+  let close;
+  const pct = v => Math.round(v * 100) + '%';
+  const nome = h('input', { class: 'inp', id: 'se-nome', maxlength: 40, value: st.nome, oninput: e => { st.nome = e.target.value; } });
+  const ini = st.fonte === 'yt' ? h('label', { class: 'field', for: 'se-ini' }, h('span', null, 'Começar no segundo'), h('input', { class: 'inp', id: 'se-ini', type: 'number', min: 0, step: 1, value: st.ini || 0, style: { width: '120px' }, oninput: e => { st.ini = Math.max(0, Math.floor(+e.target.value || 0)); } })) : null;
+  const save = () => { const s = Object.assign({}, Store.data.sons?.[id] || {}, { nome: (st.nome || '').trim().slice(0, 40) || 'Som', tipo: st.tipo, vol: st.vol, ini: st.ini || 0, cor: st.cor || '' }); Store.put('sons/' + id, s, 0); if (s.tipo !== 'ambiente') Som.putLoops(a => { delete a.loops[id]; }); };
+  const colors = ['', '#e9b45a', '#4fa3a5', '#de6b58', '#8cc084', '#9b8cd9', '#d98cb3'];
+  close = modal(
+    h('h2', null, 'Editar som'),
+    h('p', { class: 'hint', style: { margin: '0' } }, somBadge(s0) + (s0.fonte === 'yt' ? ' · youtu.be/' + s0.yt : s0.bytes ? ` · ${(s0.bytes / 1048576).toFixed(1)} MB` : '')),
+    h('label', { class: 'field', for: 'se-nome' }, h('span', null, 'Nome'), nome),
+    h('div', { class: 'field' }, h('span', null, 'Tipo'), seg(SOM_TIPOS, st.tipo, v => { st.tipo = v; document.querySelectorAll('#se-tipo button').forEach((b, i) => b.classList.toggle('on', SOM_TIPOS[i][0] === v)); }, 'se-tipo')),
+    rangeField('Volume para todos', 'se-vol', 0, 1, 0.05, st.vol ?? 0.8, v => { st.vol = v; }, pct),
+    ini,
+    h('div', { class: 'field' }, h('span', null, 'Cor do botão'), h('div', { class: 'swatches', role: 'group', 'aria-label': 'Cor do botão' }, colors.map(c => h('button', { type: 'button', class: 'swatch' + ((st.cor || '') === c ? ' on' : ''), style: { '--c': c || 'var(--panel-3)' }, 'aria-label': c ? 'Cor ' + c : 'Sem cor', onclick: e => { st.cor = c; e.currentTarget.parentNode.querySelectorAll('.swatch').forEach(b => b.classList.toggle('on', b === e.currentTarget)); } })))),
+    h('div', { class: 'row' }, h('button', { class: 'btn sm', type: 'button', html: icon('play') + 'Ouvir só aqui', onclick: () => { const tmp = Object.assign({}, s0, st); const P = Som.make(tmp, false, () => {}); P.apply(Som.level(tmp) || 0.8); setTimeout(() => P.stop(600), 8000); } }),
+      h('span', { class: 'sp', style: { flex: '1' } }),
+      confirmButton('Apagar som', () => { Som.remove(id); close(); UI.renderRight(); })),
+    h('div', { class: 'acts' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => close() }, 'Cancelar'), h('button', { class: 'btn primary', type: 'button', onclick: () => { save(); close(); UI.renderRight(); } }, 'Salvar')));
+}
+
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
   const toolbar = h('div', { class: 'toolbar', role: 'toolbar', 'aria-label': 'Ferramentas', 'aria-orientation': 'vertical' },
@@ -6917,11 +7326,12 @@ function buildShell() {
       h('div', { class: 'titlecard', id: 'titlecard', 'aria-hidden': 'true' }, h('div', { class: 'ov' }), h('h2'), h('p')),
       h('div', { class: 'pl-title', id: 'pl-title', hidden: true }, h('div', { class: 'ov', id: 'pl-title-ov' }), h('h1', { id: 'pl-title-h' })),
       h('div', { class: 'pl-follow', id: 'pl-follow', hidden: true }, h('button', { class: 'btn primary', type: 'button', html: icon('target') + 'Seguir o mestre', onclick: () => { PL_FOLLOW = true; const sc = Store.data.vtt.scene; if (sc?.cam && sc.map === CUR) applyCamRect(sc.cam); else fitView(); UI.renderPlayerChrome(); } })),
-      h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
+      h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
+      h('button', { class: 'btn primary som-pill', id: 'som-pill', type: 'button', hidden: true, html: icon('sound') + 'Toque para ouvir os sons da mesa', onclick: () => Som.unlock() }),
       h('div', { class: 'loader', id: 'loader', hidden: true, role: 'status' }, h('i'), h('span', null, 'Carregando…')),
       h('div', { class: 'toasts', id: 'toasts', 'aria-live': 'polite' })),
     h('aside', { class: 'side side-right', 'aria-label': 'Painel do mestre' },
-      h('div', { class: 'tabs', role: 'tablist' }, [['fichas', 'Peças'], ['dados', 'Dados'], ['notas', 'Notas'], ['mapa', 'Mapa']].map(([id, label]) => h('button', { type: 'button', role: 'tab', 'data-tab': id, onclick: () => UI.setTab(id) }, label))),
+      h('div', { class: 'tabs', role: 'tablist' }, [['fichas', 'Peças'], ['dados', 'Dados'], ['notas', 'Notas'], ['mapa', 'Mapa'], ['sons', 'Sons']].map(([id, label]) => h('button', { type: 'button', role: 'tab', 'data-tab': id, onclick: () => UI.setTab(id) }, label))),
       h('div', { class: 'scroll' }, h('div', { class: 'pane', id: 'pane', role: 'tabpanel' }))),
     h('div', { class: 'drawer-back', onclick: () => UI.closeDrawers() }),
     h('section', { class: 'sheets', id: 'sheets', hidden: true, 'aria-label': 'Fichas dos personagens' }),
@@ -6934,6 +7344,7 @@ function wireStore() {
   Store.on((path, val, origin) => {
     const [b, k] = splitPath(path);
     if (b === 'maps') {
+      Som.autoSoon(); Som.paneSoon();
       if (k === CUR && WORLD_INFO) {
         const prev = WORLD_INFO; refreshWorldInfo();
         if (origin === 'remote') {
@@ -6948,10 +7359,15 @@ function wireStore() {
       if (origin === 'remote') { UI.renderRightSoon(); UI.renderLeftSoon(); }
     } else if (b === 'notes') {
       if (k === CUR && origin === 'remote' && UI.tab === 'notas') { const ta = $('#notes-ta'); if (ta && document.activeElement !== ta) ta.value = val?.text || ''; }
+    } else if (b === 'sons') {
+      Som.applySoon(); if (ROLE === 'gm') Som.autoSoon();
+      Som.paneSoon();
     } else if (b === 'mural' || b === 'hmural') {
       if (Mural.open) Mural.renderSoon();
     } else if (b === 'vtt') {
-      if (k === 'scene') onScene(val);
+      if (k === 'scene') { onScene(val); Som.autoSoon(); Som.paneSoon(); }
+      if (k === 'audio') { Som.applySoon(); Som.paneSoon(); }
+      if (k === 'sonsauto') { Som.autoSoon(); Som.paneSoon(); }
       if (k === 'rolls' && origin === 'remote') onRolls(val);
       if (k === 'mural') { if (origin === 'remote') Mural.onRemote(val); else if (Mural.open) Mural.renderHeadSoon(); }
     }
@@ -6965,6 +7381,7 @@ function wireStore() {
   });
   Live.on('fog', d => { if (!d || d.map !== CUR || Input.mode === 'fog' || Input.mode === 'fogrect') return; Fog.applyRemote(d); });
   Live.on('ping', d => { if (d && d.map === CUR && isFinite(d.x) && isFinite(d.y)) showPing(+d.x, +d.y, String(d.id || '')); });
+  Live.on('sfx', d => { if (d?.stop) Som.stopOnes(); else if (d?.id) Som.once(String(d.id), true); });
   Live.on('roll', d => { if (d && d.id && !ROLLS_SEEN.has(d.id)) { ROLLS_SEEN.add(d.id); if (ROLE === 'gm') { SECRET_ROLLS.unshift(Object.assign(sanitizeRoll(d), { secret: true })); SECRET_ROLLS = SECRET_ROLLS.slice(0, 30); LS.set('secretRolls', SECRET_ROLLS); } UI.rollToast(sanitizeRoll(d)); if (UI.tab === 'dados') UI.renderRightSoon(); } });
 }
 
@@ -7018,6 +7435,7 @@ async function boot(hot) {
     setTool(hot.tool && hot.tool !== 'areas' ? hot.tool : 'move');
   }
   UI.renderAll(); UI.renderViewSwitch();
+  Som.apply(); Som.autoSoon();
   if (hot.sheet) Sheets.show(hot.sheet === true ? null : hot.sheet);
   if (!db && hasRT) {
     const box = $('#toasts');
