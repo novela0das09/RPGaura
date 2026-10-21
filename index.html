@@ -611,6 +611,10 @@ textarea.notes:focus { border-color: var(--lamp); }
 .som-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .som-chip { border: 1px solid var(--line-2); background: var(--panel-2); color: var(--mist-2); border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
 .som-chip.on { background: color-mix(in srgb, var(--sea) 22%, var(--panel-2)); border-color: var(--sea); color: var(--mist); }
+.sh-newrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.sh-newrow .sh-lbl { width: 100%; }
+.loc.sub { padding-left: 30px; }
+.loc.sub .nm::before { content: '↳ '; color: var(--mist-3); }
 </style>
 </head>
 <body>
@@ -4168,7 +4172,7 @@ MAPS.cachoeira = {
     m.poly('gravel', [[6.4, 11], [9.8, 9.2], [10.6, 12.8], [8.6, 14.6], [5.6, 13.6]], { organic: 0.35 });
     // pedras
     [[11.6, 8, 1.1], [18.8, 7.6, 1.2], [20.4, 11.6, 0.9], [12.2, 13.4, 0.8], [9.4, 7.2, 1.3], [21.6, 7.8, 1.4], [16.6, 14.2, 0.6], [17.6, 9.8, 0.45], [13.2, 10.4, 0.35], [7.6, 9.2, 0.7], [22.4, 13.4, 0.8], [25.4, 17.4, 0.7], [20.2, 17.8, 0.6]].forEach(([x, y, r], i) => m.o('rock', x, y, { r, seed: 1200 + i, moss: true, color: '#6f6d64' }));
-    m.o('bridge', 23.2, 17.6, { w: 1.8, h: 4.2, rot: -58 });
+    m.o('bridge', 23.1, 17.6, { w: 1.8, h: 5.4, rot: 38 });
     m.path('trail', [[-1, 14.4], [3.6, 14], [6.4, 13]], 1.4, { organic: 0.3, edge: 'rgba(40,30,20,0.35)' });
     m.path('trail', [[24.8, 15.4], [27.6, 13], [31, 11.4]], 1.3, { organic: 0.3, edge: 'rgba(40,30,20,0.35)' });
     m.path('trail', [[21.4, 19.8], [20.4, 22.4], [20, 25]], 1.3, { organic: 0.3, edge: 'rgba(40,30,20,0.35)' });
@@ -4199,6 +4203,8 @@ MAPS.monumento = {
     m.o('altarstone', 14, 9.6, { w: 1.8, h: 1.1 });
     m.o('stairs', 12.75, 10.9, { w: 0.9, h: 1.3, color: '#5f5d55' });
     m.label('desce', 12.75, 11.9, { size: 0.18 });
+    m.o('stairs', 15.7, 7, { w: 1.3, h: 1.4, color: '#5f5d55', rot: 90 });
+    m.label('sobe', 15.7, 7.95, { size: 0.16 });
     for (const [x, y] of [[10.9, 6.9], [17.1, 6.9], [10.9, 13.1], [17.1, 13.1]]) m.o('pillar', x, y, { s: 0.5, color: '#8a877c' });
     m.o('rubble', 13.9, 5.6, { n: 9 }); m.o('rubble', 18.4, 10, { n: 8 }); m.o('rubble', 9.6, 9.9, { n: 8 }); m.o('rubble', 14, 14.6, { n: 6, s: 0.6 });
     m.o('roots', 18, 6, { n: 5, len: 1.8 }); m.o('roots', 10, 14, { n: 4, len: 1.6 });
@@ -4213,6 +4219,198 @@ MAPS.monumento = {
     m.trees([0, 0, 28, 22], 46, { kinds: ['dark', 'dark', 'broad', 'mango', 'dead', 'dark', 'palm'], rmin: 1, rmax: 1.9, avoid, margin: 0.2, minDist: 2 });
     m.scatter([0, 0, 28, 22], 34, { avoid, minDist: 1 }, (x, y, Rr) => m.tree(x, y, 0.35 + Rr() * 0.35, Rr() < 0.6 ? 'fern' : 'bush'));
     m.o('log', 7.4, 7.6, { w: 2, rot: -30 }); m.o('mushrooms', 7, 8.4); m.o('mushrooms', 20.6, 15.8); m.o('log', 21, 15.2, { w: 1.6, rot: 70 });
+  },
+};
+
+
+/* ==========================================================
+   Andares extras: subsolo e plataforma do monumento,
+   topo do farol e 2º andar da prefeitura
+   ========================================================== */
+PROPS.lens = function (ctx, o) { // lente de Fresnel do farol
+  const r0 = o.r ?? 1.2;
+  sh(ctx, 0.12, 0.5); circ(ctx, 0, 0, r0 * 1.08, '#4a4036'); nosh(ctx);
+  circ(ctx, 0, 0, r0 * 1.08, null, '#c9a24a', 0.06);
+  for (let i = 0; i < 6; i++) { const rr0 = r0 * (1 - i * 0.15); circ(ctx, 0, 0, rr0, i % 2 ? 'rgba(210,236,240,0.55)' : 'rgba(170,214,226,0.6)', 'rgba(255,255,255,0.55)', 0.018); }
+  for (let i = 0; i < 8; i++) { const a = (i / 8) * TAU; line(ctx, Math.cos(a) * r0 * 0.25, Math.sin(a) * r0 * 0.25, Math.cos(a) * r0, Math.sin(a) * r0, 'rgba(201,162,74,0.85)', 0.035); }
+  circ(ctx, 0, 0, r0 * 0.24, '#fff6d8', '#c9a24a', 0.03);
+  glowAt(ctx, 0, 0, r0 * 2.6, '#fff1c0', 0.35);
+};
+
+MAPS['monumento-subsolo'] = {
+  id: 'monumento-subsolo', w: 26, h: 20,
+  draw(m) {
+    m.ground('rock');
+    const S = { kind: 'ruin', t: 0.42 }, cx = 16, cy = 7.8;
+    // salão da escada
+    m.floor('ashlar', 3, 2, 6, 5);
+    m.walls([[3, 2], [9, 2], [9, 4]], S); m.walls([[9, 5.4], [9, 7], [6.6, 7]], S); m.walls([[5.4, 7], [3, 7], [3, 2]], S);
+    m.o('stairs', 6, 3.4, { w: 1.6, h: 2.2, color: '#5f5d55' });
+    m.label('sobe', 6, 4.9, { size: 0.2 });
+    m.o('rubble', 3.8, 6.2, { n: 6, s: 0.6 }); m.o('roots', 9, 2, { n: 4, len: 1.4 });
+    m.o('lantern', 8.2, 6.2);
+    // corredor até a câmara
+    m.floor('ashlarmoss', 9, 4, 4.4, 1.4);
+    m.walls([[9, 4], [13.5, 4]], S); m.walls([[9, 5.4], [12.1, 5.4]], S);
+    // câmara circular
+    m.ellipse('ashlarmoss', cx, cy, 4.6, 4.3, { layer: 'floor' });
+    const ring = (a0, a1) => m.walls(circlePts(cx, cy, 4.6, 18, a0, a1), S);
+    ring(-Math.PI * 0.68, -0.12); ring(0.16, Math.PI * 0.42); ring(Math.PI * 0.58, Math.PI * 1.17);
+    for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU + 0.5; m.o('pillar', cx + Math.cos(a) * 3.3, cy + Math.sin(a) * 3.1, { s: 0.5, color: '#7a776c' }); }
+    m.o('altarstone', cx, cy, { w: 1.9, h: 1.2 });
+    m.o('candles', cx - 1.3, cy - 0.8); m.o('candles', cx + 1.3, cy + 0.9);
+    m.o('menhir', cx, cy - 3.1, { r: 0.34, seed: 3101 });
+    m.o('roots', cx + 3.5, cy - 2.8, { n: 6, len: 2 }); m.o('mushrooms', cx - 3.1, cy + 2.6); m.o('rubble', cx + 2.8, cy + 3.2, { n: 7, s: 0.7 });
+    m.label('Câmara do Altar', cx, cy + 1.9, { size: 0.26 });
+    // passagem leste desabada
+    m.floor('ashlarmoss', 20.4, cy - 0.65, 4.6, 1.3);
+    m.walls([[20.5, cy - 0.65], [25, cy - 0.65]], S); m.walls([[20.5, cy + 0.65], [25, cy + 0.65]], S);
+    m.o('rubble', 23.6, cy, { n: 14, s: 1 }); m.o('rubble', 24.5, cy - 0.05, { n: 10, s: 0.9 });
+    m.label('desabamento', 23.2, cy + 1.3, { size: 0.18 });
+    // corredor sul e ossuário
+    m.floor('ashlar', 15.3, cy + 4.1, 1.4, 14.4 - cy - 4.1);
+    m.walls([[15.3, cy + 4.2], [15.3, 14.4]], S); m.walls([[16.7, cy + 4.2], [16.7, 14.4]], S);
+    m.floor('ruin', 11.5, 14.4, 9, 4.4);
+    m.walls([[15.3, 14.4], [11.5, 14.4], [11.5, 18.8], [20.5, 18.8], [20.5, 14.4], [16.7, 14.4]], S);
+    m.o('niches', 16, 18.4, { w: 8.2, h: 0.6 }); m.o('niches', 11.9, 16.6, { w: 3.6, h: 0.55, rot: 90 }); m.o('niches', 20.1, 16.6, { w: 3.6, h: 0.55, rot: -90 });
+    m.o('coffin', 14.4, 16.4, { rot: 90 }); m.o('coffin', 17.8, 16.4, { rot: 90 });
+    m.o('candles', 16, 15.2);
+    m.label('Ossuário', 16, 17.4, { size: 0.26 });
+    // cisterna alagada a oeste
+    m.floor('ashlar', 5.4, 7, 1.2, 2);
+    m.walls([[5.4, 7], [5.4, 9]], S); m.walls([[6.6, 7], [6.6, 9]], S);
+    m.floor('ashlarmoss', 2.4, 9, 7.6, 8.4);
+    m.water('shallow', [[3.4, 11.4], [6.2, 10.4], [9.2, 11.6], [9.2, 16.4], [6, 16.8], [3.2, 15.8]], { organic: 0.35, layer: 'floor' });
+    m.walls([[5.4, 9], [2.4, 9], [2.4, 17.4], [10, 17.4], [10, 9], [6.6, 9]], S);
+    m.o('well', 6.2, 13.6, { r: 0.6 }); m.o('rubble', 3.4, 9.8, { n: 5, s: 0.5 }); m.o('rock', 8.4, 15.6, { r: 0.4, seed: 3120, moss: true, color: '#5e5c55' });
+    m.label('Cisterna alagada', 6.2, 9.9, { size: 0.22 });
+    m.label('Subsolo do Monumento', 19.4, 1.6, { size: 0.34 });
+  },
+};
+
+MAPS['monumento-topo'] = {
+  id: 'monumento-topo', w: 24, h: 20,
+  draw(m) {
+    m.ground('forest');
+    // plataforma de pedra sobre as ruínas
+    m.floor('ashlarmoss', 5, 4, 14, 12, { ao: false });
+    m.ellipse('moss', 9, 13.6, 1.9, 1.3, { organic: 0.6, layer: 'floor' });
+    m.ellipse('moss', 16.6, 5.6, 1.6, 1, { organic: 0.6, layer: 'floor' });
+    const P = { kind: 'ruin', t: 0.36 };
+    m.walls([[5, 4], [9.4, 4]], P); m.walls([[11.2, 4], [19, 4], [19, 8.2]], P); m.walls([[19, 10.4], [19, 16], [13.6, 16]], P); m.walls([[10.8, 16], [5, 16], [5, 11.2]], P); m.walls([[5, 9], [5, 4]], P);
+    // escada que desce para as ruínas
+    m.o('stairs', 7, 6.6, { w: 1.3, h: 2, color: '#5f5d55', rot: 180 });
+    m.label('desce', 7, 8.1, { size: 0.2 });
+    // círculo de pedras gravadas e a bacia ritual
+    m.ellipse('ashlar', 12.6, 10, 2.6, 2.6, { layer: 'floor', edge: 'rgba(30,25,20,0.6)', edgeW: 0.12 });
+    m.o('font', 12.6, 10, { r: 0.75 });
+    for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU - Math.PI / 2; m.o('menhir', 12.6 + Math.cos(a) * 3.6, 10 + Math.sin(a) * 3.3, { r: 0.36, seed: 3200 + i }); }
+    m.label('Bacia ritual', 12.6, 12.9, { size: 0.22 });
+    // vestígios
+    m.o('statue', 17.2, 13.8, { s: 0.8, color: '#8a877c' });
+    m.o('rubble', 17.8, 6, { n: 8 }); m.o('rubble', 6.2, 14.6, { n: 6, s: 0.6 }); m.o('rubble', 19.4, 9.3, { n: 7 });
+    m.o('roots', 19, 16, { n: 5, len: 2 }); m.o('roots', 5, 4, { n: 4, len: 1.6 });
+    m.o('crate', 16.4, 7.4, { w: 0.6, h: 0.5 }); m.o('lantern', 15.6, 7.6);
+    m.o('telescope', 18, 11.2, { rot: 80 });
+    m.label('Plataforma do Monumento', 12, 2.9, { size: 0.32 });
+    // copas da mata em volta
+    const avoid = [[4.4, 3.4, 15.2, 13.2]];
+    m.trees([0, 0, 24, 20], 34, { kinds: ['dark', 'dark', 'broad', 'mango', 'dead', 'palm'], rmin: 1.1, rmax: 2, avoid, margin: 0.1, minDist: 2 });
+  },
+};
+
+MAPS['farol-topo'] = {
+  id: 'farol-topo', w: 20, h: 20,
+  draw(m) {
+    m.ground('sea');
+    m.poly('cliff', [[-1, 14.8], [4, 13.6], [8.6, 15.8], [13, 15], [17.4, 16.8], [21, 15.6], [21, 21], [-1, 21]], { organic: 0.6, shadow: 0.2 });
+    m.poly('grass', [[-1, 16.4], [4.6, 15.6], [9, 17.4], [13.6, 16.8], [17.8, 18.2], [21, 17.4], [21, 21], [-1, 21]], { organic: 0.5 });
+    m.waves([[-1, 14.4], [4, 13.2], [8.6, 15.4], [13, 14.6], [17.4, 16.4], [21, 15.2]], { count: 3, gap: 0.45, side: -1 });
+    // galeria externa
+    m.ellipse('concrete', 10, 9, 4.9, 4.9, { layer: 'floor', edge: 'rgba(20,20,20,0.5)', edgeW: 0.14 });
+    m.walls(circlePts(10, 9, 4.75, 48), { kind: 'rail', color: '#e8e2d6', closed: true });
+    // sala da lanterna
+    m.ellipse('plankdk', 10, 9, 3.15, 3.15, { layer: 'floor' });
+    m.walls(circlePts(10, 9, 3.2, 36, Math.PI * 0.62, Math.PI * 2.38), { kind: 'glass' });
+    m.door(10, 12.2, 'h', { w: 0.9, kind: 'metal', side: 1 });
+    m.o('lens', 10, 9, { r: 1.25 });
+    m.light(10, 9, 9, '#fff1c0');
+    m.o('spiral', 8, 10.6, { r: 0.75 });
+    m.label('desce', 8, 11.7, { size: 0.18 });
+    m.o('barrel', 12.2, 7.2, { color: '#8a3a22', s: 0.8 }); m.o('crate', 12.4, 10.6, { w: 0.6, h: 0.5 }); m.o('lantern', 8, 7.2);
+    m.label('Sala da Lanterna', 10, 6.6, { size: 0.2 });
+    m.o('telescope', 14, 5.2, { rot: 45 }); m.o('bench', 5.4, 9.6, { w: 1.2, rot: 90 });
+    m.label('Galeria', 10, 13.3, { size: 0.24 });
+    m.label('Topo do Farol', 10, 2.6, { size: 0.36 });
+    m.label('Mar', 3.4, 4, { kind: 'water' });
+  },
+};
+
+MAPS['prefeitura-2'] = {
+  id: 'prefeitura-2', w: 34, h: 22,
+  draw(m) {
+    m.ground('lawn');
+    m.fill('cobble', 0, 17.9, 34, 4.2);
+    m.fill('roofgray', 12.6, 14.5, 8.8, 2.3);
+    // pisos
+    m.floor('parquet', 2, 1.5, 10, 6.5); m.floor('concrete', 2, 8, 10, 6.5);
+    m.floor('tile', 12, 1.5, 5, 4); m.floor('marble', 17, 1.5, 2.5, 4); m.floor('concrete', 19.5, 1.5, 2.5, 4);
+    m.floor('carpet', 12, 5.5, 10, 9); m.floor('parquet', 22, 1.5, 10, 6.5); m.floor('carpetb', 22, 8, 10, 6.5);
+    // paredes
+    m.box(2, 1.5, 30, 13, { kind: 'white', t: 0.32 });
+    m.walls([[12, 1.5], [12, 14.5]]); m.walls([[22, 1.5], [22, 14.5]]);
+    m.walls([[2, 8], [12, 8]]); m.walls([[22, 8], [32, 8]]); m.walls([[12, 5.5], [22, 5.5]]);
+    m.walls([[17, 1.5], [17, 5.5]]); m.walls([[19.5, 1.5], [19.5, 5.5]]);
+    // portas
+    m.door(12, 6.8, 'v', { w: 1, side: -1 }); m.door(12, 11.2, 'v', { w: 1.1, side: -1, kind: 'metal' });
+    m.door(22, 6.8, 'v', { w: 1.1, side: 1 }); m.door(22, 11.2, 'v', { w: 1.1, side: 1 });
+    m.door(14.6, 5.5, 'h', { w: 1, side: -1 }); m.door(18.25, 5.5, 'h', { w: 1.6, kind: 'arch' }); m.door(20.75, 5.5, 'h', { w: 0.9, side: -1 });
+    m.door(17, 14.5, 'h', { w: 2, double: true, kind: 'glass', side: 1, t: 0.32 });
+    for (const x of [4.5, 8.5, 25, 29]) { m.win(x, 14.5, 'h', 2, { t: 0.32 }); m.win(x, 1.5, 'h', 2, { t: 0.32 }); }
+    m.win(14.5, 1.5, 'h', 1.4, { t: 0.32 });
+    for (const y of [4.5, 11]) { m.win(2, y, 'v', 1.8, { t: 0.32 }); m.win(32, y - 0.5, 'v', 1.8, { t: 0.32 }); }
+    // escada
+    m.o('stairs', 18.25, 3.4, { w: 2.1, h: 3.4, rot: 180 });
+    m.label('desce', 18.25, 5, { size: 0.2 });
+    // sala de reuniões
+    m.o('table', 7, 4.6, { w: 5.4, h: 1.5, color: '#4a2c18' });
+    for (const x of [5, 6.3, 7.7, 9]) { m.o('chair', x, 3.55, { color: '#2a1a14', s: 0.44 }); m.o('chair', x, 5.65, { rot: 180, color: '#2a1a14', s: 0.44 }); }
+    m.o('chair', 3.85, 4.6, { rot: -90, color: '#7a1f22', s: 0.46 });
+    m.o('board', 11.6, 4.6, { w: 2.4, rot: -90 }); m.o('plant', 2.6, 2.1); m.o('cooler', 11.4, 2.1);
+    m.label('Sala de Reuniões', 7, 7.1, { size: 0.26 });
+    // arquivo morto
+    for (const y of [9, 10.4, 11.8]) m.o('shelf', 6.6, y, { w: 7.6, h: 0.42, kind: 'boxes' });
+    m.o('filecab', 2.5, 13.6, { rot: 90 }); m.o('filecab', 2.5, 13, { rot: 90 }); m.o('safe', 11.3, 13.8);
+    m.o('crate', 9.6, 13.6, { w: 0.7, h: 0.5 }); m.o('crate', 8.8, 13.8, { w: 0.6, h: 0.5 }); m.o('lamp', 4.6, 13.6);
+    m.label('Arquivo Morto', 6.6, 13.4, { size: 0.26 });
+    // copa e depósito
+    m.o('counter', 14.5, 1.95, { w: 4.4, h: 0.6, sink: 0.8 }); m.o('fridge', 16.4, 4.8, { rot: -90 }); m.o('microwave', 12.6, 2);
+    m.tableSet(14, 4, { w: 1, h: 0.7, chairs: 2 });
+    m.label('Copa', 14.5, 5, { size: 0.22 });
+    m.o('shelf', 20.75, 1.95, { w: 2.2, h: 0.42 }); m.o('buckets', 20.2, 4.6); m.o('crate', 21.3, 4.7, { w: 0.6, h: 0.5 });
+    m.label('Depósito', 20.75, 3.4, { size: 0.2 });
+    // galeria dos ex-prefeitos
+    for (const x of [13.6, 15.6, 18.4, 20.4]) m.o('painting', x, 5.75, { w: 1.2 });
+    for (const y of [8, 10.4, 12.8]) { m.o('painting', 12.25, y, { w: 1.2, rot: 90 }); m.o('painting', 21.75, y, { w: 1.2, rot: -90 }); }
+    m.o('carpetrunner', 17, 10, { w: 1.4, h: 7.2 });
+    m.o('bench', 14.2, 10, { w: 1.6, rot: 90 }); m.o('bench', 19.8, 10, { w: 1.6, rot: -90 });
+    m.o('plant', 12.6, 14); m.o('plant', 21.4, 14);
+    m.label('Galeria dos Ex-Prefeitos', 17, 7.6, { size: 0.26 });
+    // gabinete do vice
+    m.o('desk', 27, 3.5, { w: 2.2, h: 0.9, items: 'papers', color: '#5a3a22' }); m.o('chair', 27, 2.7, { color: '#2a1a14', s: 0.46 });
+    m.o('chair', 26.3, 4.5, { rot: 180 }); m.o('chair', 27.7, 4.5, { rot: 180 });
+    m.o('shelf', 31.55, 4.6, { w: 3.6, rot: -90 }); m.o('sofa', 24.4, 7.2, { w: 2, rot: 180, color: '#4a2a22' }); m.o('plant', 22.6, 2.1);
+    m.label('Gabinete do Vice-Prefeito', 27, 6.2, { size: 0.24 });
+    // contabilidade
+    for (const [x, y] of [[24.8, 9.8], [28.4, 9.8], [24.8, 12.6], [28.4, 12.6]]) { m.o('desk', x, y, { w: 1.5, h: 0.7, items: 'papers' }); m.o('chair', x, y - 0.62, { color: '#2a2a2a' }); }
+    m.o('safe', 31.4, 13.8); m.o('filecab', 31.5, 8.7, { rot: -90 }); m.o('printer', 31.3, 11.2);
+    m.label('Tesouraria', 26.6, 11.2, { size: 0.26 });
+    // sacada sobre o pórtico
+    m.walls([[12.8, 14.6], [12.8, 16.6], [21.2, 16.6], [21.2, 14.6]], { kind: 'rail', color: '#e8e2d6' });
+    m.o('flagpole', 13.4, 16.1, { flag: 'br' }); m.o('plant', 20.6, 15.2);
+    m.label('Sacada', 17, 15.8, { size: 0.24 });
+    m.tree(1.6, 19.6, 1.4, 'palm'); m.tree(32.4, 19.6, 1.4, 'palm'); m.tree(0.8, 4, 1, 'bush'); m.tree(33.2, 5, 1, 'bush');
+    m.label('Prefeitura · 2º andar', 17, 0.75, { size: 0.3 });
   },
 };
 
@@ -4335,6 +4533,7 @@ const LOCS = [
   { id: 'praca', cat: 'centro', name: 'Praça Central', blurb: 'Chafariz, coreto, banca de jornal, carrinho de sorvete e bancos em volta da fonte.', hs: [[566, 346], [680, 346], [684, 470], [566, 470]] },
   { id: 'igreja', cat: 'centro', name: 'Igreja', blurb: 'Nave com bancos, altar, capela lateral, sacristia com alçapão, torre do sino e batistério.', hs: [[686, 348], [766, 348], [766, 430], [686, 430]] },
   { id: 'prefeitura', cat: 'centro', name: 'Prefeitura', blurb: 'Gabinete do prefeito, secretaria, arquivo, câmara municipal e a praça cívica.', hs: [[624, 166], [714, 166], [714, 252], [624, 252]] },
+  { id: 'prefeitura-2', cat: 'centro', sub: 'prefeitura', name: 'Prefeitura · 2º andar', blurb: 'Sala de reuniões, arquivo morto, galeria dos ex-prefeitos, gabinete do vice, tesouraria e a sacada sobre o pórtico.' },
   { id: 'galeria', cat: 'centro', name: 'Galeria Comercial', blurb: 'Lanchonete, lojas, lotérica, caixas 24h, escadas rolantes e estacionamento.', hs: [[730, 200], [800, 196], [888, 244], [890, 302], [812, 300], [730, 272]] },
   { id: 'escola', cat: 'centro', name: 'Escola Municipal', blurb: 'Três salas de aula, diretoria, secretaria, professores, biblioteca, quadra e refeitório.', hs: [[794, 380], [962, 380], [962, 476], [794, 476]] },
   { id: 'casa-medica', cat: 'centro', name: 'Casa da Médica', blurb: 'Casa térrea com consultório de entrada própria, escritório cheio de papéis e garagem.', hs: [[672, 496], [766, 496], [766, 566], [672, 566]] },
@@ -4349,12 +4548,29 @@ const LOCS = [
   { id: 'praia-banhistas', cat: 'praia', name: 'Praia dos banhistas', blurb: 'Calçadão de ondas, quiosque, guarda-sóis, quadra de vôlei e posto de salva-vidas.', hs: [[118, 592], [180, 644], [262, 690], [352, 722], [450, 744], [552, 752], [652, 756], [760, 760], [852, 760], [852, 800], [760, 814], [650, 810], [562, 842], [468, 842], [438, 804], [358, 784], [258, 752], [176, 708], [108, 652]] },
   { id: 'praia-surf', cat: 'praia', name: 'Praia de surfe e pesca', blurb: 'Rancho dos pescadores, canoas na areia, pico de surfe e piscinas naturais no costão.', hs: [[858, 746], [1000, 736], [1100, 742], [1196, 770], [1232, 820], [1182, 852], [1100, 846], [984, 842], [878, 812]] },
   { id: 'farol', cat: 'farol', name: 'Farol', blurb: 'Farol com escada em caracol, casa do faroleiro com sala de rádio e galpão de querosene.', hs: [[1300, 760], [1462, 760], [1462, 882], [1300, 882]] },
+  { id: 'farol-topo', cat: 'farol', sub: 'farol', name: 'Topo do Farol', blurb: 'Sala da lanterna com a lente de Fresnel e a galeria aberta sobre o mar e o costão.' },
   { id: 'entrada-floresta', cat: 'floresta', name: 'Entrada da Floresta', blurb: 'Fim da estrada, portal das trilhas, cabana do guarda-parque e a bifurcação no riacho.', hs: [[1046, 344], [1236, 344], [1236, 420], [1046, 420]] },
   { id: 'cachoeira', cat: 'floresta', name: 'Cachoeira do Véu', blurb: 'Queda d\'água do penhasco, poço fundo, prainha de cascalho e uma gruta atrás do véu.', hs: [[1338, 118], [1458, 118], [1458, 304], [1338, 304]] },
   { id: 'monumento', cat: 'floresta', name: 'Monumento', blurb: 'Ruína de pedra com câmara central, altar entalhado, escada que desce e um obelisco marcado.', hs: [[1298, 452], [1408, 452], [1408, 568], [1298, 568]] },
+  { id: 'monumento-subsolo', cat: 'floresta', sub: 'monumento', name: 'Subsolo do Monumento', blurb: 'Câmara do altar sob as ruínas, ossuário com nichos, cisterna alagada e uma passagem desabada.' },
+  { id: 'monumento-topo', cat: 'floresta', sub: 'monumento', name: 'Plataforma do Monumento', blurb: 'O alto das ruínas: círculo de pedras gravadas, uma bacia ritual e a vista sobre a mata.' },
 ];
 const LOC = Object.fromEntries(LOCS.map(l => [l.id, l]));
-const DEFAULT_HOTSPOTS = LOCS.map(l => ({ id: 'h-' + l.id, to: l.id, pts: l.hs }));
+const DEFAULT_HOTSPOTS = LOCS.filter(l => l.hs).map(l => ({ id: 'h-' + l.id, to: l.id, pts: l.hs }));
+/* escadas que ligam um andar ao outro (em quadrados do mapa) */
+const SUB_HS = (() => {
+  const a = (id, to, pts) => ({ id, to, pts: pts.map(([x, y]) => [Math.round(x * CS), Math.round(y * CS)]) });
+  const sq = (x0, y0, x1, y1) => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+  return {
+    monumento: [a('sub-monumento-desce', 'monumento-subsolo', sq(12.1, 10, 13.4, 12.2)), a('sub-monumento-sobe', 'monumento-topo', sq(14.9, 6.2, 16.5, 7.8))],
+    'monumento-subsolo': [a('sub-subsolo-sobe', 'monumento', sq(5.1, 2.2, 6.9, 4.6))],
+    'monumento-topo': [a('sub-topo-desce', 'monumento', sq(6.2, 5.5, 7.8, 7.7))],
+    farol: [a('sub-farol-sobe', 'farol-topo', sq(17.9, 8.8, 21.3, 12.2))],
+    'farol-topo': [a('sub-faroltopo-desce', 'farol', sq(7.1, 9.7, 8.9, 11.5))],
+    prefeitura: [a('sub-prefeitura-sobe', 'prefeitura-2', sq(17.1, 1.7, 19.4, 5.1))],
+    'prefeitura-2': [a('sub-prefeitura2-desce', 'prefeitura', sq(17.1, 1.7, 19.4, 5.1))],
+  };
+})();
 const TOKEN_COLORS = ['#e9b45a', '#4fa3a5', '#d0604f', '#7fb069', '#8a7fd6', '#e07ab0', '#5b8fd8', '#c98a4a', '#9fb0b3', '#2f2f2f'];
 const KINDS = { pj: 'Jogador', npc: 'NPC', inimigo: 'Inimigo' };
 
@@ -4567,7 +4783,11 @@ function mapInfo(id) {
     custom: !!d.custom, replaced: !!(d.image && base),
     labelsOn: d.labels !== false,
     outline: d.outline ?? (matchMedia('(pointer: coarse)').matches),
-    hotspots: Array.isArray(d.hotspots) ? d.hotspots : id === CITY_ID ? DEFAULT_HOTSPOTS : [],
+    hotspots: (() => {
+      const defs = (SUB_HS[id] || []).filter(x => !(Array.isArray(d.hsOff) && d.hsOff.includes(x.id)));
+      if (Array.isArray(d.hotspots)) return [...d.hotspots, ...defs.filter(x => !d.hotspots.some(y => y.id === x.id))];
+      return id === CITY_ID ? DEFAULT_HOTSPOTS : defs;
+    })(),
     fog: d.fog || null,
   };
 }
@@ -4989,7 +5209,7 @@ function drawHotspots() {
     if (a) a.pts.forEach((p, i) => svg.append(sv('circle', { class: 'handle', cx: p[0], cy: p[1], r: (7 / View.z).toFixed(2), 'data-i': i })));
   }
 }
-function setHotspots(list) { putMap(CUR, { hotspots: list }, 300); refreshWorldInfo(); drawHotspots(); }
+function setHotspots(list) { const off = (SUB_HS[CUR] || []).filter(x => !list.some(y => y.id === x.id)).map(x => x.id); putMap(CUR, { hotspots: list, hsOff: off }, 300); refreshWorldInfo(); drawHotspots(); }
 function hoverHotspot(id, ev) {
   const svg = Layers.hot, chip = $('#hoverchip');
   if (!id || TOOL !== 'move' || Input.mode) { svg.classList.remove('dimming'); chip.hidden = true; return; }
@@ -5371,7 +5591,7 @@ const UI = {
     const q = ($('#loc-search')?.value || '').trim().toLowerCase();
     const scene = Store.data.vtt.scene?.map || CITY_ID;
     const counts = {}; for (const t of allTokens()) if (t.kind === 'pj') counts[t.map] = (counts[t.map] || 0) + 1;
-    const item = id => h('button', { class: 'loc' + (id === CUR ? ' cur' : ''), onclick: () => { UI.closeDrawers(); if (id !== CUR) goTo(id); } },
+    const item = id => h('button', { class: 'loc' + (id === CUR ? ' cur' : '') + (LOC[id]?.sub ? ' sub' : ''), onclick: () => { UI.closeDrawers(); if (id !== CUR) goTo(id); } },
       h('span', { class: 'nm' }, mapName(id)),
       scene === id ? h('span', { class: 'tag', title: 'Os jogadores estão vendo este mapa' }, 'jogadores') : null,
       counts[id] ? h('span', { class: 'cnt', title: 'Fichas de jogadores neste mapa' }, String(counts[id])) : null);
@@ -5904,10 +6124,15 @@ function blankSheet() {
     trauma: '', motivacao: '', gatilho: '', itens: [], itensSorte: '', bolso: '',
     familia: '', reputacao: '', habito: '', localNome: '', localMisterio: '', localMapa: '', notas: '',
     rolls: [], token: '', criado: Date.now(), upd: Date.now(),
+    tipo: 'pj', atitude: 'neutro', visivel: false, vmax: '', ataques: '', habilidades: '', fraquezas: '', comportamento: '', notasMestre: '',
   };
 }
 /* parte pública da ficha (todos veem) e parte privada (só o dono e o mestre) */
-const PUB_KEYS = ['nome', 'idade', 'conceito', 'jogador', 'aparencia', 'retrato', 'cor', 'token', 'criado', 'upd'];
+const PUB_KEYS = ['nome', 'idade', 'conceito', 'jogador', 'aparencia', 'retrato', 'cor', 'token', 'criado', 'upd', 'tipo'];
+const isNpc = s => !!s && (s.tipo === 'npc' || s.tipo === 'inimigo');
+const NPC_TIPOS = { npc: 'NPC', inimigo: 'Inimigo' };
+const ATITUDES = [['aliado', 'Aliado', '#8cc084'], ['neutro', 'Neutro', '#9fb0b3'], ['hostil', 'Hostil', '#de6b58']];
+const atrMax = s => (isNpc(s) ? 10 : 5);
 function splitSheet(s) {
   const pub = {}, priv = {};
   for (const [k, v] of Object.entries(s)) { if (k[0] === '_') continue; (PUB_KEYS.includes(k) ? pub : priv)[k] = v; }
@@ -5919,7 +6144,8 @@ function normSheet(d) {
   if (!d || typeof d !== 'object') return b;
   const s = Object.assign(b, d);
   s.atr = Object.assign(blankSheet().atr, d.atr && typeof d.atr === 'object' ? d.atr : {});
-  for (const k of Object.keys(s.atr)) s.atr[k] = clampI(s.atr[k], 0, 5);
+  if (!['pj', 'npc', 'inimigo'].includes(s.tipo)) s.tipo = 'pj';
+  for (const k of Object.keys(s.atr)) s.atr[k] = clampI(s.atr[k], 0, atrMax(s));
   s.usos = Object.assign(blankSheet().usos, d.usos && typeof d.usos === 'object' ? d.usos : {});
   if (!Array.isArray(s.itens)) s.itens = [];
   if (!Array.isArray(s.rolls)) s.rolls = [];
@@ -5929,9 +6155,10 @@ function normSheet(d) {
   s.doses = clampI(s.doses ?? 3, 0, 9);
   return s;
 }
-const vidaMax = s => 10 + 2 * clampI(s.atr.corpo, 0, 5);
+const vidaMax = s => { const v = parseInt(s.vmax, 10); if (isNpc(s) && v > 0) return Math.min(v, 999); return 10 + 2 * clampI(s.atr.corpo, 0, 5); };
 const vidaAt = s => (s.vida == null || s.vida === '' ? vidaMax(s) : clampI(s.vida, 0, vidaMax(s)));
 const firstName = s => String(s.nome || '').trim().split(/\s+/)[0] || 'Persona';
+const shName = s => (isNpc(s) ? String(s.nome || '').trim().slice(0, 24) || NPC_TIPOS[s.tipo] : firstName(s));
 function atrCheck(s) {
   const tot = ATRS.reduce((a, [k]) => a + (s.atr[k] || 0), 0), msgs = [];
   if (!s.destaque) msgs.push('Marque a estrela do Destaque.');
@@ -6017,9 +6244,17 @@ const Sheets = {
     try {
       if (s) {
         const [pub, priv] = splitSheet(clone(s));
-        await this.db.doc('fichas_priv/' + id).set(priv);
-        await this.db.doc('fichas/' + id).set(pub);
-        this.pub[id] = pub; this.priv[id] = priv; s._full = true;
+        if (isNpc(s) && !s.visivel) {
+          const all = Object.assign({}, priv, pub);
+          await this.db.doc('fichas_priv/' + id).set(all);
+          await this.db.doc('fichas/' + id).delete();
+          delete this.pub[id]; this.priv[id] = all;
+        } else {
+          await this.db.doc('fichas_priv/' + id).set(priv);
+          await this.db.doc('fichas/' + id).set(pub);
+          this.pub[id] = pub; this.priv[id] = priv;
+        }
+        s._full = true;
       } else {
         delete this.pub[id]; delete this.priv[id];
         await Promise.all([this.db.doc('fichas_priv/' + id).delete(), this.db.doc('fichas/' + id).delete()]);
@@ -6069,8 +6304,20 @@ const Sheets = {
   /* ---------- lista ---------- */
   renderList() {
     const list = this.sorted(), cw = ROLE === 'gm' && Store.writable, canMine = !cw && PLAYER_CAN && ME && !this.data[ME];
-    const cards = list.map(([id, s]) => {
+    const cardOf = ([id, s]) => {
       const lim = this.limited(id);
+      if (isNpc(s)) {
+        const vm = vidaMax(s), va = vidaAt(s), at = ATITUDES.find(a => a[0] === s.atitude);
+        const sub = [s.conceito, !lim && at && at[1], String(s.idade || '').trim() && (/^\d+$/.test(String(s.idade).trim()) ? s.idade + ' anos' : s.idade)].filter(Boolean).join(' · ') || NPC_TIPOS[s.tipo];
+        const chips = [];
+        if (!lim && !s.visivel) chips.push('<span class="sh-chip" style="--c:#9fb0b3">Escondido dos jogadores</span>');
+        if (!lim && va === 0) chips.push('<span class="sh-chip" style="--c:#de6b58">Fora de combate</span>');
+        return `<button type="button" class="sh-pc${id === this.cur ? ' cur' : ''}" data-open="${esc(id)}">
+        <span class="sh-av" style="--c:${esc(s.cor || '#4fa3a5')}">${s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome || '?'))}</span>
+        <span style="min-width:0"><span class="nm">${esc(s.nome || (s.tipo === 'inimigo' ? 'Inimigo sem nome' : 'NPC sem nome'))}</span><span class="sub">${esc(sub)}</span>
+          ${lim ? '' : `<span class="sh-mini"><span>Vida</span><span class="sh-mbar"><b style="width:${vm ? (va / vm) * 100 : 0}%;--c:${s.tipo === 'inimigo' ? '#de6b58' : '#4fa3a5'}"></b></span><span class="v">${va}/${vm}</span></span>`}
+          ${chips.length ? `<span class="sh-chips">${chips.join('')}</span>` : ''}</span></button>`;
+      }
       const vm = vidaMax(s), va = vidaAt(s), st = stageOf(s.estresse);
       const chips = [];
       if (lim) { /* ficha de outro jogador: só o básico */ }
@@ -6084,17 +6331,20 @@ const Sheets = {
           ${lim ? '' : `<span class="sh-mini"><span>Vida</span><span class="sh-mbar"><b style="width:${vm ? (va / vm) * 100 : 0}%;--c:#4fa3a5"></b></span><span class="v">${va}/${vm}</span>
           <span>Estresse</span><span class="sh-mbar"><b style="width:${(s.estresse / s.estresseMax) * 100}%;--c:${st.c}"></b></span><span class="v">${s.estresse}/${s.estresseMax}</span></span>`}
           ${chips.length ? `<span class="sh-chips">${chips.join('')}</span>` : ''}</span></button>`;
-    }).join('');
+    };
+    const GRUPOS = [['pj', 'Personas'], ['npc', 'NPCs'], ['inimigo', 'Inimigos']];
+    const cards = GRUPOS.map(([t, n]) => { const g = list.filter(([, s]) => (s.tipo || 'pj') === t); return g.length ? `<p class="sh-sec">${n} · ${g.length}</p><div class="sh-pcs">${g.map(cardOf).join('')}</div>` : ''; }).join('');
     const rolls = [];
     const full = list.filter(([id]) => !this.limited(id));
-    for (const [, s] of full) for (const r of s.rolls || []) rolls.push(Object.assign({ who: firstName(s) }, r));
+    for (const [, s] of full.filter(([, s]) => !isNpc(s) || ROLE === 'gm')) for (const r of s.rolls || []) rolls.push(Object.assign({ who: shName(s) }, r));
     rolls.sort((a, b) => (b.t || 0) - (a.t || 0));
     const places = full.filter(([, s]) => String(s.localNome || '').trim() || String(s.localMisterio || '').trim());
     $('#sh-list').innerHTML = `
-      <div class="sh-lhead"><div><div class="eyebrow">Névoa Sobre Apogeu</div><h2>Fichas</h2></div>${cw ? `<button type="button" class="btn sm primary" data-act="new">${icon('plus')}Nova</button>` : canMine ? `<button type="button" class="btn sm primary" data-act="new">${icon('plus')}Criar minha ficha</button>` : ''}</div>
+      <div class="sh-lhead"><div><div class="eyebrow">Névoa Sobre Apogeu</div><h2>Fichas</h2></div>${canMine ? `<button type="button" class="btn sm primary" data-act="new">${icon('plus')}Criar minha ficha</button>` : ''}</div>
+      ${cw ? `<div class="sh-newrow"><span class="sh-lbl">Nova ficha</span><button type="button" class="btn sm primary" data-act="new" data-tipo="pj">${icon('plus')}Persona</button><button type="button" class="btn sm" data-act="new" data-tipo="npc">${icon('plus')}NPC</button><button type="button" class="btn sm" data-act="new" data-tipo="inimigo">${icon('plus')}Inimigo</button></div>` : ''}
       ${!cw && !PLAYER_CAN && Store.mode === 'db' ? '<p class="hint" style="margin:0">Para criar e editar a sua ficha, entre no site com a sua conta do Google.</p>' : ''}
       <button type="button" class="btn sm" data-act="map">${icon('back')}Voltar ao mapa</button>
-      ${!this.ready ? '<div class="sh-empty">Carregando as fichas…</div>' : list.length ? `<div class="sh-pcs">${cards}</div>` : `<div class="sh-empty">${cw ? 'Nenhuma ficha ainda. Toque em <b>Nova</b> para criar a primeira persona, ou espere os jogadores criarem as deles.' : canMine ? 'Ninguém criou ficha ainda. Toque em <b>Criar minha ficha</b>.' : 'Ninguém criou ficha ainda.'}</div>`}
+      ${!this.ready ? '<div class="sh-empty">Carregando as fichas…</div>' : list.length ? cards : `<div class="sh-empty">${cw ? 'Nenhuma ficha ainda. Use os botões de <b>Nova ficha</b> para criar uma persona, um NPC ou um inimigo, ou espere os jogadores criarem as deles.' : canMine ? 'Ninguém criou ficha ainda. Toque em <b>Criar minha ficha</b>.' : 'Ninguém criou ficha ainda.'}</div>`}
       ${rolls.length ? `<p class="sh-sec">Últimas rolagens</p><div class="sh-feed">${rolls.slice(0, 8).map(r => `<div><b>${esc(r.who)}</b> · ${esc(r.l || 'Rolagem')}${r.total != null ? ` · <b>${esc(r.total)}</b>` : ''}<span class="t">${[r.o || r.txt || r.expr || '', fmtTime(r.t)].filter(Boolean).map(esc).join(' · ')}</span></div>`).join('')}</div>` : ''}
       ${places.length ? `<p class="sh-sec">Lugares criados pelos jogadores</p><div class="sh-feed">${places.map(([, s]) => `<div class="sh-place"><b>${esc(s.localNome || 'Lugar sem nome')}</b><span class="t">de ${esc(firstName(s))}${s.localMapa && mapExists(s.localMapa) ? ' · perto de ' + esc(mapName(s.localMapa)) : ''}</span>${String(s.localMisterio || '').trim() ? `<p>${esc(String(s.localMisterio).trim().slice(0, 200))}${String(s.localMisterio).trim().length > 200 ? '…' : ''}</p>` : ''}</div>`).join('')}</div>` : ''}`;
   },
@@ -6105,11 +6355,11 @@ const Sheets = {
     this.built = this.cur; this.armed = null;
     if (!s) {
       main.innerHTML = `<div class="sh-empty" style="max-width:56ch"><h3>${this.sorted().length ? 'Escolha uma ficha' : 'As fichas da mesa'}</h3>
-        Cada persona tem Vida, Estresse, os 6 atributos, o Destaque com seus poderes e tudo o que o jogador escreveu sobre ela. ${this.canWrite() ? 'O que você muda aqui aparece na hora para quem estiver com a mesa aberta.' : 'As fichas atualizam sozinhas quando o mestre muda alguma coisa.'}</div>`;
+        Cada persona tem Vida, Estresse, os 6 atributos, o Destaque com seus poderes e tudo o que o jogador escreveu sobre ela.${ROLE === 'gm' ? ' NPCs e inimigos têm foto, Vida, atributos, ataques e segredos que só você vê.' : ''} ${this.canWrite() ? 'O que você muda aqui aparece na hora para quem estiver com a mesa aberta.' : 'As fichas atualizam sozinhas quando o mestre muda alguma coisa.'}</div>`;
       return;
     }
     const ro = !this.canWrite(), dis = ro ? 'disabled' : '';
-    this.limitedView = this.limited();
+    this.limitedView = this.limited(); this.npcView = false;
     const fld = (id, k, label, ph, extra = '') => `<label class="sh-fld" for="${id}"><span class="sh-lbl">${label}</span><input class="sh-in" id="${id}" data-k="${k}" placeholder="${ro ? '' : ph}" autocomplete="off" ${extra} ${dis}></label>`;
     const ta = (id, k, label, ph, rows = 3, hint = '') => `<label class="sh-fld" for="${id}"><span class="sh-lbl">${label}</span><textarea class="sh-ta" id="${id}" data-k="${k}" rows="${rows}" placeholder="${ro ? '—' : ph}" ${dis}></textarea>${hint ? `<span class="hint">${hint}</span>` : ''}</label>`;
     const step = (k, lbl) => ro ? '' : `<span class="sh-step"><button type="button" data-step="${k}" data-d="-1" aria-label="Diminuir ${lbl}">−</button><button type="button" data-step="${k}" data-d="1" aria-label="Aumentar ${lbl}">+</button></span>`;
@@ -6123,17 +6373,18 @@ const Sheets = {
           <input class="sh-name" id="sh-nome" data-k="nome" maxlength="80" autocomplete="off" disabled>
           <div class="sh-fields">
             ${fld('sh-idade', 'idade', 'Idade', '')}
-            ${fld('sh-conc', 'conceito', 'Conceito / Ocupação', '')}
-            ${fld('sh-jog', 'jogador', 'Jogador', '')}
+            ${fld('sh-conc', 'conceito', isNpc(s) ? 'Papel / ocupação' : 'Conceito / Ocupação', '')}
+            ${isNpc(s) ? '' : fld('sh-jog', 'jogador', 'Jogador', '')}
           </div>
           <div class="sh-wide">${ta('sh-apar', 'aparencia', 'Aparência e estilo', '', 3)}</div>
         </div>
       </header>
-      <div class="sh-empty sh-locked">${icon('lock')}<span><b>O resto desta ficha é segredo.</b> Atributos, habilidades, Vida, Estresse, rolagens e anotações ficam só com quem criou a ficha e com o mestre.</span></div>`;
+      <div class="sh-empty sh-locked">${icon('lock')}<span><b>O resto desta ficha é segredo.</b> ${isNpc(s) ? 'Vida, atributos, ataques e segredos ficam só com o mestre.' : 'Atributos, habilidades, Vida, Estresse, rolagens e anotações ficam só com quem criou a ficha e com o mestre.'}</span></div>`;
       this.fill();
       main.scrollTop = 0; $('#sheets').scrollTop = 0;
       return;
     }
+    if (isNpc(s)) { this.npcView = true; main.innerHTML = this.npcHtml(s, ro, dis, fld, ta, step); this.fill(); main.scrollTop = 0; $('#sheets').scrollTop = 0; return; }
     const maps = allMapIds();
     main.innerHTML = `
     <div class="sh-top">
@@ -6264,6 +6515,8 @@ const Sheets = {
     if (p.dataset.k !== want) { p.dataset.k = want; p.innerHTML = s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="Retrato de ${esc(s.nome || 'persona')}">` : esc(initials(s.nome || '?')); }
     for (const b of document.querySelectorAll('#sh-main [data-cor]')) b.classList.toggle('on', b.dataset.cor === (s.cor || TOKEN_COLORS[0]));
     if (this.limitedView) return;
+    if (!!this.npcView !== isNpc(s)) { this.build(); return; }
+    if (this.npcView) { this.derivedNpc(s, ro); return; }
     // vida
     const vm = vidaMax(s), va = vidaAt(s);
     $('#sh-vida').innerHTML = `${va}<small> / ${vm}</small>`;
@@ -6330,6 +6583,91 @@ const Sheets = {
       : `<div class="sh-empty" style="display:block">${ro ? 'Nenhuma rolagem ainda.' : 'Toque em Testar ao lado de um atributo. A rolagem fica aqui e aparece para o mestre.'}</div>`;
   },
 
+
+  /* ---------- ficha de NPC e inimigo (só o mestre edita) ---------- */
+  npcHtml(s, ro, dis, fld, ta, step) {
+    const ini = s.tipo === 'inimigo';
+    return `
+    <div class="sh-top">
+      <button type="button" class="btn sm ghost sh-back" data-act="back">${icon('back')}Todas as fichas</button>
+      <span class="sp"></span><span id="sh-tok" class="row"></span>
+      ${ro ? '' : '<button type="button" class="btn sm danger" data-act="del">Excluir ficha</button>'}
+    </div>
+    <header class="sh-head">
+      <div class="sh-pwrap"><div class="sh-portrait" id="sh-portrait"></div>
+        ${ro ? '' : `<button type="button" class="btn sm" data-act="photo">${icon('image')}Foto</button><input type="file" id="sh-file" accept="image/*" hidden>`}</div>
+      <div style="min-width:0">
+        <label class="sh-lbl" for="sh-nome">${ini ? 'Inimigo' : 'NPC'}</label>
+        <input class="sh-name" id="sh-nome" data-k="nome" placeholder="${ro ? '' : ini ? 'Nome ou apelido do inimigo' : 'Nome do NPC'}" maxlength="80" autocomplete="off" ${dis}>
+        <div class="sh-fields">
+          ${fld('sh-conc', 'conceito', 'Papel / ocupação', ini ? 'Ex.: o vulto do farol' : 'Ex.: dono do boteco')}
+          ${fld('sh-idade', 'idade', 'Idade', '40', 'maxlength="12"')}
+          <label class="sh-fld" for="sh-tipo"><span class="sh-lbl">Tipo</span><select class="sh-in" id="sh-tipo" data-k="tipo" ${dis}><option value="npc">NPC</option><option value="inimigo">Inimigo</option></select></label>
+          <label class="sh-fld" for="sh-atit"><span class="sh-lbl">Atitude</span><select class="sh-in" id="sh-atit" data-k="atitude" ${dis}>${ATITUDES.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></label>
+        </div>
+        <div class="sh-wide">${ta('sh-apar', 'aparencia', 'Aparência', 'Como os jogadores enxergam: roupa, jeito, cheiro, voz', 2)}</div>
+        ${ro ? '' : `<label class="sh-check" for="sh-vis"><input type="checkbox" id="sh-vis" data-k="visivel"><b>Os jogadores podem ver esta ficha</b><span>Eles veem só a foto, o nome, o papel, a idade e a aparência. Vida, atributos, ataques e segredos ficam só com você.</span></label>`}
+        ${ro ? '' : `<div class="sh-corrow"><span class="sh-lbl">Cor da peça no mapa</span><div class="swatches" role="group" aria-label="Cor">${TOKEN_COLORS.map(c => `<button type="button" class="swatch" data-cor="${c}" style="--c:${c}" aria-label="Cor ${c}"></button>`).join('')}</div></div>`}
+      </div>
+    </header>
+    <div class="sh-cols">
+      <div class="sh-col">
+        <section class="sh-card" id="s-status">
+          <h3>Vida<span class="aside">${ini ? 'quanto aguenta antes de cair' : 'chegando a 0, sai de cena'}</span></h3>
+          <div class="sh-meter"><div><span class="sh-lbl">Vida</span><div class="sh-big" id="sh-vida"></div></div>${step('vida', 'Vida')}<div class="sh-bar" id="sh-vbar"><b></b></div></div>
+          <div id="sh-vbox"></div>
+          <div class="sh-fields">${fld('sh-vmax', 'vmax', 'Vida máxima', '10 + Corpo × 2', 'inputmode="numeric" maxlength="4"')}</div>
+        </section>
+        <section class="sh-card" id="s-atr">
+          <h3>Atributos<span class="aside">de 0 a 10</span></h3>
+          <div class="sh-rollopts">
+            <span class="sh-lbl">Teste</span>
+            <div class="seg" id="sh-mode">${[['dis', 'Desvantagem'], ['norm', 'Normal'], ['adv', 'Vantagem']].map(([v, l]) => `<button type="button" data-mode="${v}">${l}</button>`).join('')}</div>
+            <select class="sh-sel" id="sh-dt" aria-label="Dificuldade"><option value="0">Sem DT</option>${DTS.map(([v, n]) => `<option value="${v}">DT ${v} · ${n}</option>`).join('')}</select>
+          </div>
+          <div class="sh-atr">${ATRS.map(([k, n, d]) => `<div class="sh-arow" data-arow="${k}">
+            <span></span>
+            <div class="nm"><b>${n}</b><span>${d}</span></div>
+            ${ro ? `<output class="val" id="sh-a-${k}"></output>` : `<span class="sh-step sm"><button type="button" data-step="atr.${k}" data-d="-1" aria-label="Diminuir ${n}">−</button><output id="sh-a-${k}"></output><button type="button" data-step="atr.${k}" data-d="1" aria-label="Aumentar ${n}">+</button></span>`}
+            <button type="button" class="btn sm sh-test" data-test="${k}">${icon('dice')}Testar</button></div>`).join('')}</div>
+          <p class="hint">As rolagens desta ficha ficam só com o mestre.</p>
+        </section>
+        <section class="sh-card" id="s-ata">
+          <h3>${ini ? 'Ataques e perigo' : 'O que sabe fazer'}</h3>
+          ${ta('sh-ata', 'ataques', ini ? 'Ataques e dano' : 'Ofício, recursos e contatos', ini ? 'Ex.: garras, 1D6 de dano; grito que tira 2 de Estresse' : 'Ex.: conhece todo mundo do porto; tem a chave do galpão', 3)}
+          ${ta('sh-hab', 'habilidades', 'Habilidades e poderes', 'O que ele faz de especial e quando usa', 3)}
+          ${ta('sh-fraq', 'fraquezas', 'Fraquezas', 'Do que tem medo, o que o derruba', 2)}
+        </section>
+      </div>
+      <div class="sh-col">
+        <section class="sh-card" id="s-quem">
+          <h3>Quem é</h3>
+          ${ta('sh-comp', 'comportamento', 'Comportamento e motivação', 'Como age, o que quer, como reage aos jogadores', 4)}
+          ${ta('sh-nmestre', 'notasMestre', 'Segredos e notas do mestre', 'O que os jogadores ainda não sabem', 5)}
+        </section>
+        <section class="sh-card" id="s-rol">
+          <h3>Rolagens<span class="aside">últimas desta ficha</span></h3>
+          <div class="sh-log" id="sh-log"></div>
+        </section>
+      </div>
+    </div>`;
+  },
+  derivedNpc(s, ro) {
+    const vm = vidaMax(s), va = vidaAt(s);
+    $('#sh-vida').innerHTML = `${va}<small> / ${vm}</small>`;
+    const vb = $('#sh-vbar'); vb.firstChild.style.width = (vm ? (va / vm) * 100 : 0) + '%'; vb.classList.toggle('low', va <= Math.max(1, Math.round(vm * 0.25)));
+    $('#sh-vbox').innerHTML = va === 0 ? `<div class="sh-box" style="--c:#de6b58"><span><b>Fora de combate.</b> ${s.tipo === 'inimigo' ? 'Caiu, fugiu ou foi contido: o mestre decide.' : 'Desmaiado ou ferido demais para agir.'}</span></div>` : '';
+    for (const [k] of ATRS) { const o = $('#sh-a-' + k); if (o) o.textContent = s.atr[k]; }
+    for (const b of document.querySelectorAll('#sh-mode button')) b.classList.toggle('on', b.dataset.mode === this.opt.mode);
+    const dt = $('#sh-dt'); if (dt) dt.value = String(this.opt.dt);
+    const t = s.token && getToken(s.token);
+    $('#sh-tok').innerHTML = t ? `<span class="hint">No mapa: ${esc(mapName(t.map))}</span>${ROLE === 'gm' ? `<button type="button" class="btn sm" data-act="find">${icon('target')}Ver no mapa</button>` : ''}`
+      : ROLE === 'gm' && !ro ? `<button type="button" class="btn sm" data-act="place">${icon('plus')}Pôr no mapa</button>` : '';
+    const rolls = (s.rolls || []).slice().reverse().slice(0, 12);
+    $('#sh-log').innerHTML = rolls.length ? rolls.map(r => `<div><span class="l">${esc(r.l || 'Rolagem')}</span>${r.total != null ? `<span class="tot">${esc(r.total)}</span>` : '<span></span>'}<span class="m">${[(r.o || r.txt) ? `<span class="${r.k === 'crit' ? 'o-crit' : r.k === 'fail' ? 'o-fail' : ''}">${esc(r.o || r.txt)}</span>` : '', r.expr ? esc(r.expr) : '', fmtTime(r.t)].filter(Boolean).join(' · ')}</span></div>`).join('')
+      : '<div class="sh-empty" style="display:block">Nenhuma rolagem ainda.</div>';
+  },
+
   /* ---------- regras ---------- */
   setEstresse(s, v, quiet) {
     const old = s.estresse; v = clampI(v, 0, s.estresseMax);
@@ -6342,13 +6680,13 @@ const Sheets = {
   setVida(s, v) {
     const vm = vidaMax(s); v = clampI(v, 0, vm);
     s.vida = v === vm ? null : v;
-    if (v === 0) UI.toast(`${firstName(s)} está em Agonia.`, 'err');
+    if (v === 0) UI.toast(isNpc(s) ? `${shName(s)} está fora de combate.` : `${firstName(s)} está em Agonia.`, 'err');
   },
   log(s, entry) {
     s.rolls = (s.rolls || []).concat(Object.assign({ t: Date.now() }, entry)).slice(-15);
   },
   publish(s, label, expr, res, outcome) {
-    const why = (firstName(s) + ' · ' + label + (outcome ? ' · ' + outcome : '')).slice(0, 60);
+    const why = (shName(s) + ' · ' + label + (outcome ? ' · ' + outcome : '')).slice(0, 60);
     const r = { id: uid('r'), expr: normExpr(expr), why, total: res.total, parts: res.parts, success: false, t: Date.now(), secret: false };
     if (ROLE === 'gm' && Store.writable) {
       ROLLS_SEEN.add(r.id); r.secret = true;
@@ -6417,7 +6755,7 @@ const Sheets = {
   syncToken(s) {
     if (!s.token || ROLE !== 'gm') return;
     const t = getToken(s.token); if (!t) return;
-    const name = firstName(s), color = s.cor || t.color;
+    const name = shName(s), color = s.cor || t.color;
     if (t.name !== name || t.color !== color) { putToken(Object.assign({}, t, { name, color }), 500); drawTokens(); }
   },
 };
@@ -6451,8 +6789,8 @@ function wireSheets() {
       if (el.checked && s.itens.length > 2) UI.toast('Na criação são 2 itens úteis. Combine com o Mestre se ganhou outro em jogo.');
       commit(s, 0); return;
     }
-    if (el.type === 'checkbox' && el.dataset.k) { setPath(s, el.dataset.k, el.checked); commit(s, 0); return; }
-    if (el.tagName === 'SELECT' && el.dataset.k) { setPath(s, el.dataset.k, el.value); commit(s, 0); }
+    if (el.type === 'checkbox' && el.dataset.k) { setPath(s, el.dataset.k, el.checked); commit(s, 0); if (el.dataset.k === 'visivel') UI.toast(el.checked ? 'Os jogadores agora veem o básico desta ficha.' : 'Ficha escondida dos jogadores.'); return; }
+    if (el.tagName === 'SELECT' && el.dataset.k) { setPath(s, el.dataset.k, el.value); if (el.dataset.k === 'tipo') { if (s.token) { const t = getToken(s.token); if (t) putToken(Object.assign({}, t, { kind: s.tipo }), 0); } Sheets.build(); } commit(s, 0); }
   });
   root.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b || !root.contains(b)) return;
@@ -6467,7 +6805,9 @@ function wireSheets() {
     if (act === 'new') {
       const gmNew = ROLE === 'gm' && Store.writable;
       if (!gmNew) { if (!(PLAYER_CAN && ME)) return; if (Sheets.data[ME]) { Sheets.cur = ME; Sheets.refresh(); return; } }
-      const id = gmNew ? uid('pf') : ME; Sheets.data[id] = normSheet({ cor: TOKEN_COLORS[Object.keys(Sheets.data).length % (TOKEN_COLORS.length - 1)], criado: Date.now() });
+      const tipo = gmNew && NPC_TIPOS[b.dataset.tipo] ? b.dataset.tipo : 'pj';
+      const id = gmNew ? uid(tipo === 'pj' ? 'pf' : tipo === 'npc' ? 'npc' : 'ini') : ME;
+      Sheets.data[id] = normSheet(Object.assign({ cor: tipo === 'inimigo' ? '#d0604f' : tipo === 'npc' ? '#9fb0b3' : TOKEN_COLORS[Object.keys(Sheets.data).length % (TOKEN_COLORS.length - 1)], criado: Date.now() }, tipo === 'pj' ? {} : { tipo, atitude: tipo === 'inimigo' ? 'hostil' : 'neutro', visivel: false }));
       Sheets.cur = id; Sheets.save(id, 0); Sheets.refresh();
       setTimeout(() => $('#sh-nome')?.focus(), 30); return;
     }
@@ -6483,7 +6823,7 @@ function wireSheets() {
       if (path === 'vida') Sheets.setVida(s, vidaAt(s) + d);
       else if (path === 'estresse') Sheets.setEstresse(s, s.estresse + d);
       else if (path === 'estresseMax') { s.estresseMax = clampI(s.estresseMax + d, 1, 40); if (d > 0 && s.estresse === s.estresseMax - 1) s.estresse = s.estresseMax; s.estresse = Math.min(s.estresse, s.estresseMax); }
-      else if (path.startsWith('atr.')) { const k = path.slice(4), cv0 = vidaAt(s), was = vidaMax(s); s.atr[k] = clampI(s.atr[k] + d, 0, 5); if (k === 'corpo' && s.vida != null) s.vida = clampI(cv0 + (vidaMax(s) - was), 0, vidaMax(s)); }
+      else if (path.startsWith('atr.')) { const k = path.slice(4), cv0 = vidaAt(s), was = vidaMax(s); s.atr[k] = clampI(s.atr[k] + d, 0, atrMax(s)); if (k === 'corpo' && s.vida != null) s.vida = clampI(cv0 + (vidaMax(s) - was), 0, vidaMax(s)); }
       commit(s, 250); return;
     }
     if (b.dataset.destaque) { const k = b.dataset.destaque; s.destaque = s.destaque === k ? '' : k; if (s.destaque && s.atr[k] < 4) s.atr[k] = 4; commit(s, 0); return; }
@@ -6515,10 +6855,10 @@ function wireSheets() {
     if (act === 'photo') { $('#sh-file')?.click(); return; }
     if (act === 'place') {
       const id = Sheets.cur; Sheets.hide();
-      const t = addToken({ name: firstName(s), kind: 'pj', color: s.cor || TOKEN_COLORS[0] });
+      const t = addToken({ name: shName(s), kind: isNpc(s) ? s.tipo : 'pj', color: s.cor || TOKEN_COLORS[0] });
       if (s.retrato) putToken(Object.assign({}, t, { img: s.retrato }), 0);
       s.token = t.id; Sheets.save(id, 0);
-      drawTokens(); UI.renderAll(); UI.toast(`${firstName(s)} entrou no mapa ${mapName(CUR)}.`); return;
+      drawTokens(); UI.renderAll(); UI.toast(`${shName(s)} entrou no mapa ${mapName(CUR)}.`); return;
     }
     if (act === 'find') {
       const t = s.token && getToken(s.token); if (!t) return;
