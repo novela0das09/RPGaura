@@ -615,6 +615,55 @@ textarea.notes:focus { border-color: var(--lamp); }
 .sh-newrow .sh-lbl { width: 100%; }
 .loc.sub { padding-left: 30px; }
 .loc.sub .nm::before { content: '↳ '; color: var(--mist-3); }
+
+/* ---------- combate ---------- */
+.tabs button { font-size: 12.5px; padding-left: 2px; padding-right: 2px; }
+.sh-gmonly .sh-lbl { color: var(--lamp); }
+.sh-armas { display: flex; flex-direction: column; gap: 8px; }
+.sh-arma { border: 1px solid var(--line); border-radius: 10px; background: var(--ink-2); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.sh-arma-top { display: flex; align-items: center; gap: 8px; }
+.sh-arma-top b { font-size: 15px; }
+.sh-arma-nm { font-weight: 600; flex: 1; min-width: 0; }
+.sh-x { all: unset; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 6px; color: var(--mist-3); cursor: pointer; flex: none; }
+.sh-x:hover, .sh-x:focus-visible { color: var(--danger); background: var(--panel-3); }
+.sh-x svg { width: 14px; height: 14px; }
+.sh-arma-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sh-arma-grid label { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.sh-arma-grid .sh-sel, .sh-arma-grid .sh-in { width: 100%; min-width: 0; }
+.sh-arma-foot { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.sh-arma-foot .sp { flex: 1; }
+.sh-arma-nota { margin: 0; }
+#sh-arma-add { width: 100%; }
+@media (max-width: 520px) { .sh-arma-grid { grid-template-columns: 1fr 1fr; } }
+.init-float { position: absolute; left: 76px; top: 12px; z-index: 15; width: 230px; max-width: calc(100% - 100px); background: rgba(17, 27, 31, 0.94); border: 1px solid var(--line-2); border-radius: 12px; box-shadow: var(--shadow); backdrop-filter: blur(6px); overflow: hidden; }
+.app.players .init-float { left: 12px; top: 60px; max-width: calc(100% - 24px); }
+.app.no-left .init-float { left: 76px; }
+.init-head { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 12px; cursor: pointer; font: 600 11px/1.2 var(--f-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--lamp); }
+.init-head .now { text-transform: none; letter-spacing: 0; font-size: 12.5px; color: var(--mist-2); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.init-head .now b { color: var(--mist); }
+.init-head .t { white-space: nowrap; }
+.init-head .car { margin-left: auto; color: var(--mist-3); }
+.init-head:focus-visible { outline: 2px solid var(--lamp); outline-offset: -2px; }
+.init-list { list-style: none; margin: 0; padding: 0 6px 6px; max-height: 46vh; overflow: auto; display: flex; flex-direction: column; gap: 2px; }
+.init-list li { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; font-size: 13.5px; color: var(--mist-2); }
+.init-list li .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.init-list li .nm em { font-style: normal; font-size: 11px; color: var(--mist-3); }
+.init-list li b { font-family: var(--f-mono); font-size: 13px; color: var(--mist-3); }
+.init-list li.cur { background: color-mix(in srgb, var(--lamp) 18%, transparent); color: var(--mist); box-shadow: inset 3px 0 0 var(--lamp); }
+.init-list li.cur b { color: var(--lamp); }
+.init-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35); }
+.init-acts { display: flex; gap: 6px; padding: 0 8px 8px; }
+.init-acts .btn:last-child { flex: 1; }
+.init-turn { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 9px; background: color-mix(in srgb, var(--lamp) 12%, var(--ink-2)); border: 1px solid color-mix(in srgb, var(--lamp) 35%, transparent); font-size: 13px; }
+.init-row { display: grid; grid-template-columns: auto 1fr 56px auto; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 9px; border: 1px solid var(--line); background: var(--ink-2); }
+.init-row.cur { border-color: var(--lamp); box-shadow: inset 3px 0 0 var(--lamp); }
+.init-row .nm { min-width: 0; font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+.init-row .nm small { display: block; font-weight: 400; font-size: 11px; color: var(--mist-3); }
+.init-row .init-v { height: 28px; padding: 0 6px; text-align: center; font-family: var(--f-mono); }
+.init-btns { display: flex; }
+.init-btns .iconbtn { width: 26px; height: 26px; }
+.init-btns .iconbtn svg { width: 14px; height: 14px; }
+.init-btns .iconbtn[disabled] { opacity: 0.3; }
 </style>
 </head>
 <body>
@@ -4730,11 +4779,11 @@ const KINDS = { pj: 'Jogador', npc: 'NPC', inimigo: 'Inimigo' };
 
 /* ---------- estado sincronizado ---------- */
 /* caminhos: maps/<id>, tokens/<id>, vtt/scene, vtt/rolls, secret/gm/tokens/<id>, secret/gm/notes/<id> */
-const BUCKETS = { maps: 'maps', tokens: 'tokens', vtt: 'vtt', mural: 'mural', sons: 'sons', sons_arq: 'sonsarq', 'secret/gm/tokens': 'htokens', 'secret/gm/notes': 'notes', 'secret/gm/mural': 'hmural' };
+const BUCKETS = { maps: 'maps', tokens: 'tokens', vtt: 'vtt', mural: 'mural', sons: 'sons', sons_arq: 'sonsarq', 'secret/gm/tokens': 'htokens', 'secret/gm/notes': 'notes', 'secret/gm/mural': 'hmural', 'secret/gm/init': 'hinit' };
 function splitPath(path) { const i = path.lastIndexOf('/'); return [BUCKETS[path.slice(0, i)], path.slice(i + 1)]; }
 const Store = {
   mode: 'local', db: null, writable: true,
-  data: { maps: {}, tokens: {}, htokens: {}, notes: {}, vtt: {}, mural: {}, hmural: {}, sons: {}, sonsarq: {} },
+  data: { maps: {}, tokens: {}, htokens: {}, notes: {}, vtt: {}, mural: {}, hmural: {}, sons: {}, sonsarq: {}, hinit: {} },
   subs: new Set(), dirty: new Set(), pending: new Map(), inflight: new Set(), timers: {}, bc: null,
   get(path) { const [b, k] = splitPath(path); return this.data[b]?.[k]; },
   on(fn) { this.subs.add(fn); },
@@ -4796,7 +4845,7 @@ const Store = {
   },
   initDb(db, gm) {
     this.mode = 'db'; this.db = db;
-    const cols = ['maps', 'tokens', 'vtt', 'mural', 'sons'].concat(gm ? ['secret/gm/tokens', 'secret/gm/notes', 'secret/gm/mural'] : []);
+    const cols = ['maps', 'tokens', 'vtt', 'mural', 'sons'].concat(gm ? ['secret/gm/tokens', 'secret/gm/notes', 'secret/gm/mural', 'secret/gm/init'] : []);
     const firsts = cols.map(col => new Promise(resolve => {
       let done = false;
       const listen = () => db.collection(col).onSnapshot(snap => {
@@ -5624,6 +5673,7 @@ function onKey(e) {
   if (VIEWMODE !== 'gm') return;
   const map = { v: 'move', r: 'fog-reveal', c: 'fog-hide', m: 'measure', p: 'ping', a: 'areas', l: 'light' };
   if (map[k]) { setTool(map[k]); e.preventDefault(); return; }
+  if (k === 'n' && ROLE === 'gm' && Init.get().on) { Init.next(); e.preventDefault(); return; }
   if (/^[1-9]$/.test(k) && ROLE === 'gm') { const s = somList()[+k - 1]; if (s) { Som.pad(s.id); e.preventDefault(); } return; }
   if (k === 'escape') { Measure.clear(); SEL_AREA = null; if (TOOL !== 'move') setTool('move'); else selectToken(null); return; }
   if (k === 'delete' || k === 'backspace') {
@@ -5766,7 +5816,7 @@ const UI = {
     const act = document.activeElement, keep = act && pane.contains(act) && act.id ? act.id : null;
     if (keep === 'notes-ta' && UI.tab === 'notas' && pane.dataset.map === CUR) return;
     const sel = keep && typeof act.selectionStart === 'number' ? [act.selectionStart, act.selectionEnd] : null;
-    const build = { fichas: paneTokens, dados: paneDice, notas: paneNotes, mapa: paneMap, sons: paneSons }[UI.tab] || paneTokens;
+    const build = { fichas: paneTokens, dados: paneDice, notas: paneNotes, mapa: paneMap, sons: paneSons, combate: paneCombate }[UI.tab] || paneTokens;
     pane.replaceChildren(...build().filter(Boolean));
     pane.dataset.map = CUR;
     if (keep) { const el = document.getElementById(keep); if (el) { el.focus({ preventScroll: true }); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch {} } }
@@ -6279,6 +6329,7 @@ function blankSheet() {
     familia: '', reputacao: '', habito: '', localNome: '', localMisterio: '', localMapa: '', notas: '',
     rolls: [], token: '', criado: Date.now(), upd: Date.now(),
     tipo: 'pj', atitude: 'neutro', visivel: false, vmax: '', ataques: '', habilidades: '', fraquezas: '', comportamento: '', notasMestre: '',
+    armas: [], inventario: '',
   };
 }
 /* parte pública da ficha (todos veem) e parte privada (só o dono e o mestre) */
@@ -6303,13 +6354,14 @@ function normSheet(d) {
   s.usos = Object.assign(blankSheet().usos, d.usos && typeof d.usos === 'object' ? d.usos : {});
   if (!Array.isArray(s.itens)) s.itens = [];
   if (!Array.isArray(s.rolls)) s.rolls = [];
+  s.armas = Array.isArray(s.armas) ? s.armas.slice(0, 24).map(normArma) : [];
   if (!ATRN[s.destaque]) s.destaque = '';
   s.estresseMax = clampI(s.estresseMax ?? 10, 1, 40);
   s.estresse = clampI(s.estresse ?? s.estresseMax, 0, s.estresseMax);
   s.doses = clampI(s.doses ?? 3, 0, 9);
   return s;
 }
-const vidaMax = s => { const v = parseInt(s.vmax, 10); if (isNpc(s) && v > 0) return Math.min(v, 999); return 10 + 2 * clampI(s.atr.corpo, 0, 5); };
+const vidaMax = s => { const v = parseInt(s.vmax, 10); if (v > 0) return Math.min(v, 999); return 10 + 2 * clampI(s.atr.corpo, 0, 5); }; // o mestre pode fixar a vida máxima de qualquer ficha
 const vidaAt = s => (s.vida == null || s.vida === '' ? vidaMax(s) : clampI(s.vida, 0, vidaMax(s)));
 const firstName = s => String(s.nome || '').trim().split(/\s+/)[0] || 'Persona';
 const shName = s => (isNpc(s) ? String(s.nome || '').trim().slice(0, 24) || NPC_TIPOS[s.tipo] : firstName(s));
@@ -6432,19 +6484,20 @@ const Sheets = {
     else if (id === null) this.cur = this.cur && this.data[this.cur] ? this.cur : null;
     this.open = true;
     UI.closeDrawers(); hoverHotspot(null);
-    $('#app').classList.add('sheets-open');
+    $('#app').classList.add('sheets-open'); Init.render();
     $('#sheets').hidden = false;
     this.built = null; this.refresh(true);
     UI.renderViewSwitch();
   },
   hide() {
     this.open = false;
-    $('#app').classList.remove('sheets-open');
+    $('#app').classList.remove('sheets-open'); Init.render();
     $('#sheets').hidden = true;
     UI.renderViewSwitch();
     requestAnimationFrame(() => { if (WORLD_INFO) { const f = fitZoom(); if (View.z < f * 0.35) fitView(); } });
   },
   refresh(force) {
+    if (ROLE === 'gm' && Init.get().on) Init.renderSoon();
     if (!this.open) return;
     const root = $('#sheets'); if (!root) return;
     if (!root.firstChild) root.innerHTML = '<div class="sh-wrap" id="sh-wrap"><aside class="sh-list" id="sh-list"></aside><main class="sh-main" id="sh-main"></main></div>';
@@ -6566,8 +6619,9 @@ const Sheets = {
       <div class="sh-col">
         <section class="sh-card" id="s-status">
           <h3>Vida e Estresse<span class="aside">as duas barras começam cheias e descem</span></h3>
-          <div class="sh-meter"><div><span class="sh-lbl">Vida · 10 + Corpo × 2</span><div class="sh-big" id="sh-vida"></div></div>${step('vida', 'Vida')}<div class="sh-bar" id="sh-vbar"><b></b></div></div>
+          <div class="sh-meter"><div><span class="sh-lbl">Vida · ${parseInt(s.vmax, 10) > 0 ? 'máximo definido pelo mestre' : '10 + Corpo × 2'}</span><div class="sh-big" id="sh-vida"></div></div>${step('vida', 'Vida')}<div class="sh-bar" id="sh-vbar"><b></b></div></div>
           <div id="sh-vbox"></div>
+          ${ROLE === 'gm' && !ro ? `<div class="sh-fields sh-gmonly">${fld('sh-vmax', 'vmax', 'Vida máxima · só o mestre muda', '10 + Corpo × 2 (' + (10 + 2 * clampI(s.atr.corpo, 0, 5)) + ')', 'inputmode="numeric" maxlength="4"')}</div>` : ''}
           <label class="sh-check" for="sh-sang"><input type="checkbox" id="sh-sang" data-k="sangrando" ${dis}><b>Sangrando</b><span>Perde 1 de Vida por rodada até estancar: Cérebro (primeiros socorros) ou Corpo (torniquete) contra DT 12.</span></label>
           <div class="sh-meter" style="margin-top:6px"><div><span class="sh-lbl">Estresse</span><div class="sh-big" id="sh-est"></div></div>${step('estresse', 'Estresse')}<div class="sh-pips" id="sh-pips"></div><div class="sh-scale" id="sh-scale"></div></div>
           <div id="sh-stage"></div>
@@ -6594,6 +6648,7 @@ const Sheets = {
             <button type="button" class="btn sm sh-test" data-test="${k}">${icon('dice')}Testar</button></div>`).join('')}</div>
           <p class="hint">Todo teste é 1D20 + atributo contra a DT do Mestre. 1 natural é Fracasso Crítico e 20 natural é Sucesso Perfeito. Atributo 0 não soma nada e falha nas exigências mínimas daquela área. ${ro ? '' : 'As rolagens desta ficha aparecem só para você e para o mestre.'}</p>
         </section>
+        ${armasSection(ro)}
         <section class="sh-card" id="s-pod"><h3>Poderes do Destaque<span class="aside">custos saem do Estresse atual</span></h3><div id="sh-powers"></div></section>
         <section class="sh-card" id="s-adr">
           <h3>Modo Adrenalina<span class="aside" id="sh-adr-st">1 vez por cena</span></h3>
@@ -6670,7 +6725,8 @@ const Sheets = {
     for (const b of document.querySelectorAll('#sh-main [data-cor]')) b.classList.toggle('on', b.dataset.cor === (s.cor || TOKEN_COLORS[0]));
     if (this.limitedView) return;
     if (!!this.npcView !== isNpc(s)) { this.build(); return; }
-    if (this.npcView) { this.derivedNpc(s, ro); return; }
+    if (this.npcView) { this.derivedNpc(s, ro); renderArmas(s, ro); return; }
+    renderArmas(s, ro);
     // vida
     const vm = vidaMax(s), va = vidaAt(s);
     $('#sh-vida').innerHTML = `${va}<small> / ${vm}</small>`;
@@ -6786,9 +6842,10 @@ const Sheets = {
             <button type="button" class="btn sm sh-test" data-test="${k}">${icon('dice')}Testar</button></div>`).join('')}</div>
           <p class="hint">As rolagens desta ficha ficam só com o mestre.</p>
         </section>
+        ${armasSection(ro)}
         <section class="sh-card" id="s-ata">
           <h3>${ini ? 'Ataques e perigo' : 'O que sabe fazer'}</h3>
-          ${ta('sh-ata', 'ataques', ini ? 'Ataques e dano' : 'Ofício, recursos e contatos', ini ? 'Ex.: garras, 1D6 de dano; grito que tira 2 de Estresse' : 'Ex.: conhece todo mundo do porto; tem a chave do galpão', 3)}
+          ${ta('sh-ata', 'ataques', ini ? 'Outros ataques e efeitos' : 'Ofício, recursos e contatos', ini ? 'Ex.: garras, 1D6 de dano; grito que tira 2 de Estresse' : 'Ex.: conhece todo mundo do porto; tem a chave do galpão', 3)}
           ${ta('sh-hab', 'habilidades', 'Habilidades e poderes', 'O que ele faz de especial e quando usa', 3)}
           ${ta('sh-fraq', 'fraquezas', 'Fraquezas', 'Do que tem medo, o que o derruba', 2)}
         </section>
@@ -6798,6 +6855,10 @@ const Sheets = {
           <h3>Quem é</h3>
           ${ta('sh-comp', 'comportamento', 'Comportamento e motivação', 'Como age, o que quer, como reage aos jogadores', 4)}
           ${ta('sh-nmestre', 'notasMestre', 'Segredos e notas do mestre', 'O que os jogadores ainda não sabem', 5)}
+        </section>
+        <section class="sh-card" id="s-inv">
+          <h3>Inventário<span class="aside">o que carrega e o que pode deixar cair</span></h3>
+          ${ta('sh-inventario', 'inventario', 'Itens', 'Ex.: chave do farol, 3 cartuchos, lanterna sem pilha, dinheiro', 4)}
         </section>
         <section class="sh-card" id="s-rol">
           <h3>Rolagens<span class="aside">últimas desta ficha</span></h3>
@@ -6852,6 +6913,24 @@ const Sheets = {
       try { Live.room?.emit('roll', r).catch(() => {}); } catch {}
     }
     UI.rollToast(r);
+  },
+  attack(s, a) {
+    const k = ATRN[a.atr] ? a.atr : 'corpo', val = s.atr[k] || 0, o = this.opt;
+    const base = o.mode === 'adv' ? '2d20kh1' : o.mode === 'dis' ? '2d20kl1' : '1d20', mod = val + (o.rp || 0);
+    const expr = base + (mod ? '+' + mod : ''), res = rollExpr(expr), d = res.parts[0], nat = d.vals.find((v, i) => d.kept[i]);
+    let out = '', kind = '';
+    if (nat === 20) { out = 'Sucesso Perfeito'; kind = 'crit'; }
+    else if (nat === 1) { out = 'Fracasso Crítico'; kind = 'fail'; }
+    else if (o.dt) { const ok = res.total >= o.dt; out = ok ? `Acertou contra DT ${o.dt}` : `Errou contra DT ${o.dt}`; kind = ok ? 'crit' : 'fail'; }
+    this.publish(s, 'Ataque: ' + a.nome, expr, res, out);
+    return { l: 'Ataque com ' + a.nome, total: res.total, expr: normExpr(expr) + ` (d20: ${nat})`, o: out, k: kind };
+  },
+  damage(s, a) {
+    let expr = String(a.dano || '0').trim() || '0';
+    const b = ATRN[a.bonus] ? s.atr[a.bonus] || 0 : 0; if (b) expr += '+' + b;
+    const res = rollExpr(expr);
+    this.publish(s, 'Dano: ' + a.nome, expr, res, '');
+    return { l: 'Dano de ' + a.nome, total: res.total, expr: normExpr(expr) };
   },
   test(s, k) {
     const val = s.atr[k] || 0, o = this.opt;
@@ -7899,6 +7978,238 @@ function openSomEditor(id) {
     h('div', { class: 'acts' }, h('button', { class: 'btn ghost', type: 'button', onclick: () => close() }, 'Cancelar'), h('button', { class: 'btn primary', type: 'button', onclick: () => { save(); close(); UI.renderRight(); } }, 'Salvar')));
 }
 
+
+/* ==========================================================
+   Combate · armas com dano por atributo e ordem de iniciativa
+   ========================================================== */
+// [id, nome, atributo do ataque, dano, atributo somado ao dano, observação]
+const ARMAS = [
+  ['Corpo a corpo', [
+    ['soco', 'Soco', 'corpo', '1d3', 'corpo', 'Desarmado. Sempre à mão.'],
+    ['chute', 'Chute', 'corpo', '1d4', 'corpo', 'Desarmado.'],
+    ['faca', 'Faca', 'corpo', '1d4', 'corpo', 'Pequena e fácil de esconder.'],
+    ['canivete', 'Canivete', 'corpo', '1d4', '', 'Cabe no bolso.'],
+    ['garrafa', 'Garrafa quebrada', 'corpo', '1d4', 'corpo', 'Improvisada: quebra no fim da cena.'],
+    ['taco', 'Taco ou bastão', 'corpo', '1d6', 'corpo', 'Usa as duas mãos.'],
+    ['pecabra', 'Pé de cabra', 'corpo', '1d6', 'corpo', 'Também abre portas e cadeados.'],
+    ['martelo', 'Martelo', 'corpo', '1d6', 'corpo', ''],
+    ['facao', 'Facão', 'corpo', '1d8', 'corpo', 'Abre caminho na mata.'],
+    ['machado', 'Machado', 'corpo', '1d10', 'corpo', 'Pesado: com Corpo 0, ataque com Desvantagem.'],
+    ['motosserra', 'Motosserra', 'corpo', '2d8', 'corpo', 'Barulhenta: quem vê perde 1 de Estresse.'],
+  ]],
+  ['À distância', [
+    ['pedra', 'Pedra arremessada', 'reacao', '1d4', 'corpo', 'Alcance curto.'],
+    ['estilingue', 'Estilingue', 'reacao', '1d3', '', ''],
+    ['arco', 'Arco e flecha', 'reacao', '1d8', '', 'Silencioso.'],
+    ['pistola', 'Pistola', 'reacao', '2d6', '', 'Barulho alto. 15 tiros.'],
+    ['revolver', 'Revólver', 'reacao', '2d6+2', '', '6 tiros.'],
+    ['espingarda', 'Espingarda', 'reacao', '3d6', '', 'Perto: dano cheio. Longe: metade.'],
+    ['rifle', 'Rifle de caça', 'reacao', '2d8+2', '', 'Longo alcance.'],
+    ['sinalizador', 'Sinalizador', 'reacao', '1d6', '', 'Queima e ilumina a área.'],
+    ['taser', 'Taser', 'reacao', '1d3', '', 'Acertou: o alvo perde a próxima ação.'],
+  ]],
+  ['Criaturas', [
+    ['garras', 'Garras', 'corpo', '1d6', 'corpo', ''],
+    ['mordida', 'Mordida', 'corpo', '1d8', 'corpo', ''],
+    ['investida', 'Investida', 'corpo', '2d6', 'corpo', 'Derruba quem falhar em Corpo contra DT 13.'],
+    ['grito', 'Grito aterrador', 'aura', '1d4', '', 'O dano vai no Estresse. Aura contra DT 13 evita.'],
+  ]],
+];
+const ARMA_BY = Object.fromEntries(ARMAS.flatMap(([, l]) => l.map(a => [a[0], a])));
+function normArma(a) {
+  a = a && typeof a === 'object' ? a : {};
+  return { id: String(a.id || uid('a')), nome: String(a.nome || 'Arma').slice(0, 40), atr: ATRN[a.atr] ? a.atr : 'corpo', dano: String(a.dano ?? '1d4').slice(0, 20), bonus: ATRN[a.bonus] ? a.bonus : '', nota: String(a.nota || '').slice(0, 140) };
+}
+function armaFromCat(key) {
+  const c = ARMA_BY[key];
+  return c ? normArma({ nome: c[1], atr: c[2], dano: c[3], bonus: c[4], nota: c[5] }) : normArma({ nome: 'Nova arma', atr: 'corpo', dano: '1d4', bonus: 'corpo' });
+}
+function armaResumo(s, a) {
+  const b = a.bonus ? s.atr[a.bonus] || 0 : 0;
+  return `Ataque 1D20 + ${ATRN[a.atr]} (${s.atr[a.atr] || 0}) · Dano ${a.dano.toUpperCase()}${a.bonus ? ` + ${ATRN[a.bonus]} (${b})` : ''}`;
+}
+function armasSection(ro) {
+  const opts = ARMAS.map(([g, l]) => `<optgroup label="${g}">${l.map(a => `<option value="${a[0]}">${a[1]} · ${a[3].toUpperCase()}${a[4] ? ' + ' + ATRN[a[4]] : ''}</option>`).join('')}</optgroup>`).join('');
+  return `<section class="sh-card" id="s-armas">
+    <h3>Armas e ataques<span class="aside">ataque 1D20 + atributo</span></h3>
+    <div class="sh-armas" id="sh-armas"></div>
+    ${ro ? '' : `<select class="sh-sel" id="sh-arma-add" aria-label="Adicionar arma ou ataque"><option value="">+ Adicionar arma ou ataque…</option>${opts}<option value="__nova">Outra (em branco)</option></select>`}
+    <p class="hint">Atacar usa a Vantagem, a Desvantagem e a DT escolhidas em Atributos. O dano já soma o atributo marcado.</p>
+  </section>`;
+}
+function renderArmas(s, ro) {
+  const box = $('#sh-armas'); if (!box) return;
+  const list = Array.isArray(s.armas) ? s.armas : [];
+  const sig = JSON.stringify([ro, list]);
+  if (box.dataset.sig !== sig && !box.contains(document.activeElement)) {
+    box.dataset.sig = sig;
+    const atrOpts = sel => ATRS.map(([k, n]) => `<option value="${k}"${k === sel ? ' selected' : ''}>${n}</option>`).join('');
+    box.innerHTML = list.length ? list.map(a => `<div class="sh-arma" data-arma="${esc(a.id)}">
+      <div class="sh-arma-top">${ro ? `<b>${esc(a.nome)}</b>` : `<input class="sh-in sh-arma-nm" data-ak="nome" value="${esc(a.nome)}" maxlength="40" aria-label="Nome da arma">`}
+        ${ro ? '' : `<button type="button" class="sh-x" data-delarma="${esc(a.id)}" aria-label="Tirar ${esc(a.nome)}" title="Tirar">${icon('x')}</button>`}</div>
+      ${ro ? '' : `<div class="sh-arma-grid">
+        <label><span class="sh-lbl">Ataque com</span><select class="sh-sel" data-ak="atr">${atrOpts(a.atr)}</select></label>
+        <label><span class="sh-lbl">Dados de dano</span><input class="sh-in" data-ak="dano" value="${esc(a.dano)}" maxlength="20" placeholder="1d6"></label>
+        <label><span class="sh-lbl">Soma no dano</span><select class="sh-sel" data-ak="bonus"><option value="">nada</option>${atrOpts(a.bonus)}</select></label>
+      </div>`}
+      <div class="sh-arma-foot"><span class="hint" data-asum></span><span class="sp"></span>
+        <button type="button" class="btn sm" data-atk="${esc(a.id)}">${icon('dice')}Atacar</button>
+        <button type="button" class="btn sm primary" data-dmg="${esc(a.id)}">Dano</button></div>
+      ${a.nota ? `<p class="hint sh-arma-nota">${esc(a.nota)}</p>` : ''}
+    </div>`).join('') : `<div class="sh-empty" style="display:block">${ro ? 'Nenhuma arma.' : 'Nenhuma arma ainda. Escolha uma na lista abaixo: o soco já vem com o dado certo.'}</div>`;
+  }
+  for (const el of box.querySelectorAll('[data-arma]')) { const a = list.find(x => x.id === el.dataset.arma); const sum = el.querySelector('[data-asum]'); if (a && sum) sum.textContent = armaResumo(s, a); }
+}
+function wireArmas() {
+  const root = $('#sheets');
+  const cur = () => Sheets.data[Sheets.cur];
+  const arma = el => { const row = el.closest('[data-arma]'), s = cur(); return row && s ? (s.armas || []).find(a => a.id === row.dataset.arma) : null; };
+  root.addEventListener('input', e => {
+    const el = e.target; if (!el.dataset.ak || !Sheets.canWrite()) return;
+    const a = arma(el), s = cur(); if (!a) return;
+    a[el.dataset.ak] = el.value.slice(0, el.dataset.ak === 'nome' ? 40 : 20);
+    if (el.tagName !== 'SELECT') { Sheets.save(Sheets.cur, 450); const row = el.closest('[data-arma]'); const sum = row?.querySelector('[data-asum]'); if (sum) sum.textContent = armaResumo(s, a); }
+  });
+  root.addEventListener('change', e => {
+    const el = e.target, s = cur(); if (!s || !Sheets.canWrite()) return;
+    if (el.id === 'sh-arma-add') {
+      const v = el.value; el.value = ''; if (!v) return;
+      s.armas = [...(s.armas || []), armaFromCat(v === '__nova' ? '' : v)];
+      Sheets.save(Sheets.cur, 0); renderArmas(s, false);
+      if (v === '__nova') setTimeout(() => $('#sh-armas .sh-arma:last-child .sh-arma-nm')?.select(), 30);
+      return;
+    }
+    if (el.dataset.ak && el.tagName === 'SELECT') { const a = arma(el); if (!a) return; a[el.dataset.ak] = el.value; Sheets.save(Sheets.cur, 0); const sum = el.closest('[data-arma]')?.querySelector('[data-asum]'); if (sum) sum.textContent = armaResumo(s, a); }
+  });
+  root.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || !root.contains(b)) return;
+    const s = cur(); if (!s) return;
+    if (b.dataset.delarma) { if (!Sheets.canWrite()) return; s.armas = (s.armas || []).filter(a => a.id !== b.dataset.delarma); Sheets.save(Sheets.cur, 0); renderArmas(s, false); return; }
+    const id = b.dataset.atk || b.dataset.dmg; if (!id) return;
+    const a = (s.armas || []).find(x => x.id === id); if (!a) return;
+    let entry;
+    try { entry = b.dataset.atk ? Sheets.attack(s, a) : Sheets.damage(s, a); }
+    catch (err) { UI.toast(`O dano "${a.dano}" não é uma rolagem válida. Use algo como 1d6 ou 2d6+2.`, 'err'); return; }
+    if (Sheets.canWrite()) { Sheets.log(s, entry); Sheets.save(Sheets.cur, 0); Sheets.derived(); }
+  });
+}
+
+/* ---------- ordem de iniciativa ---------- */
+const INIT_COR = { pj: '#e9b45a', npc: '#9fb0b3', inimigo: '#de6b58' };
+const Init = {
+  get() { return Store.data.vtt.init || { on: false, round: 1, cur: 0, list: [] }; },
+  put(fn) {
+    if (ROLE !== 'gm' || !Store.writable) return;
+    const d = clone(this.get()); d.list = Array.isArray(d.list) ? d.list : []; d.round = d.round || 1; d.cur = d.cur || 0;
+    fn(d); d.cur = d.list.length ? Math.min(Math.max(0, d.cur), d.list.length - 1) : 0; d.t = Date.now();
+    Store.put('vtt/init', d, 0);
+  },
+  sheetOf(e) {
+    if (e.ficha && Sheets.data[e.ficha]) return Sheets.data[e.ficha];
+    const sid = e.token && Sheets.byToken(e.token); return sid ? Sheets.data[sid] : null;
+  },
+  realName(e) {
+    const t = e.token && getToken(e.token); if (t) return t.name;
+    const s = this.sheetOf(e); if (s) return shName(s);
+    return Store.data.hinit?.nomes?.[e.id] || e.nome || '???';
+  },
+  bonus(e) { const s = this.sheetOf(e); return s ? s.atr?.reacao || 0 : 0; },
+  luck(e) { const s = this.sheetOf(e); return s ? s.atr?.sorte || 0 : 0; },
+  order(d) { d.list.sort((a, b) => (b.valor ?? -999) - (a.valor ?? -999) || this.bonus(b) - this.bonus(a) || this.luck(b) - this.luck(a)); },
+  keepCur(d, fn) { const id = d.list[d.cur]?.id; fn(); const i = d.list.findIndex(e => e.id === id); d.cur = i < 0 ? 0 : i; },
+  rollAll() {
+    this.put(d => { for (const e of d.list) { const n = rollDie(20); e.nat = n; e.valor = n + this.bonus(e); } this.order(d); d.on = true; d.cur = 0; d.round = 1; });
+    UI.toast('Iniciativa rolada: 1D20 + Reação. Quem tirou mais age primeiro.');
+  },
+  sort() { this.put(d => this.keepCur(d, () => this.order(d))); },
+  next() { this.put(d => { if (!d.list.length) return; d.on = true; d.cur += 1; if (d.cur >= d.list.length) { d.cur = 0; d.round += 1; } }); },
+  prev() { this.put(d => { if (!d.list.length) return; d.cur -= 1; if (d.cur < 0) { if (d.round > 1) { d.round -= 1; d.cur = d.list.length - 1; } else d.cur = 0; } }); },
+  move(id, k) { this.put(d => this.keepCur(d, () => { const i = d.list.findIndex(e => e.id === id), j = i + k; if (i < 0 || j < 0 || j >= d.list.length) return; [d.list[i], d.list[j]] = [d.list[j], d.list[i]]; })); },
+  remove(id) { this.put(d => { const i = d.list.findIndex(e => e.id === id); if (i < 0) return; d.list.splice(i, 1); if (i < d.cur) d.cur -= 1; }); },
+  setNomeSecreto(id, nome) { const n = Object.assign({}, Store.data.hinit?.nomes || {}); if (nome) n[id] = nome; else delete n[id]; Store.put('secret/gm/init/nomes', n, 0); },
+  toggleHide(id) {
+    const e0 = this.get().list?.find(e => e.id === id); if (!e0) return;
+    const real = this.realName(e0);
+    if (!e0.token && !this.sheetOf(e0)) this.setNomeSecreto(id, e0.oculto ? null : real);
+    this.put(d => { const e = d.list.find(x => x.id === id); if (!e) return; e.oculto = !e.oculto; e.nome = e.oculto ? '???' : real; });
+  },
+  add(entries) {
+    if (!entries.length) { UI.toast('Nada novo para adicionar.'); return; }
+    this.put(d => { for (const e of entries) d.list.push(Object.assign({ id: uid('i'), valor: null }, e)); });
+  },
+  addTokens() {
+    const have = new Set((this.get().list || []).map(e => e.token).filter(Boolean));
+    const toks = allTokens().filter(t => t.map === CUR && !have.has(t.id));
+    this.add(toks.map(t => { const sid = Sheets.byToken(t.id), s = sid && Sheets.data[sid], oc = !!t.hidden || (s && isNpc(s) && !s.visivel); return { token: t.id, ficha: sid || '', nome: oc ? '???' : t.name, cor: t.color || INIT_COR[t.kind] || '#9fb0b3', kind: t.kind || 'pj', oculto: oc }; }));
+  },
+  addSheet(id) {
+    const s = Sheets.data[id]; if (!s) return;
+    const oc = isNpc(s) && !s.visivel;
+    this.add([{ ficha: id, token: s.token || '', nome: oc ? '???' : shName(s), cor: s.cor || INIT_COR[s.tipo] || '#9fb0b3', kind: s.tipo || 'pj', oculto: oc }]);
+  },
+  addCustom(nome) { this.add([{ nome: nome.slice(0, 30), cor: '#de6b58', kind: 'inimigo', oculto: false }]); },
+  render() {
+    const box = $('#init-float'); if (!box) return;
+    const d = this.get(), gm = ROLE === 'gm', list = Array.isArray(d.list) ? d.list : [];
+    const show = !!d.on && list.length > 0 && !Sheets.open;
+    box.hidden = !show; if (!show) return;
+    const min = !!LS.get('initMin', false), curE = list[d.cur];
+    const name = e => (gm ? this.realName(e) : e.nome) || '???';
+    box.classList.toggle('min', min);
+    box.innerHTML = `<button type="button" class="init-head" data-ini="min" aria-expanded="${!min}"><span class="t">Iniciativa · Rodada ${d.round || 1}</span>${min && curE ? `<span class="now">vez de <b>${esc(name(curE))}</b></span>` : ''}<span class="car">${min ? '▸' : '▾'}</span></button>
+      ${min ? '' : `<ol class="init-list">${list.map((e, i) => `<li class="${i === d.cur ? 'cur' : ''}"><span class="init-dot" style="--c:${esc(e.cor || '#9fb0b3')}"></span><span class="nm">${esc(name(e))}${gm && e.oculto ? ' <em>escondido</em>' : ''}</span><b>${e.valor ?? '–'}</b></li>`).join('')}</ol>
+      ${gm && Store.writable ? `<div class="init-acts"><button type="button" class="btn sm" data-ini="prev" aria-label="Vez anterior">◀</button><button type="button" class="btn sm primary" data-ini="next">Próximo ▶</button></div>` : ''}`}`;
+  },
+};
+Init.renderSoon = (() => { let q = false; return () => { if (q) return; q = true; setTimeout(() => { q = false; Init.render(); if (UI.tab === 'combate') { const a = document.activeElement; if (!(a && $('#pane')?.contains(a) && a.tagName === 'INPUT')) UI.renderRightSoon(); } }, 0); }; })();
+function wireInit() {
+  const box = $('#init-float'); if (!box) return;
+  box.addEventListener('click', e => {
+    const b = e.target.closest('[data-ini]'); if (!b) return;
+    if (b.dataset.ini === 'min') { LS.set('initMin', !LS.get('initMin', false)); Init.render(); return; }
+    if (b.dataset.ini === 'next') Init.next();
+    if (b.dataset.ini === 'prev') Init.prev();
+  });
+}
+function paneCombate() {
+  const d = Init.get(), list = Array.isArray(d.list) ? d.list : [], out = [];
+  out.push(h('div', null, h('h2', { class: 'loc-title' }, 'Combate'), h('p', { class: 'loc-blurb' }, 'Ordem de iniciativa: cada um rola 1D20 + Reação e quem tirar mais age primeiro. Os jogadores veem a ordem e a vez atual no canto do mapa.')));
+  out.push(h('div', { class: 'row', style: { flexWrap: 'wrap' } },
+    h('button', { class: 'btn sm primary', type: 'button', html: icon('dice') + 'Rolar iniciativa', disabled: !list.length || null, onclick: () => Init.rollAll() }),
+    h('button', { class: 'btn sm', type: 'button', disabled: list.length < 2 || null, onclick: () => Init.sort() }, 'Ordenar'),
+    d.on ? h('button', { class: 'btn sm danger', type: 'button', onclick: () => Init.put(x => { x.on = false; }) }, 'Encerrar combate')
+      : h('button', { class: 'btn sm', type: 'button', disabled: !list.length || null, onclick: () => Init.put(x => { x.on = true; }) }, 'Mostrar na mesa')));
+  if (d.on && list.length) out.push(h('div', { class: 'init-turn' },
+    h('span', null, 'Rodada ', h('b', null, String(d.round || 1)), ' · vez de ', h('b', null, Init.realName(list[d.cur] || {}))),
+    h('span', { class: 'sp', style: { flex: '1' } }),
+    h('button', { class: 'btn sm', type: 'button', 'aria-label': 'Vez anterior', onclick: () => Init.prev() }, '◀'),
+    h('button', { class: 'btn sm primary', type: 'button', onclick: () => Init.next() }, 'Próximo ▶')));
+  out.push(h('h4', null, 'Ordem', h('span', { class: 'sp' }), list.length ? h('span', { class: 'saved' }, 'tecla N passa a vez') : null));
+  if (!list.length) out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Ninguém na ordem ainda. Adicione as peças deste mapa ou as fichas logo abaixo.'));
+  list.forEach((e, i) => {
+    const nm = Init.realName(e), b = Init.bonus(e);
+    out.push(h('div', { class: 'init-row' + (d.on && i === d.cur ? ' cur' : '') },
+      h('span', { class: 'init-dot', style: { '--c': e.cor || '#9fb0b3' } }),
+      h('span', { class: 'nm' }, nm, h('small', null, [e.oculto ? 'escondido dos jogadores' : '', b ? `+${b} de Reação` : '', e.nat ? `d20: ${e.nat}` : ''].filter(Boolean).join(' · '))),
+      h('input', { class: 'inp init-v', type: 'number', id: 'init-v-' + e.id, value: e.valor ?? '', placeholder: '–', 'aria-label': 'Iniciativa de ' + nm, onchange: ev => Init.put(x => { const y = x.list.find(z => z.id === e.id); if (y) y.valor = ev.target.value === '' ? null : Math.round(+ev.target.value); }) }),
+      h('span', { class: 'init-btns' },
+        h('button', { class: 'iconbtn', type: 'button', title: 'Subir', 'aria-label': 'Subir ' + nm, disabled: i === 0 || null, onclick: () => Init.move(e.id, -1) }, '↑'),
+        h('button', { class: 'iconbtn', type: 'button', title: 'Descer', 'aria-label': 'Descer ' + nm, disabled: i === list.length - 1 || null, onclick: () => Init.move(e.id, 1) }, '↓'),
+        h('button', { class: 'iconbtn', type: 'button', title: e.oculto ? 'Mostrar o nome aos jogadores' : 'Esconder o nome dos jogadores', 'aria-label': (e.oculto ? 'Mostrar ' : 'Esconder ') + nm, html: icon(e.oculto ? 'eyeoff' : 'eye'), onclick: () => Init.toggleHide(e.id) }),
+        h('button', { class: 'iconbtn', type: 'button', title: 'Tirar da ordem', 'aria-label': 'Tirar ' + nm, html: icon('x'), onclick: () => Init.remove(e.id) }))));
+  });
+  out.push(h('h4', null, 'Adicionar'));
+  out.push(h('button', { class: 'btn sm', type: 'button', html: icon('plus') + 'Todas as peças deste mapa', onclick: () => Init.addTokens() }));
+  const free = Sheets.sorted().filter(([id]) => !list.some(e => e.ficha === id || (e.token && Sheets.data[id]?.token === e.token)));
+  if (free.length) out.push(h('select', { class: 'inp', 'aria-label': 'Adicionar uma ficha', onchange: ev => { const v = ev.target.value; ev.target.value = ''; if (v) Init.addSheet(v); } },
+    h('option', { value: '' }, 'Adicionar uma ficha…'), ...free.map(([id, s]) => h('option', { value: id }, shName(s) + ' · ' + (isNpc(s) ? NPC_TIPOS[s.tipo] : 'Persona')))));
+  const nmIn = h('input', { class: 'inp', id: 'init-nome', placeholder: 'Outro nome (ex.: Cão de guarda)', maxlength: 30, onkeydown: ev => { if (ev.key === 'Enter') addC(); } });
+  const addC = () => { const v = nmIn.value.trim(); if (v) { Init.addCustom(v); nmIn.value = ''; } };
+  out.push(h('div', { class: 'row' }, nmIn, h('button', { class: 'btn sm', type: 'button', onclick: addC }, 'Adicionar')));
+  if (list.length) out.push(confirmButton('Limpar a ordem', () => Init.put(x => { x.list = []; x.on = false; x.cur = 0; x.round = 1; }), 'btn sm ghost'));
+  return out;
+}
+
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
   const toolbar = h('div', { class: 'toolbar', role: 'toolbar', 'aria-label': 'Ferramentas', 'aria-orientation': 'vertical' },
@@ -7940,11 +8251,12 @@ function buildShell() {
       h('div', { class: 'pl-title', id: 'pl-title', hidden: true }, h('div', { class: 'ov', id: 'pl-title-ov' }), h('h1', { id: 'pl-title-h' })),
       h('div', { class: 'pl-follow', id: 'pl-follow', hidden: true }, h('button', { class: 'btn primary', type: 'button', html: icon('target') + 'Seguir o mestre', onclick: () => { PL_FOLLOW = true; const sc = Store.data.vtt.scene; if (sc?.cam && sc.map === CUR) applyCamRect(sc.cam); else fitView(); UI.renderPlayerChrome(); } })),
       h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
+      h('div', { class: 'init-float', id: 'init-float', hidden: true, role: 'region', 'aria-label': 'Ordem de iniciativa' }),
       h('button', { class: 'btn primary som-pill', id: 'som-pill', type: 'button', hidden: true, html: icon('sound') + 'Toque para ouvir os sons da mesa', onclick: () => Som.unlock() }),
       h('div', { class: 'loader', id: 'loader', hidden: true, role: 'status' }, h('i'), h('span', null, 'Carregando…')),
       h('div', { class: 'toasts', id: 'toasts', 'aria-live': 'polite' })),
     h('aside', { class: 'side side-right', 'aria-label': 'Painel do mestre' },
-      h('div', { class: 'tabs', role: 'tablist' }, [['fichas', 'Peças'], ['dados', 'Dados'], ['notas', 'Notas'], ['mapa', 'Mapa'], ['sons', 'Sons']].map(([id, label]) => h('button', { type: 'button', role: 'tab', 'data-tab': id, onclick: () => UI.setTab(id) }, label))),
+      h('div', { class: 'tabs', role: 'tablist' }, [['fichas', 'Peças'], ['dados', 'Dados'], ['notas', 'Notas'], ['mapa', 'Mapa'], ['sons', 'Sons'], ['combate', 'Combate']].map(([id, label]) => h('button', { type: 'button', role: 'tab', 'data-tab': id, onclick: () => UI.setTab(id) }, label))),
       h('div', { class: 'scroll' }, h('div', { class: 'pane', id: 'pane', role: 'tabpanel' }))),
     h('div', { class: 'drawer-back', onclick: () => UI.closeDrawers() }),
     h('section', { class: 'sheets', id: 'sheets', hidden: true, 'aria-label': 'Fichas dos personagens' }),
@@ -7966,7 +8278,10 @@ function wireStore() {
         }
       }
       if (origin === 'remote') { UI.renderLeftSoon(); UI.renderRightSoon(); UI.renderTopSoon(); if (!mapExists(CUR)) goTo(CITY_ID); }
+    } else if (b === 'hinit') {
+      Init.renderSoon();
     } else if (b === 'tokens' || b === 'htokens') {
+      if (Init.get().on) Init.renderSoon();
       if (!(Input.mode === 'token' && Input.tok?.id === k)) drawTokens();
       if (Sheets.open) refreshSheetsSoon();
       if (origin === 'remote') { UI.renderRightSoon(); UI.renderLeftSoon(); }
@@ -7980,6 +8295,7 @@ function wireStore() {
     } else if (b === 'vtt') {
       if (k === 'scene') { onScene(val); Som.autoSoon(); Som.paneSoon(); }
       if (k === 'audio') { Som.applySoon(); Som.paneSoon(); }
+      if (k === 'init') Init.renderSoon();
       if (k === 'sonsauto') { Som.autoSoon(); Som.paneSoon(); }
       if (k === 'rolls' && origin === 'remote') onRolls(val);
       if (k === 'mural') { if (origin === 'remote') Mural.onRemote(val); else if (Mural.open) Mural.renderHeadSoon(); }
@@ -8000,7 +8316,7 @@ function wireStore() {
 
 /* ---------- inicialização ---------- */
 async function boot(hot) {
-  buildShell(); wireSheets(); wireMural(); setWide(WIDE);
+  buildShell(); wireSheets(); wireArmas(); wireInit(); wireMural(); setWide(WIDE);
   vp = $('#viewport'); world = $('#world'); stage = $('#stage');
   buildWorld(); bindInput();
   ROLE = 'loading';
@@ -8049,6 +8365,7 @@ async function boot(hot) {
   }
   UI.renderAll(); UI.renderViewSwitch();
   Som.apply(); Som.autoSoon(); setTimeout(() => Som.preload(), 400);
+  Init.render();
   if (hot.sheet) Sheets.show(hot.sheet === true ? null : hot.sheet);
   if (!db && hasRT) {
     const box = $('#toasts');
