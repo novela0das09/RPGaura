@@ -664,6 +664,28 @@ textarea.notes:focus { border-color: var(--lamp); }
 .init-btns .iconbtn { width: 26px; height: 26px; }
 .init-btns .iconbtn svg { width: 14px; height: 14px; }
 .init-btns .iconbtn[disabled] { opacity: 0.3; }
+
+/* ---------- clima, data e rolagens ---------- */
+.wx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; }
+.cal-chip { position: absolute; left: 12px; bottom: 12px; z-index: 13; display: flex; flex-direction: column; gap: 2px; padding: 9px 14px 10px; border-radius: 12px; background: rgba(17, 27, 31, 0.9); border: 1px solid var(--line-2); box-shadow: var(--shadow); backdrop-filter: blur(6px); pointer-events: none; max-width: calc(100% - 140px); }
+.cal-chip .cal-d { display: flex; align-items: center; gap: 7px; font: 600 16px/1.2 var(--f-display); color: #f4ecd8; }
+.cal-chip .cal-d svg { width: 15px; height: 15px; color: var(--lamp); flex: none; }
+.cal-chip .cal-w { font-size: 12px; color: var(--mist-2); padding-left: 22px; }
+.app.sheets-open .cal-chip, .app.sheets-open .init-float { display: none !important; }
+.cal-edit { display: grid; grid-template-columns: 64px 1fr 84px; gap: 8px; }
+.sm-sel { height: 28px; width: auto; padding: 0 6px; font-size: 12.5px; }
+.toast.roll .tot.sep { font-size: 22px; letter-spacing: 0.02em; display: flex; flex-direction: column; gap: 2px; }
+.toast.roll .tot small, .rollrow .tot small, .sh-log .tot small { font: 500 12px var(--f-mono); color: var(--mist-2); }
+.toast.roll .det { font: 500 12px var(--f-mono); color: var(--mist); margin-top: 3px; }
+.toast.roll .det .drop, .sh-log .det .drop { text-decoration: line-through; opacity: 0.5; }
+.toast.roll .det .crit, .sh-log .det .crit { color: var(--ok); font-weight: 700; }
+.toast.roll .det .fail, .sh-log .det .fail { color: var(--danger); font-weight: 700; }
+.rollrow .tot.sep { font-size: 15px; }
+.sh-log .tot.sep { font-size: 15px; }
+.sh-log .det { font-family: var(--f-mono); }
+.sh-sepg button { font-size: 12px; }
+#mp-clima { flex-wrap: wrap; height: auto; }
+#mp-clima button { flex: 1 0 auto; }
 </style>
 </head>
 <body>
@@ -5134,7 +5156,7 @@ async function loadMapIntoWorld(id) {
   if (!ok) { w = w || 1200; hh = hh || 800; UI.toast(info.kind === 'missing' ? 'Este mapa ainda não tem imagem. Envie uma na aba Mapa.' : 'Não consegui abrir a imagem deste mapa.', 'err'); }
   View.W = w; View.H = hh; WORLD_INFO = info; WORLD_LABELS = labels;
   sizeLayers(w, hh);
-  drawLabels(); drawGrid(); Fog.setup(); drawHotspots(); drawTokens(true); Mist.setup(); Night.setup(); LSEL = null; drawLightMarks(); Measure.clear();
+  drawLabels(); drawGrid(); Fog.setup(); drawHotspots(); drawTokens(true); Mist.setup(); Night.setup(); Wx.update(); Cal.render(); LSEL = null; drawLightMarks(); Measure.clear();
 }
 function refreshWorldInfo() { WORLD_INFO = mapInfo(CUR); }
 
@@ -5760,7 +5782,8 @@ const UI = {
   },
   rollToast(r) {
     const box = $('#toasts'); if (!box) return;
-    const el = h('div', { class: 'toast roll', role: 'status' }, h('div', { class: 'tot' }, String(r.total)), h('div', null, r.why ? h('div', { class: 'why' }, r.why) : null, h('div', { class: 'ex' }, (r.expr || '') + (r.success ? ' · sucessos' : '') + (r.secret ? ' · secreta' : ''))));
+    const big = rollBig(r), sep = big !== String(r.total);
+    const el = h('div', { class: 'toast roll', role: 'status' }, h('div', { class: 'tot' + (sep ? ' sep' : '') }, big, sep ? h('small', null, '= ' + r.total) : null), h('div', null, r.why ? h('div', { class: 'why' }, r.why) : null, h('div', { class: 'ex' }, (r.expr || '') + (r.success ? ' · sucessos' : '') + (r.secret ? ' · secreta' : '')), (r.parts || []).length ? h('div', { class: 'det' }, rollDetail(r)) : null));
     box.append(el); setTimeout(() => el.remove(), 6000);
   },
   saving: (() => { let t; return on => { const s = $('#save-state'); if (!s) return; clearTimeout(t); if (on) s.textContent = 'Salvando…'; else { s.textContent = 'Salvo'; t = setTimeout(() => (s.textContent = ''), 2200); } }; })(),
@@ -5984,6 +6007,7 @@ function paneDice() {
     h('button', { class: 'btn primary', type: 'button', html: icon('dice') + 'Rolar', onclick: go })));
   out.push(h('input', { class: 'inp', id: 'dice-why', placeholder: 'Motivo (opcional, ex.: Percepção da Joana)', value: st.why, maxlength: 60, 'aria-label': 'Motivo da rolagem', oninput: e => (st.why = e.target.value) }));
   out.push(kvSwitch('Rolagem secreta (só você vê)', st.secret, v => { st.secret = v; }, 'dice-secret'));
+  out.push(h('div', { class: 'field' }, h('span', null, 'Mostrar o resultado'), seg([['soma', 'Somado'], ['sep', 'Dado por dado']], ROLL_SEP ? 'sep' : 'soma', v => setRollSep(v === 'sep'), 'roll-sep')));
   out.push(h('p', { class: 'hint' }, 'Funciona com qualquer sistema: ', h('b', null, '1d20+5'), ', ', h('b', null, '3d6'), ', ', h('b', null, '4d6kh3'), ' (fica com os 3 maiores), ', h('b', null, '2d20kl1'), ' (o menor), ', h('b', null, '5d10>=7'), ' (conta sucessos).'));
   const pub = (Store.data.vtt.rolls?.list || []).filter(r => r && r.id);
   const all = [...pub, ...SECRET_ROLLS].sort((a, b) => (b.t || 0) - (a.t || 0)).slice(0, 25);
@@ -5991,7 +6015,7 @@ function paneDice() {
   if (!all.length) out.push(h('div', { class: 'empty' }, 'As rolagens aparecem aqui. As que não forem secretas também surgem na tela dos jogadores.'));
   else out.push(h('div', { class: 'rolls' }, all.map(r => h('div', { class: 'rollrow' + (r.secret ? ' secret' : '') },
     h('span', { class: 'why' }, r.why || (r.success ? 'Sucessos' : 'Rolagem')),
-    h('span', { class: 'tot' }, String(r.total)),
+    h('span', { class: 'tot' + (rollBig(r) !== String(r.total) ? ' sep' : '') }, rollBig(r), rollBig(r) !== String(r.total) ? h('small', null, ' = ' + r.total) : null),
     h('span', { class: 'ex' }, r.expr),
     h('span', { class: 'det' }, rollDetail(r)),
     h('span', { class: 'meta' }, new Date(r.t || Date.now()).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + (r.secret ? ' · secreta' : ' · jogadores viram'))))));
@@ -6037,6 +6061,8 @@ function paneMap() {
   out.push(h('h4', null, 'Luz e clima'));
   out.push(h('div', { class: 'field' }, h('span', null, 'Hora do dia'), seg(TIMES, timeOf(CUR), v => { setTime(v); UI.renderRight(); }, 'mp-time')));
   out.push(h('div', { class: 'field' }, h('span', null, 'Neblina'), seg(MISTS, +(mapDoc(CUR)?.mist || 0), v => setMist(v), 'mp-mist')));
+  out.push(h('div', { class: 'field' }, h('span', null, 'Clima · agora: ' + climaNome(climaOf(CUR), timeOf(CUR))), seg(CLIMAS.map(([v]) => [v, climaNome(v, timeOf(CUR))]), climaOf(CUR), v => setClima(v), 'mp-clima')));
+  out.push(...calSection());
   out.push(kvSwitch('Lanternas das peças', mapDoc(CUR)?.lanterns !== false, v => { putMap(CUR, { lanterns: v }, 0); afterLights(); }, 'sw-lant'));
   out.push(h('div', { class: 'row' }, h('button', { class: 'btn sm', type: 'button', html: icon('bulb') + 'Editar luzes', onclick: () => setTool('light') })));
   out.push(h('p', { class: 'hint', style: { marginTop: '-8px' } }, 'Postes, velas e fornos acendem sozinhos; com a ferramenta Luz (L) você apaga, acende ou põe luzes novas. Cada peça com lanterna ilumina em volta dela.'));
@@ -6225,7 +6251,7 @@ function setViewMode(mode) {
   $('#app').classList.toggle('players', mode === 'players');
   UI.closeDrawers(); hoverHotspot(null);
   if (mode === 'players') { TOOL = 'move'; vp.dataset.tool = 'move'; Measure.clear(); SEL_TOKEN = null; SEL_AREA = null; }
-  Fog.styleFor(); Fog.dirty = true; drawHotspots(); drawTokens(true); drawLabels(); Night.draw(); Mist.update(); drawLightMarks();
+  Fog.styleFor(); Fog.dirty = true; drawHotspots(); drawTokens(true); drawLabels(); Night.draw(); Mist.update(); Wx.update(); Cal.render(); drawLightMarks();
   UI.renderModeSwitch();
   requestAnimationFrame(async () => {
     if (mode === 'players') {
@@ -6484,14 +6510,14 @@ const Sheets = {
     else if (id === null) this.cur = this.cur && this.data[this.cur] ? this.cur : null;
     this.open = true;
     UI.closeDrawers(); hoverHotspot(null);
-    $('#app').classList.add('sheets-open'); Init.render();
+    $('#app').classList.add('sheets-open'); Init.render(); Cal.render();
     $('#sheets').hidden = false;
     this.built = null; this.refresh(true);
     UI.renderViewSwitch();
   },
   hide() {
     this.open = false;
-    $('#app').classList.remove('sheets-open'); Init.render();
+    $('#app').classList.remove('sheets-open'); Init.render(); Cal.render();
     $('#sheets').hidden = true;
     UI.renderViewSwitch();
     requestAnimationFrame(() => { if (WORLD_INFO) { const f = fitZoom(); if (View.z < f * 0.35) fitView(); } });
@@ -6640,6 +6666,7 @@ const Sheets = {
             <div class="seg" id="sh-mode">${[['dis', 'Desvantagem'], ['norm', 'Normal'], ['adv', 'Vantagem']].map(([v, l]) => `<button type="button" data-mode="${v}">${l}</button>`).join('')}</div>
             <div class="seg" id="sh-rp" title="Bônus de RP que o Mestre concede">${[0, 1, 2, 3].map(v => `<button type="button" data-rp="${v}">${v ? '+' + v : 'RP 0'}</button>`).join('')}</div>
             <select class="sh-sel" id="sh-dt" aria-label="Dificuldade"><option value="0">Sem DT</option>${DTS.map(([v, n]) => `<option value="${v}">DT ${v} · ${n}</option>`).join('')}</select>
+            ${sepSeg('sh-sep')}
           </div>
           <div class="sh-atr">${ATRS.map(([k, n, d]) => `<div class="sh-arow" data-arow="${k}">
             <button type="button" class="sh-star" data-destaque="${k}" aria-label="Tornar ${n} o Destaque" ${dis}>${STAR}</button>
@@ -6789,7 +6816,7 @@ const Sheets = {
       : ROLE === 'gm' && !ro ? `<button type="button" class="btn sm" data-act="place">${icon('plus')}Pôr no mapa</button>` : '';
     // rolagens
     const rolls = (s.rolls || []).slice().reverse().slice(0, 12);
-    $('#sh-log').innerHTML = rolls.length ? rolls.map(r => `<div><span class="l">${esc(r.l || 'Rolagem')}</span>${r.total != null ? `<span class="tot">${esc(r.total)}</span>` : '<span></span>'}<span class="m">${[(r.o || r.txt) ? `<span class="${r.k === 'crit' ? 'o-crit' : r.k === 'fail' ? 'o-fail' : ''}">${esc(r.o || r.txt)}</span>` : '', r.expr ? esc(r.expr) : '', fmtTime(r.t)].filter(Boolean).join(' · ')}</span></div>`).join('')
+    $('#sh-log').innerHTML = rolls.length ? rolls.map(r => `<div><span class="l">${esc(r.l || 'Rolagem')}</span>${r.total != null ? `<span class="tot${r.parts && rollBig(r) !== String(r.total) ? ' sep' : ''}">${esc(r.parts ? rollBig(r) : r.total)}${r.parts && rollBig(r) !== String(r.total) ? `<small> = ${esc(r.total)}</small>` : ''}</span>` : '<span></span>'}<span class="m">${[(r.o || r.txt) ? `<span class="${r.k === 'crit' ? 'o-crit' : r.k === 'fail' ? 'o-fail' : ''}">${esc(r.o || r.txt)}</span>` : '', r.parts ? `<span class="det">${rollDetailHtml(r.parts)}</span>` : r.expr ? esc(r.expr) : '', fmtTime(r.t)].filter(Boolean).join(' · ')}</span></div>`).join('')
       : `<div class="sh-empty" style="display:block">${ro ? 'Nenhuma rolagem ainda.' : 'Toque em Testar ao lado de um atributo. A rolagem fica aqui e aparece para o mestre.'}</div>`;
   },
 
@@ -6834,6 +6861,7 @@ const Sheets = {
             <span class="sh-lbl">Teste</span>
             <div class="seg" id="sh-mode">${[['dis', 'Desvantagem'], ['norm', 'Normal'], ['adv', 'Vantagem']].map(([v, l]) => `<button type="button" data-mode="${v}">${l}</button>`).join('')}</div>
             <select class="sh-sel" id="sh-dt" aria-label="Dificuldade"><option value="0">Sem DT</option>${DTS.map(([v, n]) => `<option value="${v}">DT ${v} · ${n}</option>`).join('')}</select>
+            ${sepSeg('sh-sep')}
           </div>
           <div class="sh-atr">${ATRS.map(([k, n, d]) => `<div class="sh-arow" data-arow="${k}">
             <span></span>
@@ -6879,7 +6907,7 @@ const Sheets = {
     $('#sh-tok').innerHTML = t ? `<span class="hint">No mapa: ${esc(mapName(t.map))}</span>${ROLE === 'gm' ? `<button type="button" class="btn sm" data-act="find">${icon('target')}Ver no mapa</button>` : ''}`
       : ROLE === 'gm' && !ro ? `<button type="button" class="btn sm" data-act="place">${icon('plus')}Pôr no mapa</button>` : '';
     const rolls = (s.rolls || []).slice().reverse().slice(0, 12);
-    $('#sh-log').innerHTML = rolls.length ? rolls.map(r => `<div><span class="l">${esc(r.l || 'Rolagem')}</span>${r.total != null ? `<span class="tot">${esc(r.total)}</span>` : '<span></span>'}<span class="m">${[(r.o || r.txt) ? `<span class="${r.k === 'crit' ? 'o-crit' : r.k === 'fail' ? 'o-fail' : ''}">${esc(r.o || r.txt)}</span>` : '', r.expr ? esc(r.expr) : '', fmtTime(r.t)].filter(Boolean).join(' · ')}</span></div>`).join('')
+    $('#sh-log').innerHTML = rolls.length ? rolls.map(r => `<div><span class="l">${esc(r.l || 'Rolagem')}</span>${r.total != null ? `<span class="tot${r.parts && rollBig(r) !== String(r.total) ? ' sep' : ''}">${esc(r.parts ? rollBig(r) : r.total)}${r.parts && rollBig(r) !== String(r.total) ? `<small> = ${esc(r.total)}</small>` : ''}</span>` : '<span></span>'}<span class="m">${[(r.o || r.txt) ? `<span class="${r.k === 'crit' ? 'o-crit' : r.k === 'fail' ? 'o-fail' : ''}">${esc(r.o || r.txt)}</span>` : '', r.parts ? `<span class="det">${rollDetailHtml(r.parts)}</span>` : r.expr ? esc(r.expr) : '', fmtTime(r.t)].filter(Boolean).join(' · ')}</span></div>`).join('')
       : '<div class="sh-empty" style="display:block">Nenhuma rolagem ainda.</div>';
   },
 
@@ -6923,14 +6951,14 @@ const Sheets = {
     else if (nat === 1) { out = 'Fracasso Crítico'; kind = 'fail'; }
     else if (o.dt) { const ok = res.total >= o.dt; out = ok ? `Acertou contra DT ${o.dt}` : `Errou contra DT ${o.dt}`; kind = ok ? 'crit' : 'fail'; }
     this.publish(s, 'Ataque: ' + a.nome, expr, res, out);
-    return { l: 'Ataque com ' + a.nome, total: res.total, expr: normExpr(expr) + ` (d20: ${nat})`, o: out, k: kind };
+    return { l: 'Ataque com ' + a.nome, total: res.total, expr: normExpr(expr) + ` (d20: ${nat})`, o: out, k: kind, parts: res.parts };
   },
   damage(s, a) {
     let expr = String(a.dano || '0').trim() || '0';
     const b = ATRN[a.bonus] ? s.atr[a.bonus] || 0 : 0; if (b) expr += '+' + b;
     const res = rollExpr(expr);
     this.publish(s, 'Dano: ' + a.nome, expr, res, '');
-    return { l: 'Dano de ' + a.nome, total: res.total, expr: normExpr(expr) };
+    return { l: 'Dano de ' + a.nome, total: res.total, expr: normExpr(expr), parts: res.parts };
   },
   test(s, k) {
     const val = s.atr[k] || 0, o = this.opt;
@@ -6943,7 +6971,7 @@ const Sheets = {
     else if (o.dt) { const ok = res.total >= o.dt; out = ok ? `Sucesso contra DT ${o.dt}` : `Falha contra DT ${o.dt}`; kind = ok ? 'crit' : 'fail'; }
     const label = ATRN[k] + (o.mode === 'adv' ? ' com Vantagem' : o.mode === 'dis' ? ' com Desvantagem' : '');
     this.publish(s, label, expr, res, out);
-    return { l: label, total: res.total, expr: normExpr(expr) + ` (d20: ${nat})`, o: out, k: kind };
+    return { l: label, total: res.total, expr: normExpr(expr) + ` (d20: ${nat})`, o: out, k: kind, parts: res.parts };
   },
   surto(s) {
     const k = s.surto; if (!k) return null;
@@ -7402,7 +7430,7 @@ function setAllLights(on) {
 }
 function setTime(t) { putMap(CUR, { time: t, night: t !== 'dia' }, 0); afterLights(); }
 function setMist(v) { putMap(CUR, { mist: v }, 0); Mist.update(); UI.renderSubbar(); if (UI.tab === 'mapa') UI.renderRight(); }
-function afterLights() { Night.draw(); drawLightMarks(); UI.renderSubbar(); if (UI.tab === 'mapa' || UI.tab === 'fichas') UI.renderRightSoon(); }
+function afterLights() { Night.draw(); Wx.update(); Cal.render(); drawLightMarks(); UI.renderSubbar(); if (UI.tab === 'mapa' || UI.tab === 'fichas') UI.renderRightSoon(); }
 
 function drawLightMarks() {
   const g = Layers.lmk; if (!g) return;
@@ -7428,6 +7456,7 @@ function lightSubbar() {
   const kids = [
     seg(TIMES, tm, v => setTime(v)),
     h('span', { class: 'lbl' }, 'Neblina'), seg(MISTS, mist, v => setMist(v)),
+    h('span', { class: 'lbl' }, 'Clima'), h('select', { class: 'inp sm-sel', 'aria-label': 'Clima', onchange: e => setClima(e.target.value) }, CLIMAS.map(([v]) => h('option', { value: v, selected: climaOf(CUR) === v || null }, climaNome(v, tm)))),
     h('label', { class: 'chk', title: 'Cada peça com lanterna ilumina em volta dela' }, h('input', { type: 'checkbox', checked: d.lanterns !== false || null, onchange: e => { putMap(CUR, { lanterns: e.target.checked }, 0); afterLights(); } }), 'Lanternas'),
   ];
   if (L) {
@@ -7769,11 +7798,12 @@ const Som = {
   loopVol(id, v) { this.putLoops(a => { if (a.loops[id]) a.loops[id].vol = clampN(v, 0, 1); }); },
 
   /* ---------- sons automáticos (só a tela do mestre decide) ---------- */
-  sig() { const m = somSceneMap(); return timeOf(m) + '|' + m; },
+  sig() { const m = somSceneMap(); return timeOf(m) + '|' + climaOf(m) + '|' + m; },
   rulesNow() {
     const cfg = somAuto(), m = somSceneMap(), hora = timeOf(m);
     if (cfg.on === false) return [];
-    return (cfg.regras || []).filter(r => r && r.on !== false && (!r.hora || r.hora === hora) && (!r.mapa || r.mapa === m));
+    const cl = climaOf(m);
+    return (cfg.regras || []).filter(r => r && r.on !== false && (!r.hora || r.hora === hora) && (!r.mapa || r.mapa === m) && (!r.clima || r.clima === cl));
   },
   auto() {
     if (ROLE !== 'gm' || !Store.writable || Store.mode === 'loading') return;
@@ -7930,7 +7960,7 @@ function paneSons() {
   const cfg = somAuto(), regras = cfg.regras || [], ambs = sons.filter(s => s.tipo === 'ambiente');
   out.push(h('h4', null, 'Sons automáticos'));
   out.push(kvSwitch('Ligados', cfg.on !== false, v => { Som.putAuto(c => { c.on = v; }); UI.renderRight(); }, 'som-auto-on'));
-  out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Tocam sozinhos conforme a hora do dia e o mapa que os jogadores estão vendo. Agora: ', h('b', null, (TIMES.find(t => t[0] === timeOf(map)) || [, ''])[1]), ' em ', h('b', null, mapName(map)), '.'));
+  out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Tocam sozinhos conforme a hora do dia, o clima e o mapa que os jogadores estão vendo. Agora: ', h('b', null, (TIMES.find(t => t[0] === timeOf(map)) || [, ''])[1]), ', ', h('b', null, climaNome(climaOf(map), timeOf(map)).toLowerCase()), ', em ', h('b', null, mapName(map)), '.'));
   const maps = allMapIds();
   regras.forEach((r, i) => {
     const upd = fn => { Som.putAuto(c => { const x = c.regras.find(y => y.id === r.id); if (x) fn(x); }); UI.renderRight(); };
@@ -7945,7 +7975,10 @@ function paneSons() {
           [['', 'qualquer hora'], ...TIMES.map(([v, l]) => [v, l.toLowerCase()])].map(([v, l]) => h('option', { value: v, selected: (r.hora || '') === v || null }, l))),
         h('span', { class: 'hint' }, 'em'),
         h('select', { class: 'inp', 'aria-label': 'Mapa', onchange: e => upd(x => { x.mapa = e.target.value; }) },
-          [h('option', { value: '', selected: !r.mapa || null }, 'qualquer mapa'), ...maps.map(m => h('option', { value: m, selected: r.mapa === m || null }, mapName(m)))])),
+          [h('option', { value: '', selected: !r.mapa || null }, 'qualquer mapa'), ...maps.map(m => h('option', { value: m, selected: r.mapa === m || null }, mapName(m)))]),
+        h('span', { class: 'hint' }, 'com'),
+        h('select', { class: 'inp', 'aria-label': 'Clima', onchange: e => upd(x => { x.clima = e.target.value; }) },
+          [['', 'qualquer clima'], ...CLIMAS.map(([v, l]) => [v, v === 'limpo' ? 'tempo limpo' : l.toLowerCase()])].map(([v, l]) => h('option', { value: v, selected: (r.clima || '') === v || null }, l)))),
       h('span', { class: 'hint' }, 'tocar:'),
       ambs.length ? h('div', { class: 'som-chips' }, ambs.map(s => {
         const on = (r.sons || []).includes(s.id);
@@ -8083,6 +8116,7 @@ function wireArmas() {
   });
   root.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b || !root.contains(b)) return;
+    if (b.dataset.sep) { setRollSep(b.dataset.sep === 'sep'); return; }
     const s = cur(); if (!s) return;
     if (b.dataset.delarma) { if (!Sheets.canWrite()) return; s.armas = (s.armas || []).filter(a => a.id !== b.dataset.delarma); Sheets.save(Sheets.cur, 0); renderArmas(s, false); return; }
     const id = b.dataset.atk || b.dataset.dmg; if (!id) return;
@@ -8210,6 +8244,174 @@ function paneCombate() {
   return out;
 }
 
+
+/* ==========================================================
+   Clima (chuva, ventania, tempestade, nublado, ensolarado),
+   data da campanha no canto do mapa e rolagens dado por dado
+   ========================================================== */
+ICONS.cal = '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>';
+ICONS.cloud = '<path d="M7 18h10.5a4 4 0 0 0 .4-8 6 6 0 0 0-11.6 1.6A3.3 3.3 0 0 0 7 18z"/>';
+const CLIMAS = [['limpo', 'Limpo'], ['nublado', 'Nublado'], ['chuva', 'Chuva'], ['ventania', 'Ventania'], ['tempestade', 'Tempestade']];
+const CLIMA_N = Object.fromEntries(CLIMAS);
+const climaOf = id => (CLIMA_N[mapDoc(id)?.clima] ? mapDoc(id).clima : 'limpo');
+function climaNome(c, hora) {
+  if (c !== 'limpo') return CLIMA_N[c];
+  return hora === 'dia' ? 'Ensolarado' : hora === 'tarde' ? 'Céu limpo' : hora === 'noite' ? 'Céu estrelado' : 'Noite fechada';
+}
+function setClima(v) { putMap(CUR, { clima: v }, 0); Wx.update(); Cal.render(); UI.renderSubbar(); if (UI.tab === 'mapa') UI.renderRight(); if (typeof Som !== 'undefined') Som.autoSoon(); }
+
+const Wx = {
+  c: null, ctx: null, raf: 0, kind: 'limpo', hora: 'dia', drops: [], streaks: [], leaves: [], flash: 0, nextBolt: 0, last: 0,
+  canvas() { return (this.c ||= $('#wx')); },
+  update() {
+    const c = this.canvas(); if (!c || !WORLD_INFO) return;
+    this.kind = climaOf(CUR); this.hora = timeOf(CUR);
+    const on = this.kind !== 'limpo' || this.hora === 'dia';
+    c.hidden = !on;
+    c.style.opacity = VIEWMODE === 'gm' ? '0.7' : '1';
+    cancelAnimationFrame(this.raf); this.raf = 0;
+    if (!on) return;
+    this.resize(); this.seed();
+    if (REDUCED) { this.draw(0, 0); return; }
+    const step = t => {
+      this.raf = requestAnimationFrame(step);
+      const fps = ['chuva', 'tempestade', 'ventania'].includes(this.kind) ? 33 : 120;
+      if (t - this.last < fps) return;
+      const dt = Math.min(0.1, (t - (this.last || t)) / 1000); this.last = t;
+      this.draw(t, dt);
+    };
+    this.raf = requestAnimationFrame(step);
+  },
+  resize() {
+    const c = this.canvas(), r = stage.getBoundingClientRect(), k = Math.min(1.5, window.devicePixelRatio || 1);
+    const w = Math.round(r.width * k), hh = Math.round(r.height * k);
+    if (c.width !== w || c.height !== hh) { c.width = w; c.height = hh; }
+    this.k = k; this.ctx = c.getContext('2d');
+  },
+  seed() {
+    const c = this.c, area = c.width * c.height / (this.k * this.k), R = Math.random;
+    const nRain = this.kind === 'tempestade' ? Math.min(1100, area / 1500) : this.kind === 'chuva' ? Math.min(650, area / 2800) : 0;
+    this.drops = Array.from({ length: Math.round(nRain) }, () => ({ x: R() * c.width, y: R() * c.height, l: (14 + R() * 16) * this.k, s: (900 + R() * 500) * this.k }));
+    const nWind = this.kind === 'ventania' ? Math.min(150, area / 6500) : this.kind === 'tempestade' ? Math.min(40, area / 30000) : 0;
+    this.streaks = Array.from({ length: Math.round(nWind) }, () => ({ x: R() * c.width, y: R() * c.height, l: (50 + R() * 110) * this.k, s: (700 + R() * 600) * this.k, a: 0.12 + R() * 0.16 }));
+    this.leaves = this.kind === 'ventania' ? Array.from({ length: 48 }, () => ({ x: R() * c.width, y: R() * c.height, r: R() * TAU, vr: (R() - 0.5) * 8, s: (380 + R() * 300) * this.k, ph: R() * TAU, col: R() < 0.5 ? '#7a6a2e' : R() < 0.5 ? '#4f6b2a' : '#8a4a24' })) : [];
+    this.nextBolt = performance.now() + 2500 + Math.random() * 5000;
+  },
+  draw(t, dt) {
+    const c = this.c, x = this.ctx; if (!x) return;
+    if (c.width !== Math.round(stage.clientWidth * this.k)) { this.resize(); this.seed(); }
+    const k = this.k, mx = View.x * k, my = View.y * k, mw = View.W * View.z * k, mh = View.H * View.z * k;
+    x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, c.width, c.height);
+    x.save(); x.beginPath(); x.rect(mx, my, mw, mh); x.clip();
+    const tint = { nublado: 'rgba(70,80,92,0.24)', chuva: 'rgba(28,40,54,0.26)', tempestade: 'rgba(12,18,30,0.42)', ventania: 'rgba(120,108,84,0.1)' }[this.kind];
+    if (tint) { x.fillStyle = tint; x.fillRect(mx, my, mw, mh); }
+    if (this.kind === 'limpo' && this.hora === 'dia') {
+      const g = x.createRadialGradient(mx + mw * 0.1, my + mh * 0.05, 0, mx + mw * 0.1, my + mh * 0.05, Math.max(mw, mh) * 0.95);
+      g.addColorStop(0, 'rgba(255,226,160,0.22)'); g.addColorStop(0.5, 'rgba(255,214,140,0.07)'); g.addColorStop(1, 'rgba(255,214,140,0)');
+      x.fillStyle = g; x.fillRect(mx, my, mw, mh);
+    }
+    if (this.kind === 'nublado') { const g = x.createLinearGradient(mx, my, mx + mw, my + mh); g.addColorStop(0, 'rgba(30,36,44,0.18)'); g.addColorStop(0.5, 'rgba(30,36,44,0)'); g.addColorStop(1, 'rgba(30,36,44,0.2)'); x.fillStyle = g; x.fillRect(mx, my, mw, mh); }
+    // chuva
+    if (this.drops.length) {
+      const wind = this.kind === 'tempestade' ? 0.42 : 0.16, dx = Math.sin(wind), dy = Math.cos(wind);
+      x.strokeStyle = this.kind === 'tempestade' ? 'rgba(200,214,232,0.42)' : 'rgba(205,220,235,0.36)'; x.lineWidth = 1.1 * k; x.lineCap = 'round';
+      x.beginPath();
+      for (const d of this.drops) {
+        d.y += d.s * dt; d.x += d.s * dt * dx;
+        if (d.y > c.height) { d.y = -d.l; d.x = Math.random() * c.width; }
+        if (d.x > c.width) d.x -= c.width;
+        x.moveTo(d.x, d.y); x.lineTo(d.x - dx * d.l, d.y - dy * d.l);
+      }
+      x.stroke();
+    }
+    // vento
+    for (const s of this.streaks) {
+      s.x += s.s * dt; if (s.x - s.l > c.width) { s.x = -Math.random() * 200; s.y = Math.random() * c.height; }
+      const g = x.createLinearGradient(s.x - s.l, s.y, s.x, s.y); g.addColorStop(0, 'rgba(235,235,225,0)'); g.addColorStop(1, `rgba(235,235,225,${s.a})`);
+      x.strokeStyle = g; x.lineWidth = 1.4 * k; x.beginPath(); x.moveTo(s.x - s.l, s.y); x.quadraticCurveTo(s.x - s.l / 2, s.y - 4 * k, s.x, s.y); x.stroke();
+    }
+    for (const l of this.leaves) {
+      l.x += l.s * dt; l.y += Math.sin(t / 400 + l.ph) * 30 * dt * k; l.r += l.vr * dt;
+      if (l.x > c.width + 20) { l.x = -20; l.y = Math.random() * c.height; }
+      x.save(); x.translate(l.x, l.y); x.rotate(l.r); x.fillStyle = l.col; x.beginPath(); x.ellipse(0, 0, 7 * k, 3.2 * k, 0, 0, TAU); x.fill(); x.restore();
+    }
+    // relâmpagos
+    if (this.kind === 'tempestade' && !REDUCED) {
+      const now = performance.now();
+      if (now > this.nextBolt) { this.flash = 1; this.flash2 = now + 160; this.nextBolt = now + 4500 + Math.random() * 9000; }
+      if (this.flash2 && now > this.flash2) { this.flash = Math.max(this.flash, 0.7); this.flash2 = 0; }
+      if (this.flash > 0.01) { x.fillStyle = `rgba(225,232,255,${this.flash * 0.5})`; x.fillRect(mx, my, mw, mh); this.flash *= Math.pow(0.02, dt); }
+    }
+    x.restore();
+  },
+};
+addEventListener('resize', () => { if (Wx.c && !Wx.c.hidden) { Wx.resize(); Wx.seed(); } });
+
+/* ---------- data da campanha ---------- */
+const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+const Cal = {
+  get() { const c = Store.data.vtt.cal || {}; return { on: !!c.on, d: clampI(c.d || 1, 1, 31), m: clampI(c.m || 1, 1, 12), a: Number.isFinite(+c.a) && c.a !== '' && c.a != null ? Math.round(+c.a) : 1994, semana: c.semana !== false }; },
+  date(c = this.get()) { const dt = new Date(2000, 0, 1); dt.setFullYear(c.a, c.m - 1, 1); const last = new Date(dt.getFullYear(), dt.getMonth() + 1, 0); dt.setFullYear(c.a, c.m - 1, Math.min(c.d, last.getDate())); return dt; },
+  text(c = this.get()) { const dt = this.date(c); return `${c.semana ? SEMANA[dt.getDay()] + ', ' : ''}${dt.getDate()} de ${MESES[dt.getMonth()]} de ${dt.getFullYear()}`; },
+  put(patch) { if (ROLE !== 'gm' || !Store.writable) return; Store.put('vtt/cal', Object.assign(this.get(), patch, { t: Date.now() }), 0); },
+  shift(days) { const dt = this.date(); dt.setDate(dt.getDate() + days); this.put({ d: dt.getDate(), m: dt.getMonth() + 1, a: dt.getFullYear() }); },
+  render() {
+    const el = $('#cal-chip'); if (!el) return;
+    const c = this.get(), show = c.on && !Sheets.open && !!WORLD_INFO;
+    el.hidden = !show; if (!show) return;
+    const hora = timeOf(CUR), cl = climaOf(CUR), hn = (TIMES.find(t => t[0] === hora) || [, ''])[1];
+    el.innerHTML = `<span class="cal-d">${icon('cal')}${esc(this.text(c))}</span><span class="cal-w">${esc(hn)} · ${esc(climaNome(cl, hora))}</span>`;
+  },
+};
+function calSection() {
+  const c = Cal.get(), out = [];
+  out.push(h('h4', null, 'Data da campanha'));
+  out.push(kvSwitch('Mostrar no canto do mapa', c.on, v => { Cal.put({ on: v }); UI.renderRight(); }, 'cal-on'));
+  out.push(h('div', { class: 'cal-edit' },
+    h('label', { class: 'field', for: 'cal-d' }, h('span', null, 'Dia'), h('input', { class: 'inp', id: 'cal-d', type: 'number', min: 1, max: 31, value: c.d, onchange: e => Cal.put({ d: clampI(+e.target.value || 1, 1, 31) }) })),
+    h('label', { class: 'field', for: 'cal-m' }, h('span', null, 'Mês'), h('select', { class: 'inp', id: 'cal-m', onchange: e => Cal.put({ m: +e.target.value }) }, MESES.map((n, i) => h('option', { value: i + 1, selected: c.m === i + 1 || null }, n)))),
+    h('label', { class: 'field', for: 'cal-a' }, h('span', null, 'Ano'), h('input', { class: 'inp', id: 'cal-a', type: 'number', min: 1, max: 9999, value: c.a, onchange: e => { const v = Math.round(+e.target.value); if (v > 0) Cal.put({ a: v }); } }))));
+  out.push(h('div', { class: 'row' },
+    h('button', { class: 'btn sm', type: 'button', onclick: () => { Cal.shift(-1); setTimeout(() => UI.renderRight(), 30); } }, '− 1 dia'),
+    h('button', { class: 'btn sm', type: 'button', onclick: () => { Cal.shift(1); setTimeout(() => UI.renderRight(), 30); } }, '+ 1 dia'),
+    h('span', { class: 'hint', style: { flex: '1', textAlign: 'right' } }, Cal.text(c))));
+  out.push(kvSwitch('Mostrar o dia da semana', c.semana, v => { Cal.put({ semana: v }); UI.renderRight(); }, 'cal-sem'));
+  return out;
+}
+
+/* ---------- rolagens: somadas ou dado por dado ---------- */
+let ROLL_SEP = !!LS.get('rollSep', false);
+function setRollSep(v) {
+  ROLL_SEP = !!v; LS.set('rollSep', ROLL_SEP);
+  if (UI.tab === 'dados') UI.renderRight();
+  for (const b of document.querySelectorAll('[data-sep]')) b.classList.toggle('on', (b.dataset.sep === 'sep') === ROLL_SEP);
+  if (Sheets.open) Sheets.derived();
+}
+function rollPieces(parts) { // cada dado que contou e os modificadores
+  const out = [];
+  for (const p of parts || []) {
+    if (p.type === 'num') { out.push((p.sign < 0 ? '−' : '+') + p.n); continue; }
+    (p.vals || []).forEach((v, j) => { if (!p.kept || p.kept[j]) out.push((p.sign < 0 ? '−' : '') + v); });
+  }
+  return out;
+}
+function rollBig(r) {
+  const pcs = rollPieces(r.parts);
+  if (!ROLL_SEP || pcs.length < 2 || (r.parts || []).some(p => p.cmp)) return String(r.total);
+  return pcs.join(' · ');
+}
+function rollDetailHtml(parts) {
+  if (!Array.isArray(parts) || !parts.length) return '';
+  return parts.map((p, i) => {
+    const sign = p.sign < 0 ? ' − ' : i ? ' + ' : '';
+    if (p.type === 'num') return sign + p.n;
+    const vals = (p.vals || []).map((v, j) => { const cls = p.kept && !p.kept[j] ? 'drop' : p.sides === 20 && v === 20 ? 'crit' : p.sides === 20 && v === 1 ? 'fail' : ''; return `<span class="${cls}">${v}</span>`; }).join(', ');
+    return `${sign}${p.n}d${p.sides}${p.keep || ''} [${vals}]`;
+  }).join('');
+}
+function sepSeg(id) { return `<div class="seg sh-sepg" id="${id}" role="group" aria-label="Como mostrar as rolagens"><button type="button" data-sep="soma" class="${ROLL_SEP ? '' : 'on'}">Somar</button><button type="button" data-sep="sep" class="${ROLL_SEP ? 'on' : ''}">Dado por dado</button></div>`; }
+
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
   const toolbar = h('div', { class: 'toolbar', role: 'toolbar', 'aria-label': 'Ferramentas', 'aria-orientation': 'vertical' },
@@ -8236,6 +8438,8 @@ function buildShell() {
       h('div', { class: 'side-foot' }, h('button', { class: 'btn', type: 'button', style: { flex: '1' }, html: icon('plus') + 'Novo mapa', onclick: () => openNewMapModal() }))),
     h('main', { class: 'stage', id: 'stage' },
       h('div', { class: 'viewport', id: 'viewport', 'data-tool': 'move', tabindex: '0', 'aria-label': 'Mapa. Arraste para mover, role para aproximar.' }, h('div', { class: 'world', id: 'world' })),
+      h('canvas', { class: 'wx', id: 'wx', hidden: true, 'aria-hidden': 'true' }),
+      h('div', { class: 'cal-chip', id: 'cal-chip', hidden: true, role: 'status' }),
       toolbar,
       h('div', { class: 'subbar', id: 'subbar', hidden: true }),
       h('div', { class: 'zoomctl' },
@@ -8274,7 +8478,7 @@ function wireStore() {
         const prev = WORLD_INFO; refreshWorldInfo();
         if (origin === 'remote') {
           if ((prev.src || '') !== (WORLD_INFO.src || '') || prev.kind !== WORLD_INFO.kind) loadMapIntoWorld(CUR).then(() => fitView());
-          else { drawGrid(); drawLabels(); Night.draw(); Mist.update(); if (Input.mode !== 'light') drawLightMarks(); if (Input.mode !== 'vertex' && Input.mode !== 'areadrag') drawHotspots(); if (Input.mode !== 'fog' && Input.mode !== 'fogrect') Fog.applyRemote(WORLD_INFO.fog); }
+          else { drawGrid(); drawLabels(); Night.draw(); Mist.update(); Wx.update(); Cal.render(); if (Input.mode !== 'light') drawLightMarks(); if (Input.mode !== 'vertex' && Input.mode !== 'areadrag') drawHotspots(); if (Input.mode !== 'fog' && Input.mode !== 'fogrect') Fog.applyRemote(WORLD_INFO.fog); }
         }
       }
       if (origin === 'remote') { UI.renderLeftSoon(); UI.renderRightSoon(); UI.renderTopSoon(); if (!mapExists(CUR)) goTo(CITY_ID); }
@@ -8296,6 +8500,7 @@ function wireStore() {
       if (k === 'scene') { onScene(val); Som.autoSoon(); Som.paneSoon(); }
       if (k === 'audio') { Som.applySoon(); Som.paneSoon(); }
       if (k === 'init') Init.renderSoon();
+      if (k === 'cal') { Cal.render(); if (UI.tab === 'mapa' && origin === 'remote') UI.renderRightSoon(); }
       if (k === 'sonsauto') { Som.autoSoon(); Som.paneSoon(); }
       if (k === 'rolls' && origin === 'remote') onRolls(val);
       if (k === 'mural') { if (origin === 'remote') Mural.onRemote(val); else if (Mural.open) Mural.renderHeadSoon(); }
