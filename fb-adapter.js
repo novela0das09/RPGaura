@@ -62,7 +62,7 @@
   const CLIENT = Math.random().toString(36).slice(2) + Date.now().toString(36);
   const errOf = e => ({ code: /permission/i.test(String(e && (e.code || e.message))) ? 'invalid_argument' : 'unavailable', message: String((e && e.message) || e) });
   /* cada documento vai como texto JSON: o Realtime Database não guarda listas vazias nem chaves com ponto */
-  const pack = v => ({ j: JSON.stringify(v === undefined ? null : v), t: Date.now() });
+  const pack = v => { const o = { j: JSON.stringify(v === undefined ? null : v), t: Date.now() }; if (v && typeof v.owner === 'string' && v.owner) o.o = v.owner; return o; }; // "o": dono da peça, lido pelas regras do banco
   const unpack = v => { if (v && typeof v.j === 'string') { try { return JSON.parse(v.j); } catch { return null; } } return v; };
 
   /* ---------- banco de dados (mesma forma que a mesa espera) ---------- */
@@ -132,6 +132,7 @@
       } catch (e) { showLogin(start, e); }
     });
   };
+  FB.setTravas = tv => rtdb.ref('mesa/travas').set({ pecas: !!tv.pecas, mapa: !!tv.mapa }).catch(() => {});
   function go(start) {
     window.claude = { use: async name => (name === 'db' ? db : name === 'user' ? user : name === 'room' ? room : null) };
     started = true; closeGate(); start();

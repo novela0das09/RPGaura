@@ -157,6 +157,14 @@ button { cursor: pointer; }
 .tok .kind.inimigo { background: var(--danger); }
 .tok .kind.npc { background: #9fb0b3; }
 .players .tok { cursor: default; }
+.players .tok.mine { cursor: grab; }
+.players .tok.mine .disc { box-shadow: 0 0 0 2px var(--lamp), 0 4px 14px rgba(0,0,0,.5); }
+.players .tok.mine.dragging { cursor: grabbing; }
+.pl-lock { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 12; display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; background: rgba(17, 27, 31, 0.92); border: 1px solid var(--line-2); color: var(--mist); font: 500 13px/1.2 var(--f-ui); box-shadow: var(--shadow); pointer-events: none; white-space: nowrap; }
+.pl-lock svg { width: 16px; height: 16px; color: var(--lamp); flex: none; }
+#lock-top.on { color: var(--lamp); background: rgba(233, 180, 90, 0.14); }
+.lockcard .kv { margin: 2px 0; }
+.npcrow .btn { flex: none; }
 
 /* barra de ferramentas */
 .toolbar { position: absolute; left: 12px; top: 12px; display: flex; flex-direction: column; gap: 2px; padding: 4px; background: rgba(17, 27, 31, 0.92); border: 1px solid var(--line); border-radius: 11px; box-shadow: var(--shadow); z-index: 10; backdrop-filter: blur(6px); }
@@ -4919,8 +4927,8 @@ const Store = {
   on(fn) { this.subs.add(fn); },
   emit(path, val, origin) { for (const fn of this.subs) { try { fn(path, val, origin); } catch (e) { console.warn(e); } } },
   apply(path, val) { const [b, k] = splitPath(path); if (!b) return; if (val == null) delete this.data[b][k]; else this.data[b][k] = val; },
-  put(path, val, delay = 250) {
-    if (!this.writable) return;
+  put(path, val, delay = 250, force = false) {
+    if (!this.writable && !force) return; // force: jogador movendo a peça da própria ficha
     val = val == null ? null : clone(val);
     this.apply(path, val);
     this.emit(path, val, 'local');
@@ -4950,6 +4958,11 @@ const Store = {
   writeError(e, path, val) {
     const code = e?.code || 'unavailable';
     console.warn('falha ao salvar', path, code, e?.message);
+    if (ROLE !== 'gm' && path.startsWith('tokens/')) { // peça do jogador recusada (travada pelo mestre): volta ao que está no banco
+      UI.toast(TRAVAS().pecas ? 'O mestre travou as peças agora.' : 'Essa peça não é sua.', 'err');
+      this.db?.doc(path).get().then(g => { const v = g?.exists ? g.data() : null; this.apply(path, v); this.emit(path, v, 'remote'); }).catch(() => {});
+      return;
+    }
     if ((code === 'unavailable' || code === 'resource_exhausted') && !this.retried.has(path)) {
       this.retried.add(path);
       setTimeout(() => { this.retried.delete(path); if (!this.pending.has(path)) { this.pending.set(path, val); this.dirty.add(path); this.flush(path); } }, code === 'unavailable' ? 1200 + Math.random() * 800 : 5000);
@@ -5187,7 +5200,7 @@ function zoomAt(sx, sy, factor) {
   View.x = sx - (sx - View.x) * k; View.y = sy - (sy - View.y) * k; View.z = z2;
   applyView();
 }
-function zoomCenter(factor) { const r = vpRect(); zoomAt(r.width / 2, r.height / 2, factor); }
+function zoomCenter(factor) { if (mapLocked()) { UI.toast('O mestre travou o mapa.'); return; } const r = vpRect(); zoomAt(r.width / 2, r.height / 2, factor); }
 function toWorld(cx, cy) { const r = vpRect(); return [(cx - r.left - View.x) / View.z, (cy - r.top - View.y) / View.z]; }
 function viewRectWorld() { const r = vpRect(); return [-View.x / View.z, -View.y / View.z, (r.width - View.x) / View.z, (r.height - View.y) / View.z]; }
 let viewAnim = 0;
@@ -5457,10 +5470,48 @@ function getToken(id) { return Store.data.tokens[id] || Store.data.htokens[id] |
 function tokenPath(t) { return (t.hidden ? 'secret/gm/tokens/' : 'tokens/') + t.id; }
 function putToken(t, delay = 150) {
   const prev = getToken(t.id);
+  if (ROLE !== 'gm') { if (t.owner !== ME || t.hidden || (prev && prev.owner !== ME)) return; Store.put(tokenPath(t), t, delay, true); return; }
   if (prev && !!prev.hidden !== !!t.hidden) Store.put(tokenPath(prev), null, 0);
   Store.put(tokenPath(t), t, delay);
 }
 function deleteToken(id) { const t = getToken(id); if (!t) return; Store.put(tokenPath(t), null, 0); if (SEL_TOKEN === id) SEL_TOKEN = null; }
+/* travas do mestre e peças de cada jogador */
+const TRAVAS = () => Object.assign({ pecas: false, mapa: false }, Store.data.vtt?.travas || {});
+const mapLocked = () => VIEWMODE !== 'gm' && TRAVAS().mapa;
+function myToken(t) { return !!(t && ME && (t.owner === ME || (!t.owner && Sheets.byToken(t.id) === ME))); }
+function setTravas(patch) {
+  const tv = Object.assign(TRAVAS(), patch);
+  Store.put('vtt/travas', tv, 0);
+  try { window.APOGEU_FB?.setTravas?.(tv); } catch {}
+  if (patch.mapa) { FOLLOW_CAM = true; LS.set('followCam', true); FOLLOW_MAP = true; LS.set('followMap', true); setScene(CUR); emitCam(); }
+  onTravas(); UI.renderRight();
+}
+function onTravas() {
+  const tv = TRAVAS();
+  $('#lock-top')?.classList.toggle('on', tv.pecas || tv.mapa);
+  if (mapLocked() && !PL_FOLLOW) { PL_FOLLOW = true; const sc = Store.data.vtt.scene; if (sc?.cam && sc.map === CUR) applyCamRect(sc.cam); }
+  if (Input.mode === 'token' && VIEWMODE !== 'gm' && tv.pecas) { Input.tok?.el.classList.remove('dragging'); Input.mode = null; drawTokens(); }
+  drawTokens(); UI.renderPlayerChrome();
+}
+/* o mestre marca o dono de cada peça de jogador (as regras do banco usam isso) */
+function ensureOwners() {
+  if (ROLE !== 'gm' || !Store.writable || !Sheets.ready) return;
+  for (const t of allTokens()) {
+    const sid = Sheets.byToken(t.id), sh = sid && Sheets.data[sid], want = sh && !isNpc(sh) ? sid : '';
+    if ((t.owner || '') === want) continue;
+    const nt = Object.assign({}, t); if (want) nt.owner = want; else delete nt.owner;
+    putToken(nt, 600);
+  }
+}
+/* coloca no mapa atual a peça de uma ficha (ou traz de outro mapa) */
+function placeSheet(id) {
+  const sh = Sheets.data[id]; if (!sh) return null;
+  const old = sh.token && getToken(sh.token);
+  if (old) { if (old.map !== CUR) bringToken(old.id); drawTokens(); return getToken(old.id); }
+  const t = addToken({ name: shName(sh), kind: isNpc(sh) ? sh.tipo : 'pj', color: sh.cor || TOKEN_COLORS[0], img: sh.retrato || '', owner: isNpc(sh) ? '' : id });
+  sh.token = t.id; Sheets.save(id, 0); drawTokens();
+  return t;
+}
 function tokensHere() { return allTokens().filter(t => t.map === CUR && (VIEWMODE === 'gm' || !t.hidden)); }
 function cellSize() { return WORLD_INFO?.grid?.size || 30; }
 function drawTokens(rebuild) {
@@ -5487,6 +5538,7 @@ function drawTokens(rebuild) {
     el.children[2].textContent = t.name || 'Sem nome';
     el.classList.toggle('sel', SEL_TOKEN === t.id && VIEWMODE === 'gm');
     el.classList.toggle('hidden-tok', !!t.hidden);
+    el.classList.toggle('mine', VIEWMODE !== 'gm' && myToken(t));
     el.hidden = VIEWMODE !== 'gm' && Fog.fogged(t.x, t.y);
   }
   if (Night.on) Night.drawSoon();
@@ -5507,7 +5559,9 @@ function addToken(o) {
   let [x, y] = [Math.min(View.W - cell, Math.max(cell, cx + ((here % 4) - 1.5) * cell)), Math.min(View.H - cell, Math.max(cell, cy + Math.floor(here / 4) * cell))];
   [x, y] = snapPoint(x, y, o.size || 1);
   const t = { id: uid('tk'), map: CUR, x: Math.round(x), y: Math.round(y), name: o.name || 'Ficha', color: o.color || TOKEN_COLORS[0], kind: o.kind || 'pj', size: o.size || 1, hidden: !!o.hidden };
-  putToken(t, 0); SEL_TOKEN = t.id;
+  if (o.img) t.img = o.img;
+  if (o.owner) t.owner = o.owner;
+  putToken(t, 0); if (ROLE === 'gm') SEL_TOKEN = t.id;
   return t;
 }
 function bringToken(id, i = 0) {
@@ -5610,6 +5664,7 @@ function bindInput() {
   vp.addEventListener('contextmenu', e => e.preventDefault());
   vp.addEventListener('wheel', e => {
     e.preventDefault();
+    if (mapLocked()) return;
     const r = vpRect(), sx = e.clientX - r.left, sy = e.clientY - r.top;
     const trackpadPan = !e.ctrlKey && e.deltaMode === 0 && (Math.abs(e.deltaX) > 1 || (Math.abs(e.deltaY) < 30 && e.deltaY % 1 !== 0));
     if (trackpadPan) { View.x -= e.deltaX; View.y -= e.deltaY; applyView(); }
@@ -5634,12 +5689,20 @@ function onDown(e) {
   try { vp.setPointerCapture(e.pointerId); } catch {}
   Input.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
   hoverHotspot(null);
-  if (Input.pointers.size === 2) { beginPinch(); return; }
+  if (Input.pointers.size === 2) { if (mapLocked()) return; beginPinch(); return; }
   if (Input.pointers.size > 2) return;
   const [wx, wy] = toWorld(e.clientX, e.clientY);
   Input.start = { x: e.clientX, y: e.clientY, wx, wy, vx: View.x, vy: View.y };
   Input.moved = false;
   const tk = e.target.closest?.('.tok'), hs = e.target.closest?.('.hs'), hd = e.target.closest?.('.handle');
+  if (VIEWMODE !== 'gm' && e.button === 0 && tk) { // jogador: só a peça da própria ficha
+    const t = getToken(tk.dataset.id);
+    if (t && myToken(t)) {
+      if (TRAVAS().pecas) UI.toast('O mestre travou as peças agora.');
+      else { Input.mode = 'token'; Input.tok = { id: t.id, el: tk, ox: t.x - wx, oy: t.y - wy }; tk.classList.add('dragging'); return; }
+    }
+  }
+  if (mapLocked()) { Input.mode = null; return; }
   if (e.button === 1 || e.button === 2 || Input.space || VIEWMODE !== 'gm') {
     Input.mode = 'pan'; vp.classList.add('panning');
     if (VIEWMODE !== 'gm' && e.button === 0) { PL_FOLLOW = false; UI.renderPlayerChrome(); }
@@ -5963,7 +6026,9 @@ const UI = {
     const t = $('#pl-title'); if (!t) return;
     t.hidden = !show || CUR === CITY_ID; // o mapa da cidade já traz o título impresso
     if (show) { $('#pl-title-ov').textContent = CUR === CITY_ID ? 'Névoa Sobre Apogeu' : catName(CUR) || 'Apogeo'; $('#pl-title-h').textContent = mapName(CUR); }
-    $('#pl-follow').hidden = !show || PL_FOLLOW;
+    $('#pl-follow').hidden = !show || PL_FOLLOW || mapLocked();
+    { const tv = TRAVAS(), pl = $('#pl-lock'), msg = show && (tv.mapa || tv.pecas) ? (tv.mapa && tv.pecas ? 'O mestre travou o mapa e as peças' : tv.mapa ? 'O mestre travou o mapa' : 'O mestre travou as peças') : '';
+      if (pl) { pl.hidden = !msg; if (msg) pl.innerHTML = icon('lock') + esc(msg); } }
     Abertura.renderBtn();
     $('#pl-mode').hidden = ROLE === 'loading'; // no celular o seletor fica no canto do mapa também para o mestre
     this.renderModeSwitch();
@@ -6027,7 +6092,13 @@ function rangeField(label, id, min, max, step, value, onInput, fmt = v => v) {
 function paneTokens() {
   const st = (UI.newTok ||= { name: '', kind: 'pj', color: TOKEN_COLORS[0] });
   const add = () => {
-    addToken({ name: st.name.trim() || defaultName(st.kind), kind: st.kind, color: st.color });
+    const name = st.name.trim() || defaultName(st.kind);
+    const t = addToken({ name, kind: st.kind, color: st.color });
+    if (st.kind !== 'pj' && st.ficha !== false && Store.writable) { // NPC e inimigo já nascem com ficha ligada à peça
+      const id = uid(st.kind === 'npc' ? 'npc' : 'ini');
+      Sheets.data[id] = normSheet({ nome: name, tipo: st.kind, cor: st.color, atitude: st.kind === 'inimigo' ? 'hostil' : 'neutro', visivel: false, token: t.id, criado: Date.now() });
+      Sheets.save(id, 0);
+    }
     st.name = ''; drawTokens(); UI.renderRight(); UI.renderLeftSoon();
     setTimeout(() => $('#nt-name')?.focus(), 0);
   };
@@ -6037,7 +6108,23 @@ function paneTokens() {
     h('input', { class: 'inp', id: 'nt-name', placeholder: 'Nome (ex.: Joana, Cão de guarda)', value: st.name, maxlength: 40, 'aria-label': 'Nome da nova ficha', oninput: e => (st.name = e.target.value), onkeydown: e => { if (e.key === 'Enter') add(); } }),
     seg([['pj', 'Jogador'], ['npc', 'NPC'], ['inimigo', 'Inimigo']], st.kind, v => { st.kind = v; if (v === 'inimigo') st.color = '#d0604f'; else if (v === 'npc') st.color = '#9fb0b3'; else if (st.color === '#d0604f' || st.color === '#9fb0b3') st.color = TOKEN_COLORS[0]; UI.renderRight(); }, 'nt-kind'),
     swatches(st.color, c => { st.color = c; UI.renderRight(); }),
+    st.kind !== 'pj' ? kvSwitch('Criar a ficha junto (dá para editar tudo depois)', st.ficha !== false, v => { st.ficha = v; }, 'nt-ficha') : null,
     h('button', { class: 'btn primary', type: 'button', html: icon('plus') + 'Colocar no mapa', onclick: add })));
+  { const tv = TRAVAS();
+    out.unshift(h('div', { class: 'card lockcard' },
+      h('h4', null, 'Travas'),
+      kvSwitch('Travar as peças dos jogadores', tv.pecas, v => setTravas({ pecas: v }), 'tv-pecas'),
+      kvSwitch('Travar o mapa dos jogadores', tv.mapa, v => setTravas({ mapa: v }), 'tv-mapa'),
+      h('p', { class: 'hint' }, tv.mapa ? 'Mapa travado: os jogadores não arrastam nem dão zoom; todos veem exatamente o que você vê.' : 'Cada jogador arrasta só a peça da própria ficha. NPCs, inimigos e peças dos outros só você move.'))); }
+  { const npcs = Sheets.sorted().filter(([, x]) => isNpc(x));
+    if (npcs.length) out.push(h('h4', null, 'NPCs e inimigos · ' + npcs.length), h('div', { class: 'toklist' }, npcs.map(([id, x]) => {
+      const t = x.token && getToken(x.token), here = t && t.map === CUR;
+      return h('div', { class: 'tokrow npcrow' },
+        h('span', { class: 'sh-av', style: { '--c': x.cor || '#9fb0b3', width: '30px', height: '30px', fontSize: '11px' }, html: x.retrato ? `<img src="${esc(imgSrc(x.retrato))}" alt="" style="width:100%;height:100%;object-fit:cover">` : esc(initials(x.nome || '?')) }),
+        h('button', { class: 'nm', type: 'button', style: { background: 'none', border: 0, padding: 0, textAlign: 'left', cursor: 'pointer' }, onclick: () => Sheets.show(id) }, x.nome || NPC_TIPOS[x.tipo], h('span', { class: 'sub' }, NPC_TIPOS[x.tipo] + (here ? ' · neste mapa' : t ? ' · em ' + mapName(t.map) : ' · fora do mapa'))),
+        here ? h('button', { class: 'btn sm ghost', type: 'button', onclick: () => { selectToken(t.id); centerOn(t.x, t.y); } }, 'Ver')
+          : h('button', { class: 'btn sm', type: 'button', html: icon('plus') + (t ? 'Trazer' : 'Colocar'), onclick: () => { placeSheet(id); UI.renderAll(); } }));
+    }))); }
   const here = tokensHere().sort((a, b) => (a.kind || '').localeCompare(b.kind || '') || String(a.name).localeCompare(String(b.name)));
   out.push(h('h4', null, 'Neste mapa · ' + here.length));
   if (!here.length) out.push(h('div', { class: 'empty' }, 'Nenhuma ficha aqui. Crie uma acima ou traga o grupo de outro mapa.'));
@@ -6072,6 +6159,10 @@ function tokEditor(t) {
     (t.lantern ?? (t.kind === 'pj')) ? h('div', { class: 'row' }, h('span', { class: 'hint' }, 'Alcance da luz'), seg(LANTERN_SIZES, t.lr || 2, v => { upd({ lr: v }, 0); Night.draw(); UI.renderRight(); })) : null,
     mapDoc(CUR)?.lanterns === false ? h('p', { class: 'hint' }, 'As lanternas estão desligadas neste mapa (ferramenta Luz).') : null,
     h('div', { class: 'row', style: { flexWrap: 'nowrap' } }, sel, h('button', { class: 'btn sm', type: 'button', onclick: () => { const to = sel.value; if (to === CUR) return; putToken(Object.assign({}, getToken(t.id), { map: to }), 0); SEL_TOKEN = null; drawTokens(); UI.renderAll(); UI.toast(`${t.name} foi para ${mapName(to)}.`); } }, 'Levar')),
+    (() => { const sid = Sheets.byToken(t.id);
+      if (sid) return h('button', { class: 'btn sm', type: 'button', html: icon('user') + 'Abrir a ficha', onclick: () => Sheets.show(sid) });
+      if (t.kind === 'npc' || t.kind === 'inimigo') return h('button', { class: 'btn sm', type: 'button', html: icon('plus') + 'Criar ficha para esta peça', onclick: () => { const id = uid(t.kind === 'npc' ? 'npc' : 'ini'); Sheets.data[id] = normSheet({ nome: t.name || '', tipo: t.kind, cor: t.color, retrato: t.img || '', atitude: t.kind === 'inimigo' ? 'hostil' : 'neutro', visivel: false, token: t.id, criado: Date.now() }); Sheets.save(id, 0); Sheets.show(id); } });
+      return null; })(),
     h('p', { class: 'hint' }, 'Arraste a ficha no mapa para mover. Tecla Delete exclui a ficha selecionada.'));
 }
 
@@ -6921,8 +7012,8 @@ const Sheets = {
     $('#sh-lgo').innerHTML = s.localMapa && mapExists(s.localMapa) ? `<button type="button" class="btn sm" data-goto="${esc(s.localMapa)}">${icon('compass')}Abrir no mapa</button>` : '';
     // peça no mapa
     const t = s.token && getToken(s.token);
-    $('#sh-tok').innerHTML = t ? `<span class="hint">No mapa: ${esc(mapName(t.map))}</span>${ROLE === 'gm' ? `<button type="button" class="btn sm" data-act="find">${icon('target')}Ver no mapa</button>` : ''}`
-      : ROLE === 'gm' && !ro ? `<button type="button" class="btn sm" data-act="place">${icon('plus')}Pôr no mapa</button>` : '';
+    $('#sh-tok').innerHTML = t ? `<span class="hint">No mapa: ${esc(mapName(t.map))}</span>${ROLE === 'gm' || this.cur === ME ? `<button type="button" class="btn sm" data-act="find">${icon('target')}Ver no mapa</button>` : ''}`
+      : (ROLE === 'gm' || (this.cur === ME && !TRAVAS().pecas)) && !ro ? `<button type="button" class="btn sm" data-act="place">${icon('plus')}Pôr no mapa</button>` : '';
     // rolagens
     const rolls = (s.rolls || []).slice().reverse().slice(0, 12);
     $('#sh-log').innerHTML = rolls.length ? rolls.map(r => `<div><span class="l">${esc(r.l || 'Rolagem')}</span>${r.total != null ? `<span class="tot${r.parts && rollBig(r) !== String(r.total) ? ' sep' : ''}">${esc(r.parts ? rollBig(r) : r.total)}${r.parts && rollBig(r) !== String(r.total) ? `<small> = ${esc(r.total)}</small>` : ''}</span>` : '<span></span>'}<span class="m">${[(r.o || r.txt) ? `<span class="${r.k === 'crit' ? 'o-crit' : r.k === 'fail' ? 'o-fail' : ''}">${esc(r.o || r.txt)}</span>` : '', r.parts ? `<span class="det">${rollDetailHtml(r.parts)}</span>` : r.expr ? esc(r.expr) : '', fmtTime(r.t)].filter(Boolean).join(' · ')}</span></div>`).join('')
@@ -7013,8 +7104,8 @@ const Sheets = {
     for (const b of document.querySelectorAll('#sh-mode button')) b.classList.toggle('on', b.dataset.mode === this.opt.mode);
     const dt = $('#sh-dt'); if (dt) dt.value = String(this.opt.dt);
     const t = s.token && getToken(s.token);
-    $('#sh-tok').innerHTML = t ? `<span class="hint">No mapa: ${esc(mapName(t.map))}</span>${ROLE === 'gm' ? `<button type="button" class="btn sm" data-act="find">${icon('target')}Ver no mapa</button>` : ''}`
-      : ROLE === 'gm' && !ro ? `<button type="button" class="btn sm" data-act="place">${icon('plus')}Pôr no mapa</button>` : '';
+    $('#sh-tok').innerHTML = t ? `<span class="hint">No mapa: ${esc(mapName(t.map))}</span>${ROLE === 'gm' || this.cur === ME ? `<button type="button" class="btn sm" data-act="find">${icon('target')}Ver no mapa</button>` : ''}`
+      : (ROLE === 'gm' || (this.cur === ME && !TRAVAS().pecas)) && !ro ? `<button type="button" class="btn sm" data-act="place">${icon('plus')}Pôr no mapa</button>` : '';
     const rolls = (s.rolls || []).slice().reverse().slice(0, 12);
     $('#sh-log').innerHTML = rolls.length ? rolls.map(r => `<div><span class="l">${esc(r.l || 'Rolagem')}</span>${r.total != null ? `<span class="tot${r.parts && rollBig(r) !== String(r.total) ? ' sep' : ''}">${esc(r.parts ? rollBig(r) : r.total)}${r.parts && rollBig(r) !== String(r.total) ? `<small> = ${esc(r.total)}</small>` : ''}</span>` : '<span></span>'}<span class="m">${[(r.o || r.txt) ? `<span class="${r.k === 'crit' ? 'o-crit' : r.k === 'fail' ? 'o-fail' : ''}">${esc(r.o || r.txt)}</span>` : '', r.parts ? `<span class="det">${rollDetailHtml(r.parts)}</span>` : r.expr ? esc(r.expr) : '', fmtTime(r.t)].filter(Boolean).join(' · ')}</span></div>`).join('')
       : '<div class="sh-empty" style="display:block">Nenhuma rolagem ainda.</div>';
@@ -7123,13 +7214,14 @@ const Sheets = {
     finally { UI.loading(false); }
   },
   syncToken(s) {
-    if (!s.token || ROLE !== 'gm') return;
-    const t = getToken(s.token); if (!t) return;
+    if (!s.token) return;
+    const t = getToken(s.token); if (!t || (ROLE !== 'gm' && !myToken(t))) return;
     const name = shName(s), color = s.cor || t.color;
     if (t.name !== name || t.color !== color) { putToken(Object.assign({}, t, { name, color }), 500); drawTokens(); }
   },
 };
 const refreshSheetsSoon = rafOnce(() => Sheets.refresh());
+const ensureOwnersSoon = (() => { let t; return () => { clearTimeout(t); t = setTimeout(ensureOwners, 1200); }; })();
 
 function viewSwitch() {
   const b = (v, ic, label) => h('button', { type: 'button', 'data-view': v, html: icon(ic) + `<span>${label}</span>`, onclick: () => { if (v === 'fichas') { if (!Sheets.open) Sheets.show(null); } else if (Sheets.open) Sheets.hide(); } });
@@ -7224,14 +7316,13 @@ function wireSheets() {
     if (act === 'rest') { Sheets.setEstresse(s, s.estresse + 3); Sheets.setVida(s, vidaAt(s) + 2); Sheets.log(s, { l: 'Noite de descanso', txt: '+3 Estresse, +2 Vida' }); commit(s, 0); return; }
     if (act === 'photo') { $('#sh-file')?.click(); return; }
     if (act === 'place') {
-      const id = Sheets.cur; Sheets.hide();
-      const t = addToken({ name: shName(s), kind: isNpc(s) ? s.tipo : 'pj', color: s.cor || TOKEN_COLORS[0] });
-      if (s.retrato) putToken(Object.assign({}, t, { img: s.retrato }), 0);
-      s.token = t.id; Sheets.save(id, 0);
-      drawTokens(); UI.renderAll(); UI.toast(`${shName(s)} entrou no mapa ${mapName(CUR)}.`); return;
+      if (ROLE !== 'gm' && TRAVAS().pecas) { UI.toast('O mestre travou as peças agora.'); return; }
+      Sheets.hide(); placeSheet(Sheets.cur);
+      UI.renderAll(); UI.toast(`${shName(s)} entrou no mapa ${mapName(CUR)}.`); return;
     }
     if (act === 'find') {
       const t = s.token && getToken(s.token); if (!t) return;
+      if (ROLE !== 'gm') { if (t.map !== CUR) { UI.toast(`Sua peça está em ${mapName(t.map)}.`); return; } Sheets.hide(); if (!mapLocked()) { PL_FOLLOW = false; centerOn(t.x, t.y); UI.renderPlayerChrome(); } return; }
       Sheets.hide();
       (async () => { if (t.map !== CUR) await goTo(t.map, { from: CUR }); selectToken(t.id); centerOn(t.x, t.y); })();
       return;
@@ -8826,6 +8917,7 @@ function buildShell() {
       h('div', { class: 'scene-pill', id: 'scene-pill' }),
       h('span', { class: 'saved', id: 'save-state', 'aria-live': 'polite' }),
       h('button', { class: 'iconbtn hide-xs', type: 'button', html: icon('screen'), title: 'Como mostrar a tela dos jogadores no Discord', 'aria-label': 'Como mostrar a tela dos jogadores no Discord', onclick: openPlayersModal }),
+      h('button', { class: 'iconbtn', id: 'lock-top', type: 'button', html: icon('lock'), title: 'Travar o mapa e as peças', 'aria-label': 'Travar o mapa e as peças', onclick: () => { if (UI.tab !== 'fichas') UI.setTab('fichas'); UI.openRight(); setTimeout(() => $('#tv-pecas')?.focus(), 50); } }),
       h('button', { class: 'iconbtn', id: 'ab-top', type: 'button', html: icon('film'), title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', onclick: () => (ROLE === 'gm' ? openAberturaModal() : Abertura.local()) }),
       modeSwitch('mode-top'),
       window.APOGEU_FB?.discord ? h('a', { class: 'iconbtn', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Abrir o Discord da mesa', html: icon('chat') }) : null,
@@ -8853,6 +8945,7 @@ function buildShell() {
       h('div', { class: 'measure-label', id: 'measure-label', hidden: true }),
       h('div', { class: 'titlecard', id: 'titlecard', 'aria-hidden': 'true' }, h('div', { class: 'ov' }), h('h2'), h('p')),
       h('div', { class: 'pl-title', id: 'pl-title', hidden: true }, h('div', { class: 'ov', id: 'pl-title-ov' }), h('h1', { id: 'pl-title-h' })),
+      h('div', { class: 'pl-lock', id: 'pl-lock', hidden: true, role: 'status' }),
       h('div', { class: 'pl-follow', id: 'pl-follow', hidden: true }, h('button', { class: 'btn primary', type: 'button', html: icon('target') + 'Seguir o mestre', onclick: () => { PL_FOLLOW = true; const sc = Store.data.vtt.scene; if (sc?.cam && sc.map === CUR) applyCamRect(sc.cam); else fitView(); UI.renderPlayerChrome(); } })),
       h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-ab', type: 'button', title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', html: icon('film') + '<span>Abertura</span>', onclick: () => Abertura.local() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
       h('div', { class: 'init-float', id: 'init-float', hidden: true, role: 'region', 'aria-label': 'Ordem de iniciativa' }),
@@ -8885,6 +8978,7 @@ function wireStore() {
     } else if (b === 'hinit') {
       Init.renderSoon();
     } else if (b === 'tokens' || b === 'htokens') {
+      if (origin === 'remote') ensureOwnersSoon();
       if (Init.get().on) Init.renderSoon();
       if (!(Input.mode === 'token' && Input.tok?.id === k)) drawTokens();
       if (Sheets.open) refreshSheetsSoon();
@@ -8902,6 +8996,7 @@ function wireStore() {
       if (k === 'init') Init.renderSoon();
       if (k === 'cal') { Cal.render(); if (UI.tab === 'mapa' && origin === 'remote') UI.renderRightSoon(); }
       if (k === 'sonsauto') { Som.autoSoon(); Som.paneSoon(); }
+      if (k === 'travas') onTravas();
       if (k === 'abertura') { Abertura.renderBtn(); if (origin === 'remote' && val && val.ativa === false && Abertura.on && ROLE !== 'gm') Abertura.close(); }
       if (k === 'rolls' && origin === 'remote') onRolls(val);
       if (k === 'mural') { if (origin === 'remote') Mural.onRemote(val); else if (Mural.open) Mural.renderHeadSoon(); }
@@ -8954,6 +9049,7 @@ async function boot(hot) {
   $('#app').classList.remove('booting');
   for (const r of Store.data.vtt.rolls?.list || []) if (r?.id) ROLLS_SEEN.add(r.id);
   Live.init(room);
+  setTimeout(() => { ensureOwners(); onTravas(); }, 3500); setInterval(ensureOwners, 30000);
   Sheets.init(db);
   VIEWMODE = gm ? (hot.viewmode || SS.get('view', 'gm')) : 'players';
   $('#app').classList.toggle('players', VIEWMODE === 'players');

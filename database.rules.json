@@ -9,6 +9,9 @@
           ".write": "auth != null && ((!root.child('mesa/mestres').exists() && $uid === auth.uid) || root.child('mesa/mestres/' + auth.uid).val() === true)",
           ".validate": "newData.isBoolean() && newData.val() === true"
         }
+      },
+      "travas": {
+        ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
       }
     },
     "users": {
@@ -46,7 +49,10 @@
     },
     "tokens": {
       ".read": "auth != null",
-      ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
+      ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true",
+      "$id": {
+        ".write": "auth != null && root.child('mesa/travas/pecas').val() !== true && newData.exists() && newData.child('o').val() === auth.uid && (!data.exists() || data.child('o').val() === auth.uid)"
+      }
     },
     "vtt": {
       ".read": "auth != null",
