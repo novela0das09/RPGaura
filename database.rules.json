@@ -12,6 +12,9 @@
       },
       "travas": {
         ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
+      },
+      "fichasOk": {
+        ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
       }
     },
     "users": {
@@ -23,14 +26,14 @@
     "fichas": {
       ".read": "auth != null",
       "$id": {
-        ".write": "auth != null && (auth.uid === $id || root.child('mesa/mestres/' + auth.uid).val() === true)"
+        ".write": "auth != null && ((auth.uid === $id && (data.exists() || root.child('fichas_priv/' + $id).exists() || root.child('mesa/fichasOk/' + auth.uid).exists())) || root.child('mesa/mestres/' + auth.uid).val() === true)"
       }
     },
     "fichas_priv": {
       ".read": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true",
       "$id": {
         ".read": "auth != null && (auth.uid === $id || root.child('mesa/mestres/' + auth.uid).val() === true)",
-        ".write": "auth != null && (auth.uid === $id || root.child('mesa/mestres/' + auth.uid).val() === true)"
+        ".write": "auth != null && ((auth.uid === $id && (data.exists() || root.child('fichas/' + $id).exists() || root.child('mesa/fichasOk/' + auth.uid).exists())) || root.child('mesa/mestres/' + auth.uid).val() === true)"
       }
     },
     "live": {
@@ -69,6 +72,13 @@
     "sons_arq": {
       ".read": "auth != null",
       ".write": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true"
+    },
+    "pedidos": {
+      ".read": "auth != null && root.child('mesa/mestres/' + auth.uid).val() === true",
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('mesa/mestres/' + auth.uid).val() === true)",
+        ".write": "auth != null && (auth.uid === $uid || root.child('mesa/mestres/' + auth.uid).val() === true)"
+      }
     }
   }
 }

@@ -892,8 +892,8 @@ textarea.notes:focus { border-color: var(--lamp); }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610221611"></script>
-<script src="fb-adapter.js?v=202610221611"></script>
+<script src="firebase-config.js?v=202610221917"></script>
+<script src="fb-adapter.js?v=202610221917"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -6715,7 +6715,7 @@ const Sheets = {
       const done = () => {
         if (gotPub && gotPriv && !this.ready) {
           this.ready = true; this.migrate();
-          if (PLAYER_CAN && ME && !this.data[ME]) setTimeout(() => UI.toast('Bem-vindo à mesa! Toque em Fichas, no canto de cima, para criar a sua.'), 900);
+          if (PLAYER_CAN && ME && !this.data[ME]) setTimeout(() => UI.toast(Pedidos.can() ? 'Bem-vindo à mesa! Toque em Fichas, no canto de cima, para criar a sua.' : 'Bem-vindo à mesa! Toque em Fichas, no canto de cima, para pedir ao mestre a sua ficha.'), 900);
         }
         this.refresh();
         if (this.ready) { Crise.check(); Crise.gmCheck(); Crise.scanSoon(); PlSheet.renderSoon(); }
@@ -6785,6 +6785,7 @@ const Sheets = {
       const code = e?.code || 'unavailable';
       if (code === 'unavailable' || code === 'resource_exhausted') { this.inflight.delete(id); this.timers[id] = setTimeout(() => this.flush(id), 2500); return; }
       if (code === 'quota_exceeded') UI.toast('O espaço de dados da mesa acabou. Apague fichas ou mapas que não usa mais.', 'err');
+      else if (code === 'invalid_argument' && ROLE !== 'gm' && id === ME && !Pedidos.can() && !this.pub[id]) { delete this.data[id]; if (this.cur === id) this.cur = null; UI.toast('Para criar uma ficha, o mestre precisa aprovar o seu pedido primeiro.', 'err'); this.refresh(true); }
       else if (code === 'invalid_argument' && ROLE !== 'gm') { PLAYER_CAN = false; UI.toast('Sua ficha não pôde ser salva. Saia e entre de novo com a sua conta do Google.', 'err'); this.refresh(true); }
       else if (code === 'invalid_argument') UI.toast('Não foi possível salvar a ficha (o retrato pode ser grande demais).', 'err');
       else UI.toast('Uma mudança na ficha não foi salva. Tente de novo em instantes.', 'err');
@@ -6862,11 +6863,12 @@ const Sheets = {
     rolls.sort((a, b) => (b.t || 0) - (a.t || 0));
     const places = full.filter(([, s]) => String(s.localNome || '').trim() || String(s.localMisterio || '').trim());
     $('#sh-list').innerHTML = `
-      <div class="sh-lhead"><div><div class="eyebrow">Névoa Sobre Apogeu</div><h2>Fichas</h2></div>${canMine ? `<button type="button" class="btn sm primary" data-act="new">${icon('plus')}Criar minha ficha</button>` : ''}</div>
+      <div class="sh-lhead"><div><div class="eyebrow">Névoa Sobre Apogeu</div><h2>Fichas</h2></div>${canMine ? `<button type="button" class="btn sm primary" data-act="new" ${Pedidos.mine?.status === 'pendente' && !Pedidos.can() ? 'disabled' : ''}>${icon('plus')}${esc(Pedidos.label())}</button>` : ''}</div>
+      ${canMine && !Pedidos.can() ? `<div class="sh-empty" style="margin:0 0 10px">${Pedidos.mine?.status === 'pendente' ? 'Seu pedido está com o mestre. Assim que ele aprovar, o botão vira <b>Criar minha ficha</b>.' : Pedidos.mine?.status === 'recusado' ? 'O mestre recusou o pedido por enquanto. Fale com ele no Discord e peça de novo.' : 'Para criar uma ficha nesta mesa, o mestre precisa aprovar. Toque em <b>Pedir para criar ficha</b>.'}</div>` : ''}
       ${cw ? `<div class="sh-newrow"><span class="sh-lbl">Nova ficha</span><button type="button" class="btn sm primary" data-act="new" data-tipo="pj">${icon('plus')}Persona</button><button type="button" class="btn sm" data-act="new" data-tipo="npc">${icon('plus')}NPC</button><button type="button" class="btn sm" data-act="new" data-tipo="inimigo">${icon('plus')}Inimigo</button></div>` : ''}
       ${!cw && !PLAYER_CAN && Store.mode === 'db' ? '<p class="hint" style="margin:0">Para criar e editar a sua ficha, entre no site com a sua conta do Google.</p>' : ''}
       <button type="button" class="btn sm" data-act="map">${icon('back')}Voltar ao mapa</button>
-      ${!this.ready ? '<div class="sh-empty">Carregando as fichas…</div>' : list.length ? cards : `<div class="sh-empty">${cw ? 'Nenhuma ficha ainda. Use os botões de <b>Nova ficha</b> para criar uma persona, um NPC ou um inimigo, ou espere os jogadores criarem as deles.' : canMine ? 'Ninguém criou ficha ainda. Toque em <b>Criar minha ficha</b>.' : 'Ninguém criou ficha ainda.'}</div>`}
+      ${!this.ready ? '<div class="sh-empty">Carregando as fichas…</div>' : list.length ? cards : `<div class="sh-empty">${cw ? 'Nenhuma ficha ainda. Use os botões de <b>Nova ficha</b> para criar uma persona, um NPC ou um inimigo, ou espere os jogadores criarem as deles.' : canMine ? `Ninguém criou ficha ainda. Toque em <b>${esc(Pedidos.label())}</b>.` : 'Ninguém criou ficha ainda.'}</div>`}
       ${rolls.length ? `<p class="sh-sec">Últimas rolagens</p><div class="sh-feed">${rolls.slice(0, 8).map(r => `<div><b>${esc(r.who)}</b> · ${esc(r.l || 'Rolagem')}${r.total != null ? ` · <b>${esc(r.total)}</b>` : ''}<span class="t">${[r.o || r.txt || r.expr || '', fmtTime(r.t)].filter(Boolean).map(esc).join(' · ')}</span></div>`).join('')}</div>` : ''}
       ${places.length ? `<p class="sh-sec">Lugares criados pelos jogadores</p><div class="sh-feed">${places.map(([, s]) => `<div class="sh-place"><b>${esc(s.localNome || 'Lugar sem nome')}</b><span class="t">de ${esc(firstName(s))}${s.localMapa && mapExists(s.localMapa) ? ' · perto de ' + esc(mapName(s.localMapa)) : ''}</span>${String(s.localMisterio || '').trim() ? `<p>${esc(String(s.localMisterio).trim().slice(0, 200))}${String(s.localMisterio).trim().length > 200 ? '…' : ''}</p>` : ''}</div>`).join('')}</div>` : ''}`;
   },
@@ -7358,7 +7360,7 @@ function wireSheets() {
     if (act === 'back') { Sheets.cur = null; Sheets.refresh(); return; }
     if (act === 'new') {
       const gmNew = ROLE === 'gm' && Store.writable;
-      if (!gmNew) { if (!(PLAYER_CAN && ME)) return; if (Sheets.data[ME]) { Sheets.cur = ME; Sheets.refresh(); return; } }
+      if (!gmNew) { if (!(PLAYER_CAN && ME)) return; if (Sheets.data[ME]) { Sheets.cur = ME; Sheets.refresh(); return; } if (!Pedidos.can()) { Pedidos.pedir(); return; } }
       const tipo = gmNew && NPC_TIPOS[b.dataset.tipo] ? b.dataset.tipo : 'pj';
       const id = gmNew ? uid(tipo === 'pj' ? 'pf' : tipo === 'npc' ? 'npc' : 'ini') : ME;
       Sheets.data[id] = normSheet(Object.assign({ cor: tipo === 'inimigo' ? '#d0604f' : tipo === 'npc' ? '#9fb0b3' : TOKEN_COLORS[Object.keys(Sheets.data).length % (TOKEN_COLORS.length - 1)], criado: Date.now() }, tipo === 'pj' ? {} : { tipo, atitude: tipo === 'inimigo' ? 'hostil' : 'neutro', visivel: false }));
@@ -9056,11 +9058,11 @@ const Crise = {
     if (ROLE !== 'gm') this.first();
     let box = $('#crise-stack');
     const show = ROLE === 'gm' && VIEWMODE === 'gm' && this.multi();
-    const list = show ? this.pending() : [];
+    const list = show ? this.pending() : [], peds = show ? Pedidos.cards() : [];
     if (!box) { box = h('div', { class: 'crise-stack', id: 'crise-stack', role: 'region', 'aria-label': 'Crises de estresse' }); document.body.append(box); }
     let fresh = false;
     const notes = show ? this.notes : [];
-    fill(box, notes.map(n => h('div', { class: 'crise-card note', style: { '--c': n.c.cor || '#e9b45a' } },
+    fill(box, peds, notes.map(n => h('div', { class: 'crise-card note', style: { '--c': n.c.cor || '#e9b45a' } },
       h('span', { class: 'crise-ic', html: icon('dice') }),
       h('div', { class: 'crise-tx' }, h('b', null, `${n.nome} rolou a ${n.c.crise}` + (n.c.total != null ? ` · tirou ${n.c.total}` : '')), h('span', null, n.c.efeito + ' — ' + n.c.txt)),
       h('button', { class: 'btn sm ghost', type: 'button', onclick: () => { this.notes = this.notes.filter(x => x !== n); this.scan(); } }, 'OK'))),
@@ -9073,7 +9075,8 @@ const Crise = {
         s.surto === 'ansiedade' ? h('button', { class: 'btn sm ghost', type: 'button', title: 'Pela regra, na Primeira Crise quem rola é o jogador', onclick: () => Sheets.show(id) }, 'Esperando o jogador rolar')
           : h('button', { class: 'btn sm primary', type: 'button', html: icon('dice') + 'Resolver', onclick: () => this.open(id) }));
     }));
-    box.hidden = !list.length && !notes.length;
+    box.hidden = !list.length && !notes.length && !peds.length;
+    for (const [uid] of show ? Pedidos.pending() : []) if (!this.seen.has('p' + uid)) { this.seen.add('p' + uid); fresh = true; }
     if (notes.some(n => !this.seen.has('n' + n.t))) { notes.forEach(n => this.seen.add('n' + n.t)); fresh = true; }
     if (fresh) this.beep();
   },
@@ -9276,6 +9279,73 @@ const PlSheet = {
 };
 PlSheet.renderSoon = rafOnce(() => PlSheet.render());
 
+/* ---------- permissão do mestre para criar ficha ---------- */
+const Pedidos = {
+  db: null, ok: false, mine: null, list: {}, seen: new Set(), loaded: false,
+  needed() { return !!this.db && ROLE !== 'gm'; },
+  can() { return !this.needed() || this.ok; },
+  init(db) {
+    if (!db || typeof db.doc !== 'function' || Store.mode !== 'db') return;
+    this.db = db;
+    if (ROLE === 'gm') {
+      const listen = () => db.collection('pedidos').onSnapshot(snap => {
+        for (const ch of snap.docChanges()) { if (ch.type === 'removed') delete this.list[ch.doc.id]; else this.list[ch.doc.id] = ch.doc.data(); }
+        Crise.scanSoon();
+      }, err => { if (err?.code === 'unavailable') setTimeout(listen, 3000); });
+      listen();
+    } else if (ME) {
+      let first = true;
+      db.doc('mesa/fichasOk/' + ME).onSnapshot(d => {
+        const was = this.ok; this.ok = !!(d.exists && d.data()?.ok);
+        if (this.ok && !was && !first && !Sheets.data[ME]) UI.toast('O mestre aprovou! Agora você pode criar a sua ficha.');
+        first = false; this.loaded = true; this.changed();
+      }, () => { this.loaded = true; this.changed(); });
+      db.doc('pedidos/' + ME).onSnapshot(d => {
+        const prev = this.mine; this.mine = d.exists ? d.data() : null;
+        if (prev?.status === 'pendente' && this.mine?.status === 'recusado') UI.toast('O mestre recusou o pedido de ficha por enquanto.', 'err');
+        this.changed();
+      }, () => {});
+    }
+  },
+  changed() { if (Sheets.open) Sheets.renderList(); PlSheet.renderSoon(); },
+  label() {
+    if (this.can()) return 'Criar minha ficha';
+    if (this.mine?.status === 'pendente') return 'Pedido enviado ao mestre';
+    if (this.mine?.status === 'recusado') return 'Pedir de novo ao mestre';
+    return 'Pedir para criar ficha';
+  },
+  async pedir() {
+    if (!this.db || !ME) return;
+    if (this.mine?.status === 'pendente') { UI.toast('Seu pedido já foi enviado. Espere o mestre aprovar.'); return; }
+    const u = window.APOGEU_FB?.user || {};
+    try {
+      await this.db.doc('pedidos/' + ME).set({ nome: String(u.displayName || u.email || 'Jogador').slice(0, 60), foto: String(u.photoURL || '').slice(0, 400), t: Date.now(), status: 'pendente' });
+      UI.toast('Pedido enviado! Quando o mestre aprovar, você cria a sua ficha.');
+    } catch { UI.toast('Não foi possível enviar o pedido agora. Tente de novo.', 'err'); }
+  },
+  pending() { return Object.entries(this.list).filter(([, p]) => p && p.status === 'pendente').sort((a, b) => (a[1].t || 0) - (b[1].t || 0)); },
+  async aprovar(uid) {
+    try { await this.db.doc('mesa/fichasOk/' + uid).set({ ok: true, t: Date.now() }); await this.db.doc('pedidos/' + uid).delete(); delete this.list[uid]; UI.toast('Pedido aprovado. O jogador já pode criar a ficha.'); }
+    catch { UI.toast('Não foi possível aprovar agora.', 'err'); }
+    Crise.scan();
+  },
+  async recusar(uid) {
+    const p = this.list[uid]; if (!p) return;
+    try { await this.db.doc('pedidos/' + uid).set(Object.assign({}, p, { status: 'recusado', t: Date.now() })); this.list[uid] = Object.assign({}, p, { status: 'recusado' }); }
+    catch { UI.toast('Não foi possível recusar agora.', 'err'); }
+    Crise.scan();
+  },
+  cards() {
+    if (ROLE !== 'gm' || VIEWMODE !== 'gm') return [];
+    return this.pending().map(([uid, p]) => h('div', { class: 'crise-card note', style: { '--c': '#4fa3a5' } },
+      p.foto ? h('span', { class: 'sh-av', html: `<img src="${esc(p.foto)}" alt="" referrerpolicy="no-referrer">` }) : h('span', { class: 'sh-av', style: { '--c': '#4fa3a5' } }, initials(p.nome)),
+      h('div', { class: 'crise-tx' }, h('b', null, p.nome), h('span', null, 'quer criar uma ficha')),
+      h('div', { class: 'row', style: { gap: '6px', flexWrap: 'nowrap' } },
+        h('button', { class: 'btn sm ghost', type: 'button', onclick: () => this.recusar(uid) }, 'Recusar'),
+        h('button', { class: 'btn sm primary', type: 'button', onclick: () => this.aprovar(uid) }, 'Aprovar'))));
+  },
+};
+
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
   const toolbar = h('div', { class: 'toolbar', role: 'toolbar', 'aria-label': 'Ferramentas', 'aria-orientation': 'vertical' },
@@ -9428,6 +9498,7 @@ async function boot(hot) {
   PlSheet.wire();
   setTimeout(() => { ensureOwners(); onTravas(); }, 3500); setInterval(ensureOwners, 30000);
   Sheets.init(db);
+  Pedidos.init(db);
   VIEWMODE = gm ? (hot.viewmode || SS.get('view', 'gm')) : 'players';
   $('#app').classList.toggle('players', VIEWMODE === 'players');
   if (VIEWMODE === 'players') {
