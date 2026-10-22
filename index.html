@@ -9,7 +9,7 @@
 <title>Névoa Sobre Apogeu</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 /* Layout: mesa de mestre — lista de locais à esquerda, mapa ao centro, painel do mestre à direita.
    Visual único escuro (mar à noite), acento âmbar da lanterna do farol. */
@@ -686,6 +686,112 @@ textarea.notes:focus { border-color: var(--lamp); }
 .sh-sepg button { font-size: 12px; }
 #mp-clima { flex-wrap: wrap; height: auto; }
 #mp-clima button { flex: 1 0 auto; }
+/* ---------- abertura ---------- */
+.ab { position: fixed; inset: 0; z-index: 90; background: #050809; overflow: hidden; color: #eef1ef; animation: ab-fadein .5s ease both; user-select: none; }
+.ab.ab-out { animation: ab-fadeout .6s ease both; }
+@keyframes ab-fadein { from { opacity: 0; } }
+@keyframes ab-fadeout { to { opacity: 0; } }
+.ab-fx { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ab-vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(0,0,0,.62) 100%); }
+.ab-vig::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px); mix-blend-mode: multiply; opacity: .5; }
+.ab-flash { position: absolute; inset: 0; pointer-events: none; background: #fff; opacity: 0; }
+.ab-flash.go { animation: ab-flash .32s ease-out; }
+@keyframes ab-flash { 0% { opacity: .75; } 100% { opacity: 0; } }
+.ab-stage { position: absolute; inset: 0; }
+.ab-ctl { position: absolute; right: 16px; bottom: 16px; display: flex; gap: 8px; z-index: 3; opacity: .55; transition: opacity .2s; }
+.ab-ctl:hover, .ab-ctl:focus-within { opacity: 1; }
+.ab-ctl .btn { background: rgba(5, 8, 9, .55); backdrop-filter: blur(4px); }
+.ab-tap { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 3; display: inline-flex; gap: 8px; align-items: center; border: 1px solid rgba(255,255,255,.25); background: rgba(5,8,9,.7); color: #fff; border-radius: 999px; padding: 10px 16px; font: 600 14px var(--f-ui); cursor: pointer; animation: ab-pulse 1.6s ease-in-out infinite; }
+.ab-tap svg { width: 18px; height: 18px; }
+@keyframes ab-pulse { 50% { box-shadow: 0 0 0 8px rgba(233,180,90,.18); } }
+.ab-ch { display: inline-block; animation: ab-up .55s cubic-bezier(.2,.9,.25,1.15) both; }
+@keyframes ab-up { from { transform: translateY(105%) rotate(7deg); opacity: 0; } }
+
+/* abertura: frase datilografada */
+.ab-intro { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 0 24px; gap: 18px; }
+.ab-eyebrow { font: 500 12px/1 var(--f-mono); letter-spacing: .5em; text-transform: uppercase; color: rgba(233,180,90,.85); animation: ab-fadein 1.2s .1s ease both; }
+.ab-type { font: italic 500 clamp(24px, 4.2vw, 52px)/1.2 var(--f-display); color: #e8eeec; max-width: 22ch; margin: 0 auto; text-shadow: 0 2px 30px rgba(0,0,0,.6); }
+.ab-tw .ab-ch { animation: ab-type .12s linear both; }
+@keyframes ab-type { from { opacity: 0; } to { opacity: 1; } }
+.ab-intro::after { content: ""; position: absolute; left: 50%; bottom: 18%; width: 1px; height: 0; background: rgba(233,180,90,.7); animation: ab-line 3s 1s ease forwards; }
+@keyframes ab-line { to { height: 14vh; } }
+
+/* cartão do personagem */
+.ab-card { position: absolute; inset: 0; animation: ab-cardout .3s calc(4.8s - .3s) ease-in both; }
+@keyframes ab-cardout { to { transform: scale(1.06) skewX(-3deg); filter: blur(6px) brightness(1.6); opacity: 0; } }
+.ab-mq { position: absolute; left: 0; white-space: nowrap; font: 400 clamp(90px, 19vh, 220px)/1 "Anton", "Barlow", sans-serif; color: transparent; -webkit-text-stroke: 1.5px var(--txt); opacity: .13; pointer-events: none; }
+.ab-mq span { display: inline-block; }
+.ab-mq.m1 { top: 4vh; } .ab-mq.m1 span { animation: ab-mqL 4.8s linear both; }
+.ab-mq.m2 { bottom: 2vh; opacity: .09; } .ab-mq.m2 span { animation: ab-mqR 4.8s linear both; }
+@keyframes ab-mqL { from { transform: translateX(0); } to { transform: translateX(-28%); } }
+@keyframes ab-mqR { from { transform: translateX(-30%); } to { transform: translateX(-2%); } }
+.ab-num { position: absolute; top: 6vh; font: 400 clamp(70px, 14vh, 160px)/1 "Anton", "Barlow", sans-serif; color: var(--acc); opacity: .9; animation: ab-num .7s .1s cubic-bezier(.2,.9,.3,1) both; text-shadow: 0 0 40px rgba(0,0,0,.35); }
+@keyframes ab-num { from { transform: translateY(-40%); opacity: 0; } }
+.ab-L .ab-num { right: 5vw; } .ab-R .ab-num { left: 5vw; }
+.ab-por { position: absolute; top: 50%; width: min(40vw, 62vh); aspect-ratio: 4 / 5; transform: translateY(-50%); }
+.ab-L .ab-por { left: 7vw; } .ab-R .ab-por { right: 7vw; }
+.ab-por-sh { position: absolute; inset: 0; background: var(--acc); transform: translate(18px, 18px); clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%); animation: ab-wipe .55s .12s cubic-bezier(.7,0,.2,1) both; opacity: .9; }
+.ab-R .ab-por-sh { transform: translate(-18px, 18px); }
+.ab-por-in { position: absolute; inset: 0; overflow: hidden; clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%); animation: ab-wipe .6s cubic-bezier(.7,0,.2,1) both; background: var(--bg0); }
+@keyframes ab-wipe { from { clip-path: polygon(8% 0, 8% 0, 0 100%, 0 100%); } }
+.ab-por-in img { width: 100%; height: 100%; object-fit: cover; display: block; animation: ab-ken 4.8s ease-out both, ab-glitch .4s .05s steps(2) both; }
+@keyframes ab-ken { from { transform: scale(1.16); } to { transform: scale(1.02); } }
+@keyframes ab-glitch { 0% { filter: hue-rotate(80deg) saturate(2); translate: 8px 0; } 50% { filter: hue-rotate(-60deg) contrast(1.4); translate: -6px 0; } 100% { filter: none; translate: 0 0; } }
+.ab-ini { width: 100%; height: 100%; display: grid; place-items: center; font: 400 clamp(80px, 22vh, 240px)/1 "Anton", sans-serif; color: rgba(255,255,255,.92); text-shadow: 0 6px 40px rgba(0,0,0,.4); animation: ab-ken 4.8s ease-out both; }
+.ab-por::after { content: ""; position: absolute; inset: 0; clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%); background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,.45)); pointer-events: none; }
+.ab-txt { position: absolute; top: 50%; transform: translateY(-50%); width: min(46vw, 760px); display: flex; flex-direction: column; gap: 14px; }
+.ab-L .ab-txt { right: 6vw; text-align: right; align-items: flex-end; } .ab-R .ab-txt { left: 6vw; }
+.ab-tag { display: inline-flex; align-items: center; gap: 12px; font: 500 clamp(12px, 1.5vw, 16px)/1 var(--f-mono); letter-spacing: .32em; text-transform: uppercase; color: var(--txt); animation: ab-slide .6s .2s ease both; }
+.ab-tag::before { content: ""; width: 42px; height: 3px; background: var(--acc); }
+.ab-L .ab-tag { flex-direction: row-reverse; }
+@keyframes ab-slide { from { transform: translateX(-30px); opacity: 0; } }
+.ab-L .ab-tag { animation-name: ab-slideR; } @keyframes ab-slideR { from { transform: translateX(30px); opacity: 0; } }
+.ab-nm { margin: 0; display: flex; flex-direction: column; line-height: .9; }
+.ab-nm .ab-f, .ab-nm .ab-l { overflow: hidden; padding-bottom: .04em; white-space: nowrap; }
+.ab-nm .ab-f { font: 400 clamp(48px, calc(min(46vw, 760px) / (var(--len) * 0.62)), 160px)/0.95 "Anton", "Barlow", sans-serif; text-transform: uppercase; color: var(--txt); text-shadow: 0.05em 0.05em 0 var(--acc); letter-spacing: .01em; }
+.ab-nm .ab-l { font: 400 clamp(26px, 4.4vw, 60px)/1 "Anton", "Barlow", sans-serif; text-transform: uppercase; color: var(--acc); letter-spacing: .14em; margin-top: 6px; }
+.ab-fr { margin: 6px 0 0; font: italic 500 clamp(18px, 2.3vw, 30px)/1.25 var(--f-display); color: var(--txt); max-width: 30ch; animation: ab-fadein .8s 1.5s ease both; text-shadow: 0 2px 18px rgba(0,0,0,.5); }
+.ab-by { font: 500 clamp(11px, 1.2vw, 14px)/1 var(--f-mono); letter-spacing: .26em; text-transform: uppercase; color: var(--txt); opacity: .75; animation: ab-fadein .8s 2.1s ease both; }
+.ab-by b { color: var(--acc); font-weight: 600; }
+
+/* título final */
+.ab-title { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 0 20px; gap: 18px; }
+.ab-tt { margin: 0; font: 700 clamp(38px, 8.5vw, 128px)/1 var(--f-display); text-transform: uppercase; letter-spacing: .1em; color: #f1f4f2; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 .45em; text-shadow: 0 4px 50px rgba(0,0,0,.6), 0 0 30px rgba(233,180,90,.25); animation: ab-breath 7.2s ease-out both; }
+@keyframes ab-breath { from { letter-spacing: .02em; } to { letter-spacing: .14em; } }
+.ab-tw2 .ab-ch { animation: ab-blur 1.2s ease both; }
+@keyframes ab-blur { from { opacity: 0; filter: blur(14px); transform: scale(1.4); } }
+.ab-rule { width: 0; height: 2px; margin: 0 auto; background: var(--lamp); animation: ab-rule 1.4s 1.6s ease forwards; }
+@keyframes ab-rule { to { width: min(320px, 50vw); } }
+.ab-ts { margin: 0; font: 500 clamp(12px, 1.5vw, 16px)/1 var(--f-mono); letter-spacing: .5em; text-transform: uppercase; color: rgba(233,180,90,.9); animation: ab-fadein 1.2s 2.2s ease both; }
+
+/* celular em pé: retrato em cima, texto embaixo */
+@media (max-aspect-ratio: 1/1) {
+  .ab-por { top: 8vh; transform: none; width: min(66vw, 42vh); left: 50% !important; right: auto !important; margin-left: calc(min(66vw, 42vh) / -2); }
+  .ab-txt { top: auto; bottom: 9vh; transform: none; left: 7vw !important; right: 7vw !important; width: auto; text-align: center !important; align-items: center !important; }
+  .ab-L .ab-tag { flex-direction: row; }
+  .ab-num { top: 3vh; font-size: 11vh; }
+  .ab-mq { font-size: 15vh; }
+  .ab-nm .ab-f { font-size: clamp(44px, calc(88vw / var(--len) * 1.05), 120px); }
+}
+.ab-calm .ab-ch, .ab-calm .ab-por-in img, .ab-calm .ab-ini, .ab-calm .ab-mq span, .ab-calm .ab-tt { animation-duration: .01s !important; }
+.ab-calm .ab-flash.go { animation: none; }
+
+/* janela do mestre */
+.ab-cfg { display: flex; flex-direction: column; gap: 12px; }
+.ab-cfg .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 560px) { .ab-cfg .grid2 { grid-template-columns: 1fr; } }
+.ab-cfg h4 { margin: 6px 0 0; }
+.ab-list { display: flex; flex-direction: column; gap: 8px; }
+.ab-row { display: grid; grid-template-columns: auto auto 1fr auto; gap: 10px; align-items: center; padding: 8px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel-2); }
+.ab-row.off { opacity: .5; }
+.ab-row .sh-av { width: 38px; height: 38px; }
+.ab-row .sh-av img { width: 100%; height: 100%; object-fit: cover; }
+.ab-rw { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ab-rw .inp { width: 100%; }
+.ab-mv { display: flex; flex-direction: column; gap: 4px; }
+.ab-mv .iconbtn { width: 30px; height: 26px; font-size: 14px; }
+.ab-mv .iconbtn:disabled { opacity: .3; }
+#ab-top.off { opacity: .45; }
 </style>
 </head>
 <body>
@@ -4690,6 +4796,8 @@ const initials = name => (String(name || '?').trim().split(/\s+/).map(w => w[0])
 /* ---------- ícones ---------- */
 const ICONS = {
   chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/><path d="M9 12h.01M12 12h.01M15 12h.01"/>',
+  film: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 8h4M3 12h4M3 16h4M17 8h4M17 12h4M17 16h4"/>',
+  play: '<path d="M7 5l12 7-12 7z"/>',
   compass: '<circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><path d="M12 7l2 5-2 5-2-5z" fill="currentColor" stroke="none"/>',
   move: '<path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>',
   reveal: '<path d="M4 15c1.5-2 4-2 5.5-.5S13 16 15 14"/><path d="M5 19h14"/><path d="M15 4l1.2 2.8L19 8l-2.8 1.2L15 12l-1.2-2.8L11 8l2.8-1.2z"/>',
@@ -4891,7 +4999,7 @@ const Store = {
 };
 
 /* ---------- canal ao vivo (sala + abas do mesmo navegador) ---------- */
-const LIVE_TOPICS = ['ping', 'tok', 'fog', 'roll', 'cam', 'scene', 'sfx'];
+const LIVE_TOPICS = ['ping', 'tok', 'fog', 'roll', 'cam', 'scene', 'sfx', 'intro'];
 const Live = {
   room: null, bc: null, handlers: {},
   init(room) {
@@ -5856,6 +5964,7 @@ const UI = {
     t.hidden = !show || CUR === CITY_ID; // o mapa da cidade já traz o título impresso
     if (show) { $('#pl-title-ov').textContent = CUR === CITY_ID ? 'Névoa Sobre Apogeu' : catName(CUR) || 'Apogeo'; $('#pl-title-h').textContent = mapName(CUR); }
     $('#pl-follow').hidden = !show || PL_FOLLOW;
+    Abertura.renderBtn();
     $('#pl-mode').hidden = ROLE === 'loading'; // no celular o seletor fica no canto do mapa também para o mestre
     this.renderModeSwitch();
   },
@@ -8412,6 +8521,296 @@ function rollDetailHtml(parts) {
 }
 function sepSeg(id) { return `<div class="seg sh-sepg" id="${id}" role="group" aria-label="Como mostrar as rolagens"><button type="button" data-sep="soma" class="${ROLL_SEP ? '' : 'on'}">Somar</button><button type="button" data-sep="sep" class="${ROLL_SEP ? 'on' : ''}">Dado por dado</button></div>`; }
 
+/* ---------- abertura (apresentação dos personagens, estilo vinheta de série) ----------
+   O mestre liga/desliga, escolhe o elenco, a ordem, uma frase para cada um e a trilha.
+   Só usa a parte pública das fichas (nome, idade, conceito, jogador, retrato, cor). */
+const AB_B = 0.6; // um tempo da música (100 bpm)
+const AB_INTRO = 8 * AB_B, AB_CARD = 8 * AB_B, AB_TITLE = 12 * AB_B;
+const AB_HOUSE = { bg0: [7, 11, 13], bg1: [26, 42, 47], bg2: [111, 131, 135], acc: [233, 180, 90], txt: [236, 240, 238] };
+const AB_CHORDS = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]]; // Lá menor, Fá, Dó, Sol
+const abHz = m => 440 * Math.pow(2, (m - 69) / 12);
+const abRgb = a => `rgb(${a.map(v => Math.round(v)).join(',')})`;
+function abHsl(hh, s, l) {
+  hh = ((hh % 360) + 360) % 360 / 360; const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+  const f = t => { t = (t + 1) % 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; };
+  return [f(hh + 1 / 3) * 255, f(hh) * 255, f(hh - 1 / 3) * 255];
+}
+function abToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2;
+  if (mx === mn) return [0, 0, l];
+  const d = mx - mn, s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+  const hh = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [hh * 60, s, l];
+}
+function abHex(hex) { const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '')); const n = m ? parseInt(m[1], 16) : 0x4fa3a5; return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+/* paleta a partir da arte do personagem (ou da cor da peça, se não tiver retrato) */
+function abPaletteFrom(main, alt) {
+  const s1 = clampN(main[1], 0.3, 0.75), s2 = clampN(alt[1], 0.4, 0.85);
+  return { bg0: abHsl(main[0], Math.min(s1, 0.55), 0.07), bg1: abHsl(main[0], s1, 0.2), bg2: abHsl(alt[0], s2, 0.36), acc: abHsl(alt[0], 0.82, 0.62), txt: abHsl(main[0], 0.35, 0.95) };
+}
+async function abPalette(s) {
+  const fb = abToHsl(...abHex(s.cor));
+  const fallback = abPaletteFrom(fb, [fb[0] + 35, fb[1], fb[2]]);
+  if (!s.retrato) return fallback;
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = imgSrc(s.retrato); setTimeout(() => rej(new Error('tempo')), 4000); });
+    const N = 36, c = cv(N, N), g = c.getContext('2d', { willReadFrequently: true });
+    g.drawImage(img, 0, 0, N, N);
+    const d = g.getImageData(0, 0, N, N).data, bins = Array.from({ length: 18 }, () => ({ w: 0, h: 0, s: 0, l: 0 }));
+    for (let i = 0; i < d.length; i += 4) {
+      const [hh, ss, ll] = abToHsl(d[i], d[i + 1], d[i + 2]);
+      if (ss < 0.16 || ll < 0.1 || ll > 0.9) continue;
+      const w = ss * (1 - Math.abs(ll - 0.5) * 1.3), b = bins[Math.floor(hh / 20) % 18];
+      b.w += w; b.h += hh * w; b.s += ss * w; b.l += ll * w;
+    }
+    const ranked = bins.map(b => (b.w ? { w: b.w, c: [b.h / b.w, b.s / b.w, b.l / b.w] } : null)).filter(Boolean).sort((a, b) => b.w - a.w);
+    if (!ranked.length || ranked[0].w < 4) return fallback; // arte quase sem cor: usa a cor da peça
+    const main = ranked[0].c, far = ranked.find(r => Math.min(Math.abs(r.c[0] - main[0]), 360 - Math.abs(r.c[0] - main[0])) >= 40 && r.w >= ranked[0].w * 0.18);
+    return abPaletteFrom(main, far ? far.c : [main[0] + 30, main[1], main[2]]);
+  } catch { return fallback; }
+}
+
+/* trilha original, gerada no navegador (nada de música de terceiros) */
+function abMusic(ac, plan, from, vol) {
+  const t0 = ac.currentTime + 0.06 - from, end = t0 + plan.total;
+  const master = ac.createGain(); master.gain.value = vol; master.connect(ac.destination);
+  const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; comp.connect(master);
+  const rev = ac.createConvolver(), rl = Math.floor(ac.sampleRate * 2.6), ir = ac.createBuffer(2, rl, ac.sampleRate);
+  for (let ch = 0; ch < 2; ch++) { const a = ir.getChannelData(ch); for (let i = 0; i < rl; i++) a[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / rl, 3.2); }
+  rev.buffer = ir; const revG = ac.createGain(); revG.gain.value = 0.32; rev.connect(revG); revG.connect(comp);
+  const dly = ac.createDelay(1), fbk = ac.createGain(), dG = ac.createGain(); dly.delayTime.value = AB_B * 0.75; fbk.gain.value = 0.38; dG.gain.value = 0.3;
+  dly.connect(fbk); fbk.connect(dly); dly.connect(dG); dG.connect(comp); dG.connect(rev);
+  const nb = ac.createBuffer(1, ac.sampleRate, ac.sampleRate); { const a = nb.getChannelData(0); for (let i = 0; i < a.length; i++) a[i] = Math.random() * 2 - 1; }
+  const ok = t => t >= ac.currentTime - 0.001 && t < end + 3;
+  const env = (g, t, a, peak, rel) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + rel); };
+  const kick = t => { if (!ok(t)) return; const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(130, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.16); env(g, t, 0.004, 0.9, 0.32); o.connect(g); g.connect(comp); o.start(t); o.stop(t + 0.4); };
+  const noise = (t, dur, type, f, peak, toRev) => { if (!ok(t)) return; const n = ac.createBufferSource(), fl = ac.createBiquadFilter(), g = ac.createGain(); n.buffer = nb; fl.type = type; fl.frequency.value = f; env(g, t, 0.003, peak, dur); n.connect(fl); fl.connect(g); g.connect(comp); if (toRev) g.connect(rev); n.start(t); n.stop(t + dur + 0.05); };
+  const hat = t => noise(t, 0.05, 'highpass', 7500, 0.16);
+  const hit = t => { if (!ok(t)) return; noise(t, 0.9, 'lowpass', 2400, 0.5, true); const o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(70, t); o.frequency.exponentialRampToValueAtTime(30, t + 1.2); env(g, t, 0.005, 1, 1.4); o.connect(g); g.connect(comp); g.connect(rev); o.start(t); o.stop(t + 1.6); };
+  const riser = (t, dur) => { if (t + dur < ac.currentTime) return; const st = Math.max(t, ac.currentTime); const n = ac.createBufferSource(), fl = ac.createBiquadFilter(), g = ac.createGain(); n.buffer = nb; n.loop = true; fl.type = 'bandpass'; fl.Q.value = 3; fl.frequency.setValueAtTime(300, st); fl.frequency.exponentialRampToValueAtTime(6000, t + dur); g.gain.setValueAtTime(0.0001, st); g.gain.exponentialRampToValueAtTime(0.22, t + dur); g.gain.setValueAtTime(0.0001, t + dur + 0.01); n.connect(fl); fl.connect(g); g.connect(comp); n.start(st); n.stop(t + dur + 0.05); };
+  const bell = (t, m, peak = 0.16) => { if (!ok(t)) return; const o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain(); o.type = 'triangle'; o.frequency.value = abHz(m); o2.type = 'sine'; o2.frequency.value = abHz(m) * 2.01; env(g, t, 0.004, peak, 1.1); o.connect(g); o2.connect(g); g.connect(comp); g.connect(dly); g.connect(rev); o.start(t); o2.start(t); o.stop(t + 1.3); o2.stop(t + 1.3); };
+  const bass = (t, m, dur) => { if (!ok(t)) return; const o = ac.createOscillator(), fl = ac.createBiquadFilter(), g = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = abHz(m - 24); fl.type = 'lowpass'; fl.frequency.setValueAtTime(900, t); fl.frequency.exponentialRampToValueAtTime(160, t + dur); env(g, t, 0.01, 0.34, dur); o.connect(fl); fl.connect(g); g.connect(comp); o.start(t); o.stop(t + dur + 0.1); };
+  const pad = (t, notes, dur, peak) => { if (t + dur < ac.currentTime) return; const st = Math.max(t, ac.currentTime); for (const m of notes) for (const det of [-7, 7]) { const o = ac.createOscillator(), fl = ac.createBiquadFilter(), g = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = abHz(m); o.detune.value = det; fl.type = 'lowpass'; fl.frequency.value = 1100; g.gain.setValueAtTime(0.0001, st); g.gain.exponentialRampToValueAtTime(peak, st + 1.2); g.gain.setValueAtTime(peak, t + dur - 2); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(fl); fl.connect(g); g.connect(comp); g.connect(rev); o.start(st); o.stop(t + dur + 0.1); } };
+  // drone por baixo de tudo
+  { const st = Math.max(t0, ac.currentTime); for (const [m, det] of [[33, -5], [33, 5], [40, 0]]) { const o = ac.createOscillator(), fl = ac.createBiquadFilter(), g = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = abHz(m); o.detune.value = det; fl.type = 'lowpass'; fl.frequency.setValueAtTime(220, st); fl.frequency.linearRampToValueAtTime(520, end - AB_TITLE); fl.frequency.linearRampToValueAtTime(180, end); g.gain.setValueAtTime(0.0001, st); g.gain.exponentialRampToValueAtTime(0.09, st + 2.5); g.gain.setValueAtTime(0.09, end - 2.5); g.gain.exponentialRampToValueAtTime(0.0001, end); o.connect(fl); fl.connect(g); g.connect(comp); o.start(st); o.stop(end + 0.1); } }
+  // abertura: sinos esparsos e um sopro subindo até o primeiro corte
+  for (let b = 0; b < 8; b += 2) bell(t0 + b * AB_B, [69, 72, 76, 74][b / 2], 0.11);
+  riser(t0 + 6 * AB_B, 2 * AB_B);
+  plan.segs.forEach((sg, i) => {
+    if (sg.kind !== 'card') return;
+    const c = AB_CHORDS[(sg.i) % 4], T = t0 + sg.t;
+    hit(T); bass(T, c[0], 4 * AB_B); bass(T + 4 * AB_B, c[0], 3.5 * AB_B);
+    for (const b of [0, 3, 4, 6]) kick(T + b * AB_B);
+    for (let b = 0; b < 8; b++) hat(T + (b + 0.5) * AB_B);
+    [0, 1, 2, 1, 0, 2, 1, 2].forEach((ix, k) => bell(T + k * AB_B, c[ix] + 12 + (k >= 4 && ix === 0 ? 12 : 0)));
+    const next = plan.segs[i + 1]; if (next) riser(T + 6.5 * AB_B, 1.5 * AB_B);
+  });
+  const tt = plan.segs.find(s => s.kind === 'title');
+  if (tt) { const T = t0 + tt.t; hit(T); kick(T); pad(T, [57, 60, 64, 69], AB_TITLE, 0.035); [76, 72, 69, 64].forEach((m, k) => bell(T + (1 + k * 1.5) * AB_B, m, 0.12)); }
+  return { stop(fade = 0.5) { const now = ac.currentTime; try { master.gain.cancelScheduledValues(now); master.gain.setValueAtTime(master.gain.value, now); master.gain.linearRampToValueAtTime(0, now + fade); } catch {} setTimeout(() => { try { master.disconnect(); } catch {} }, fade * 1000 + 200); } };
+}
+
+const Abertura = {
+  on: false, root: null, raf: 0, start: 0, plan: null, seg: -1, music: null, pal: null, palT: null, grain: null, mine: false, n: '',
+  cfg() {
+    const c = Store.data.vtt?.abertura || {};
+    return { ativa: c.ativa !== false, titulo: String(c.titulo ?? 'Névoa Sobre Apogeu').slice(0, 60), intro: String(c.intro ?? 'Em Apogeu, a névoa nunca vai embora.').slice(0, 90), sub: String(c.sub ?? 'uma mesa de RPG').slice(0, 60),
+      trilha: String(c.trilha || 'synth'), fora: c.fora && typeof c.fora === 'object' ? c.fora : {}, frases: c.frases && typeof c.frases === 'object' ? c.frases : {}, ordem: Array.isArray(c.ordem) ? c.ordem.map(String) : [] };
+  },
+  put(fn) { const c = this.cfg(); fn(c); Store.put('vtt/abertura', c, 300); this.renderBtn(); },
+  pjs() { return Object.entries(Sheets.data || {}).filter(([, s]) => s && !isNpc(s) && String(s.nome || '').trim()).map(([id, s]) => ({ id, s })); },
+  elenco(c = this.cfg(), all = false) {
+    const list = this.pjs(), pos = id => { const i = c.ordem.indexOf(id); return i < 0 ? 1e6 : i; };
+    list.sort((a, b) => pos(a.id) - pos(b.id) || (a.s.criado || 0) - (b.s.criado || 0));
+    return all ? list : list.filter(x => !c.fora[x.id]);
+  },
+  renderBtn() {
+    const b = $('#pl-ab'); if (b) b.hidden = !this.cfg().ativa;
+    const t = $('#ab-top'); if (t) t.classList.toggle('off', !this.cfg().ativa);
+  },
+  /* mestre: toca para a mesa inteira */
+  broadcast() {
+    const c = this.cfg(), ids = this.elenco(c).map(x => x.id);
+    if (!ids.length) { UI.toast('Ainda não há personagens com nome para apresentar.', 'err'); return; }
+    if (!c.ativa) this.put(x => { x.ativa = true; });
+    const frases = {}; for (const id of ids) if (c.frases[id]) frases[id] = String(c.frases[id]).slice(0, 110);
+    const msg = { n: uid(), ids, cfg: { titulo: c.titulo, intro: c.intro, sub: c.sub, trilha: c.trilha, frases } };
+    Live.emit('intro', msg); this.play(msg, true);
+  },
+  stopAll() { Live.emit('intro', { stop: true, n: uid() }); this.close(); },
+  onRemote(d) {
+    if (!d) return;
+    if (d.stop) { this.close(); return; }
+    if (d.n && d.n === this.n) return;
+    if (Array.isArray(d.ids)) this.play(d, false);
+  },
+  /* jogador (ou mestre) assistindo só no próprio aparelho */
+  local() {
+    const c = this.cfg();
+    if (!c.ativa && ROLE !== 'gm') { UI.toast('O mestre desligou a abertura.'); return; }
+    const ids = this.elenco(c).map(x => x.id);
+    if (!ids.length) { UI.toast('Ainda não há personagens com nome para apresentar.'); return; }
+    this.play({ n: uid(), ids, cfg: c }, false);
+  },
+  async play(msg, mine) {
+    this.close(true);
+    const c = Object.assign(this.cfg(), msg.cfg || {});
+    const cast = (msg.ids || []).map(id => ({ id, s: Sheets.data?.[id] })).filter(x => x.s && String(x.s.nome || '').trim()).slice(0, 12);
+    if (!cast.length) return;
+    this.n = msg.n || uid(); this.mine = !!mine; this.on = true; const myN = this.n;
+    const segs = [{ kind: 'intro', t: 0, d: AB_INTRO }];
+    cast.forEach((x, i) => segs.push({ kind: 'card', i, t: AB_INTRO + i * AB_CARD, d: AB_CARD, x }));
+    segs.push({ kind: 'title', t: AB_INTRO + cast.length * AB_CARD, d: AB_TITLE });
+    this.plan = { segs, total: AB_INTRO + cast.length * AB_CARD + AB_TITLE, c };
+    this.build();
+    const pals = await Promise.all(cast.map(x => abPalette(x.s)));
+    if (!this.on || this.n !== myN) return;
+    cast.forEach((x, i) => { x.pal = pals[i]; });
+    this.pal = JSON.parse(JSON.stringify(AB_HOUSE)); this.palT = AB_HOUSE;
+    this.seg = -1; this.start = performance.now();
+    this.audioStart(0);
+    const loop = () => { if (!this.on) return; this.tick(); this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+  },
+  elapsed() { return (performance.now() - this.start) / 1000; },
+  audioStart(from) {
+    const c = this.plan.c;
+    if (c.trilha === 'none') return;
+    if (c.trilha !== 'synth') { if (from < 1 && Store.data.sons?.[c.trilha]) Som.once(c.trilha, true); return; }
+    const ac = Som.ctx(); if (!ac) return;
+    const go = () => { if (!this.on || this.music) return; this.music = abMusic(ac, this.plan, this.elapsed(), Som.mudo ? 0 : 0.85 * Som.vol); $('#ab-tap')?.remove(); };
+    if (ac.state === 'running') go();
+    else {
+      ac.resume().then(() => { if (ac.state === 'running') go(); }).catch(() => {});
+      setTimeout(() => { if (this.on && !this.music && ac.state !== 'running') this.root?.append(h('button', { class: 'ab-tap', id: 'ab-tap', type: 'button', html: icon('sound') + 'Toque para ouvir a trilha', onclick: e => { e.stopPropagation(); Som.unlock(); ac.resume().then(go).catch(() => {}); } })); }, 400);
+    }
+  },
+  build() {
+    this.root?.remove();
+    const cvs = h('canvas', { class: 'ab-fx', 'aria-hidden': 'true' });
+    this.root = h('div', { class: 'ab' + (REDUCED ? ' ab-calm' : ''), role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Abertura da mesa' },
+      cvs, h('div', { class: 'ab-stage', id: 'ab-stage' }), h('div', { class: 'ab-vig' }), h('div', { class: 'ab-flash', id: 'ab-flash' }),
+      h('div', { class: 'ab-ctl' },
+        ROLE === 'gm' && this.mine ? h('button', { class: 'btn sm ghost', type: 'button', html: icon('x') + 'Parar para todos', onclick: () => this.stopAll() }) : null,
+        h('button', { class: 'btn sm ghost', type: 'button', onclick: () => this.close() }, 'Pular')));
+    this.cvs = cvs; this.g = cvs.getContext('2d');
+    if (!this.grain) { const n = cv(160, 160), gg = n.getContext('2d'), im = gg.createImageData(160, 160); for (let i = 0; i < im.data.length; i += 4) { const v = Math.random() * 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; } gg.putImageData(im, 0, 0); this.grain = n; }
+    this.onKey = e => { if (e.key === 'Escape') { e.stopPropagation(); this.close(); } };
+    document.addEventListener('keydown', this.onKey, true);
+    document.body.append(this.root);
+    this.size();
+    this.onResize = () => this.size(); addEventListener('resize', this.onResize);
+  },
+  size() { if (!this.cvs) return; const k = Math.min(1, 900 / Math.max(innerWidth, innerHeight)); this.cvs.width = Math.round(innerWidth * k); this.cvs.height = Math.round(innerHeight * k); },
+  close(silent) {
+    if (!this.on && !this.root) return;
+    this.on = false; cancelAnimationFrame(this.raf);
+    if (this.music) { this.music.stop(silent ? 0.1 : 0.6); this.music = null; }
+    if (this.plan && this.plan.c.trilha !== 'synth' && this.plan.c.trilha !== 'none') Som.stopOnes();
+    document.removeEventListener('keydown', this.onKey, true); removeEventListener('resize', this.onResize);
+    const r = this.root; this.root = null; this.plan = null;
+    if (r) { if (silent) r.remove(); else { r.classList.add('ab-out'); setTimeout(() => r.remove(), 600); } }
+  },
+  tick() {
+    const t = this.elapsed(), P = this.plan; if (!P) return;
+    if (t >= P.total) { this.close(); return; }
+    let si = 0; for (let i = 0; i < P.segs.length; i++) if (t >= P.segs[i].t) si = i;
+    if (si !== this.seg) { this.seg = si; this.show(P.segs[si]); }
+    const sg = P.segs[si], lt = t - sg.t;
+    // a cor do fundo acompanha o personagem
+    const k = 0.08; for (const key of Object.keys(this.pal)) for (let j = 0; j < 3; j++) this.pal[key][j] += (this.palT[key][j] - this.pal[key][j]) * k;
+    this.draw(t, sg, lt);
+  },
+  draw(t, sg, lt) {
+    const g = this.g, W = this.cvs.width, H = this.cvs.height, p = this.pal;
+    const bg = g.createLinearGradient(0, 0, W * 0.4, H); bg.addColorStop(0, abRgb(p.bg1)); bg.addColorStop(1, abRgb(p.bg0));
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    const R = Math.max(W, H);
+    const blob = (x, y, r, col, a) => { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${col.map(Math.round).join(',')},${a})`); gr.addColorStop(1, `rgba(${col.map(Math.round).join(',')},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); };
+    g.globalCompositeOperation = 'screen';
+    blob(W * (0.75 + 0.1 * Math.sin(t * 0.4)), H * (0.3 + 0.12 * Math.cos(t * 0.33)), R * 0.55, p.bg2, 0.55);
+    blob(W * (0.2 + 0.08 * Math.cos(t * 0.27)), H * (0.85 + 0.06 * Math.sin(t * 0.5)), R * 0.45, p.acc, sg.kind === 'card' ? 0.28 : 0.12);
+    // névoa passando
+    for (let i = 0; i < 7; i++) { const x = ((i * 0.37 + t * (0.018 + i * 0.004)) % 1.4 - 0.2) * W, y = H * (0.25 + 0.6 * ((i * 0.61) % 1)) + Math.sin(t * 0.5 + i) * H * 0.04; blob(x, y, R * (0.22 + 0.05 * (i % 3)), [210, 220, 222], sg.kind === 'card' ? 0.07 : 0.12); }
+    // feixes de luz diagonais nos cortes
+    if (sg.kind === 'card') { const a = Math.max(0, 1 - lt / 0.9); if (a > 0) { g.save(); g.translate(W / 2, H / 2); g.rotate(-0.5); const x = (lt / 0.9 - 0.5) * W * 2; const lg = g.createLinearGradient(x - 120, 0, x + 120, 0); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, `rgba(${p.acc.map(Math.round).join(',')},${0.5 * a})`); lg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = lg; g.fillRect(-W * 2, -H * 2, W * 4, H * 4); g.restore(); } }
+    // grão de filme
+    g.globalCompositeOperation = 'overlay'; g.globalAlpha = 0.16;
+    const ox = Math.random() * 160, oy = Math.random() * 160; g.fillStyle = g.createPattern(this.grain, 'repeat'); g.save(); g.translate(-ox, -oy); g.fillRect(0, 0, W + 160, H + 160); g.restore();
+    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  },
+  flash() { const f = $('#ab-flash'); if (!f) return; f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); },
+  letters(txt, cls, d0, step) { return h('span', { class: cls }, [...String(txt)].map((ch, i) => h('span', { class: 'ab-ch', style: { animationDelay: (d0 + i * step).toFixed(3) + 's' } }, ch === ' ' ? ' ' : ch))); },
+  show(sg) {
+    const st = $('#ab-stage'); if (!st) return;
+    const P = this.plan, c = P.c;
+    if (sg.kind === 'intro') {
+      this.palT = AB_HOUSE;
+      fill(st, h('div', { class: 'ab-intro' }, h('div', { class: 'ab-eyebrow' }, c.sub), h('p', { class: 'ab-type' }, this.letters(c.intro, 'ab-tw', 0.6, 0.045))));
+      return;
+    }
+    if (sg.kind === 'title') {
+      this.palT = AB_HOUSE; this.flash();
+      const words = String(c.titulo).trim().split(/\s+/);
+      fill(st, h('div', { class: 'ab-title' }, h('h1', { class: 'ab-tt' }, words.map((w, i) => this.letters(w, 'ab-tw2', 0.25 + i * 0.35, 0.06))), h('div', { class: 'ab-rule' }), h('p', { class: 'ab-ts' }, c.sub)));
+      return;
+    }
+    const { s, id, pal } = sg.x; this.palT = pal || AB_HOUSE; this.flash();
+    const nm = String(s.nome).trim().replace(/\s+/g, ' '), parts = nm.split(' '), first = parts[0], rest = parts.slice(1).join(' ');
+    const meta = [s.idade ? String(s.idade).replace(/\D+$/, '') + ' anos' : '', String(s.conceito || '').trim()].filter(Boolean).join(' · ');
+    const frase = String(c.frases?.[id] || '').trim();
+    const side = sg.i % 2 ? 'ab-R' : 'ab-L', css = { '--acc': abRgb(pal.acc), '--bg2': abRgb(pal.bg2), '--txt': abRgb(pal.txt), '--bg0': abRgb(pal.bg0), '--len': Math.max(first.length, 4) };
+    const marq = (txt, cls) => h('div', { class: 'ab-mq ' + cls }, h('span', null, Array(6).fill(txt.toUpperCase()).join('  ·  ')));
+    fill(st, h('div', { class: 'ab-card ' + side, style: css },
+      marq(nm, 'm1'), marq(String(s.conceito || nm), 'm2'),
+      h('div', { class: 'ab-num' }, String(sg.i + 1).padStart(2, '0')),
+      h('div', { class: 'ab-por' }, h('div', { class: 'ab-por-sh' }), h('div', { class: 'ab-por-in' }, s.retrato ? h('img', { src: imgSrc(s.retrato), alt: '' }) : h('div', { class: 'ab-ini', style: { background: s.cor || '#4fa3a5' } }, initials(nm)))),
+      h('div', { class: 'ab-txt' },
+        meta ? h('div', { class: 'ab-tag' }, meta) : null,
+        h('h2', { class: 'ab-nm' }, this.letters(first, 'ab-f', 0.32, 0.04), rest ? this.letters(rest, 'ab-l', 0.55, 0.03) : null),
+        frase ? h('p', { class: 'ab-fr' }, '“' + frase + '”') : null,
+        s.jogador ? h('div', { class: 'ab-by' }, 'jogado por ', h('b', null, String(s.jogador).slice(0, 40))) : null)));
+  },
+};
+
+/* janela do mestre: ligar/desligar, elenco, ordem, frases e trilha */
+function openAberturaModal() {
+  let close;
+  const body = h('div', { class: 'ab-cfg' });
+  const render = () => {
+    const c = Abertura.cfg(), list = Abertura.elenco(c, true);
+    const inp = (k, ph, max) => h('input', { class: 'inp', value: c[k], placeholder: ph, maxlength: max, onchange: e => Abertura.put(x => { x[k] = e.target.value.trim(); }) });
+    const move = (id, d) => Abertura.put(x => { const ids = Abertura.elenco(x, true).map(y => y.id), i = ids.indexOf(id), j = i + d; if (j < 0 || j >= ids.length) return; [ids[i], ids[j]] = [ids[j], ids[i]]; x.ordem = ids; });
+    fill(body,
+      kvSwitch('Abertura ligada (os jogadores podem assistir)', c.ativa, v => { Abertura.put(x => { x.ativa = v; }); if (!v) Abertura.stopAll(); }, 'ab-on'),
+      h('div', { class: 'grid2' },
+        h('label', { class: 'field' }, h('span', null, 'Título no final'), inp('titulo', 'Névoa Sobre Apogeu', 60)),
+        h('label', { class: 'field' }, h('span', null, 'Linha embaixo do título'), inp('sub', 'uma mesa de RPG', 60))),
+      h('label', { class: 'field' }, h('span', null, 'Frase de abertura (aparece antes dos personagens)'), inp('intro', 'Em Apogeu, a névoa nunca vai embora.', 90)),
+      h('label', { class: 'field' }, h('span', null, 'Trilha'), h('select', { class: 'inp', onchange: e => Abertura.put(x => { x.trilha = e.target.value; }) },
+        h('option', { value: 'synth', selected: c.trilha === 'synth' || null }, 'Trilha original da mesa (gerada no site)'),
+        h('option', { value: 'none', selected: c.trilha === 'none' || null }, 'Sem música'),
+        somList().map(s => h('option', { value: s.id, selected: c.trilha === s.id || null }, 'Som da mesa: ' + s.nome)))),
+      h('h4', null, 'Elenco e ordem'),
+      list.length ? h('div', { class: 'ab-list' }, list.map(({ id, s }, i) => h('div', { class: 'ab-row' + (c.fora[id] ? ' off' : '') },
+        h('input', { type: 'checkbox', checked: !c.fora[id] || null, 'aria-label': 'Mostrar ' + s.nome, onchange: e => Abertura.put(x => { if (e.target.checked) delete x.fora[id]; else x.fora[id] = true; }) }),
+        h('span', { class: 'sh-av', style: { '--c': s.cor || '#4fa3a5' }, html: s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome)) }),
+        h('div', { class: 'ab-rw' }, h('b', null, s.nome), h('input', { class: 'inp', value: c.frases[id] || '', placeholder: 'Frase do personagem (opcional)', maxlength: 110, onchange: e => Abertura.put(x => { const v = e.target.value.trim(); if (v) x.frases[id] = v; else delete x.frases[id]; }) })),
+        h('div', { class: 'ab-mv' }, h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Subir', disabled: i === 0 || null, onclick: () => move(id, -1) }, '↑'), h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Descer', disabled: i === list.length - 1 || null, onclick: () => move(id, 1) }, '↓')))))
+        : h('p', { class: 'hint' }, 'Quando os jogadores criarem as fichas (com nome), eles aparecem aqui.'),
+      h('p', { class: 'hint' }, 'O fundo de cada personagem usa as cores do retrato dele. Só aparece o que todos já veem na ficha: nome, idade, conceito, retrato e quem joga.'));
+  };
+  render();
+  close = modal(h('h2', null, 'Abertura'), h('p', null, 'Uma vinheta que apresenta cada personagem antes da sessão.'), body,
+    h('div', { class: 'acts' },
+      h('button', { class: 'btn ghost', type: 'button', onclick: () => close() }, 'Fechar'),
+      h('button', { class: 'btn', type: 'button', html: icon('eye') + 'Ver só aqui', onclick: () => { body.querySelector('input:focus')?.blur(); close(); setTimeout(() => Abertura.local(), 50); } }),
+      h('button', { class: 'btn primary', type: 'button', html: icon('play') + 'Tocar para todos', onclick: () => { body.querySelector('input:focus')?.blur(); close(); setTimeout(() => Abertura.broadcast(), 50); } })));
+  // modal() devolve só o fechar; os botões de mover recriam a lista
+  body.addEventListener('click', e => { if (e.target.closest('.ab-mv button')) setTimeout(render, 0); });
+  body.addEventListener('change', e => { if (e.target.type === 'checkbox') setTimeout(render, 0); });
+}
+
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
   const toolbar = h('div', { class: 'toolbar', role: 'toolbar', 'aria-label': 'Ferramentas', 'aria-orientation': 'vertical' },
@@ -8427,6 +8826,7 @@ function buildShell() {
       h('div', { class: 'scene-pill', id: 'scene-pill' }),
       h('span', { class: 'saved', id: 'save-state', 'aria-live': 'polite' }),
       h('button', { class: 'iconbtn hide-xs', type: 'button', html: icon('screen'), title: 'Como mostrar a tela dos jogadores no Discord', 'aria-label': 'Como mostrar a tela dos jogadores no Discord', onclick: openPlayersModal }),
+      h('button', { class: 'iconbtn', id: 'ab-top', type: 'button', html: icon('film'), title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', onclick: () => (ROLE === 'gm' ? openAberturaModal() : Abertura.local()) }),
       modeSwitch('mode-top'),
       window.APOGEU_FB?.discord ? h('a', { class: 'iconbtn', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Abrir o Discord da mesa', html: icon('chat') }) : null,
       window.APOGEU_FB?.ready ? h('button', { class: 'iconbtn acc-btn', type: 'button', title: 'Conta e jogadores', 'aria-label': 'Conta e jogadores', html: icon('users'), onclick: () => window.APOGEU_FB.account() }) : null,
@@ -8454,7 +8854,7 @@ function buildShell() {
       h('div', { class: 'titlecard', id: 'titlecard', 'aria-hidden': 'true' }, h('div', { class: 'ov' }), h('h2'), h('p')),
       h('div', { class: 'pl-title', id: 'pl-title', hidden: true }, h('div', { class: 'ov', id: 'pl-title-ov' }), h('h1', { id: 'pl-title-h' })),
       h('div', { class: 'pl-follow', id: 'pl-follow', hidden: true }, h('button', { class: 'btn primary', type: 'button', html: icon('target') + 'Seguir o mestre', onclick: () => { PL_FOLLOW = true; const sc = Store.data.vtt.scene; if (sc?.cam && sc.map === CUR) applyCamRect(sc.cam); else fitView(); UI.renderPlayerChrome(); } })),
-      h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
+      h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-ab', type: 'button', title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', html: icon('film') + '<span>Abertura</span>', onclick: () => Abertura.local() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
       h('div', { class: 'init-float', id: 'init-float', hidden: true, role: 'region', 'aria-label': 'Ordem de iniciativa' }),
       h('button', { class: 'btn primary som-pill', id: 'som-pill', type: 'button', hidden: true, html: icon('sound') + 'Toque para ouvir os sons da mesa', onclick: () => Som.unlock() }),
       h('div', { class: 'loader', id: 'loader', hidden: true, role: 'status' }, h('i'), h('span', null, 'Carregando…')),
@@ -8502,6 +8902,7 @@ function wireStore() {
       if (k === 'init') Init.renderSoon();
       if (k === 'cal') { Cal.render(); if (UI.tab === 'mapa' && origin === 'remote') UI.renderRightSoon(); }
       if (k === 'sonsauto') { Som.autoSoon(); Som.paneSoon(); }
+      if (k === 'abertura') { Abertura.renderBtn(); if (origin === 'remote' && val && val.ativa === false && Abertura.on && ROLE !== 'gm') Abertura.close(); }
       if (k === 'rolls' && origin === 'remote') onRolls(val);
       if (k === 'mural') { if (origin === 'remote') Mural.onRemote(val); else if (Mural.open) Mural.renderHeadSoon(); }
     }
@@ -8515,6 +8916,7 @@ function wireStore() {
   });
   Live.on('fog', d => { if (!d || d.map !== CUR || Input.mode === 'fog' || Input.mode === 'fogrect') return; Fog.applyRemote(d); });
   Live.on('ping', d => { if (d && d.map === CUR && isFinite(d.x) && isFinite(d.y)) showPing(+d.x, +d.y, String(d.id || '')); });
+  Live.on('intro', d => Abertura.onRemote(d));
   Live.on('sfx', d => { if (d?.stop) Som.stopOnes(); else if (d?.id) Som.once(String(d.id), true); });
   Live.on('roll', d => { if (d && d.id && !ROLLS_SEEN.has(d.id)) { ROLLS_SEEN.add(d.id); if (ROLE === 'gm') { SECRET_ROLLS.unshift(Object.assign(sanitizeRoll(d), { secret: true })); SECRET_ROLLS = SECRET_ROLLS.slice(0, 30); LS.set('secretRolls', SECRET_ROLLS); } UI.rollToast(sanitizeRoll(d)); if (UI.tab === 'dados') UI.renderRightSoon(); } });
 }
