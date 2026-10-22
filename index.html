@@ -296,7 +296,8 @@ textarea.notes:focus { border-color: var(--lamp); }
 .modal .acts { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 
 /* ---------- tela dos jogadores ---------- */
-.app.players { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); grid-template-areas: "stage"; }
+.app.players, .app.players.no-left, .app.players.no-right, .app.players.no-left.no-right { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); grid-template-areas: "stage"; }
+.app.players #wide-btn { display: none; }
 .app.players .topbar, .app.players .side, .app.players .toolbar, .app.players .subbar, .app.players .hotspots { display: none !important; }
 .pl-title { position: absolute; left: 22px; top: 18px; z-index: 11; pointer-events: none; max-width: calc(100% - 230px); }
 .pl-title .ov { font: 600 11px/1 var(--f-ui); letter-spacing: 0.3em; text-transform: uppercase; color: var(--lamp); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9); }
@@ -891,8 +892,8 @@ textarea.notes:focus { border-color: var(--lamp); }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610221246"></script>
-<script src="fb-adapter.js?v=202610221246"></script>
+<script src="firebase-config.js?v=202610221557"></script>
+<script src="fb-adapter.js?v=202610221557"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
