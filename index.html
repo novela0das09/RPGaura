@@ -805,6 +805,9 @@ textarea.notes:focus { border-color: var(--lamp); }
 .crise-stack { position: fixed; top: 64px; left: 50%; transform: translateX(-50%); z-index: 58; display: flex; flex-direction: column; gap: 8px; width: min(340px, calc(100vw - 32px)); }
 .crise-card { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: rgba(17, 27, 31, 0.97); border: 1px solid var(--c); box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.5), 0 0 24px color-mix(in srgb, var(--c) 35%, transparent); animation: crise-in .4s cubic-bezier(.2,.9,.3,1.2) both, crise-glow 1.6s ease-in-out infinite; }
 .crise-card .sh-av { width: 38px; height: 38px; }
+.crise-card.note { animation: crise-in .4s cubic-bezier(.2,.9,.3,1.2) both; }
+.crise-ic { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 20%, transparent); color: var(--c); }
+.crise-ic svg { width: 20px; height: 20px; }
 .crise-card .sh-av img, .crise-head .sh-av img, .crise-note .sh-av img { width: 100%; height: 100%; object-fit: cover; }
 .crise-tx { display: flex; flex-direction: column; min-width: 0; font-size: 13px; color: var(--mist-2); }
 .crise-tx b { color: var(--mist); font-size: 14px; }
@@ -834,14 +837,62 @@ textarea.notes:focus { border-color: var(--lamp); }
 .sh-crise { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--c); background: rgba(0,0,0,.2); }
 .sh-crise b { color: var(--c); }
 @media (prefers-reduced-motion: reduce) { .crise-card, .crise-box { animation: none; } }
+
+/* ---------- ficha ao lado do mapa (jogador) ---------- */
+.pl-sheet { position: absolute; top: 62px; right: 12px; bottom: 62px; width: 304px; z-index: 13; display: flex; flex-direction: column; background: rgba(17, 27, 31, 0.95); border: 1px solid var(--line-2); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; backdrop-filter: blur(6px); }
+.app:not(.players) .pl-sheet { display: none !important; }
+.pl-sheet[hidden] { display: none; }
+#pl-me.on { background: rgba(233, 180, 90, 0.18); border-color: rgba(233, 180, 90, 0.5); color: var(--lamp-2); }
+.ps-head { display: grid; grid-template-columns: auto 1fr auto auto; gap: 8px; align-items: center; padding: 10px 10px 10px 12px; border-bottom: 1px solid var(--line); }
+.ps-head .sh-av { width: 40px; height: 40px; }
+.ps-head .sh-av img { width: 100%; height: 100%; object-fit: cover; }
+.ps-nm { display: flex; flex-direction: column; min-width: 0; }
+.ps-nm b { font: 600 19px/1.1 var(--f-display); color: var(--mist); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ps-nm span { font-size: 12px; color: var(--mist-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ps-scroll { flex: 1; overflow: auto; padding: 10px 12px 14px; display: flex; flex-direction: column; gap: 12px; overscroll-behavior: contain; }
+.ps-meter { display: flex; flex-direction: column; gap: 6px; }
+.ps-row { display: flex; align-items: center; gap: 6px; }
+.ps-row .iconbtn { width: 30px; height: 30px; }
+.ps-lbl { font: 600 11px/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--mist-3); flex: 1; }
+.ps-num { font: 600 22px/1 var(--f-mono); color: var(--mist); margin-right: 4px; }
+.ps-num small { font-size: 13px; color: var(--mist-3); font-weight: 500; }
+.ps-bar { height: 6px; border-radius: 99px; background: var(--panel-3); overflow: hidden; }
+.ps-bar i { display: block; height: 100%; border-radius: 99px; transition: width .25s; }
+.ps-pips { display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 3px; }
+.ps-pips i { height: 8px; border-radius: 3px; background: var(--panel-3); }
+.ps-pips i.on { background: var(--c); }
+.ps-stage { font-size: 12.5px; color: var(--mist-2); }
+.ps-stage b { color: var(--c); }
+.ps-warn { font-size: 12.5px; color: var(--danger); font-weight: 600; }
+.ps-sec { display: flex; flex-direction: column; gap: 6px; }
+.ps-sech { display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 600 11px/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--mist-3); }
+.ps-mode button { padding: 4px 8px; font-size: 12px; letter-spacing: 0; text-transform: none; }
+.ps-atrs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.ps-atr { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel-2); color: var(--mist); font: 500 13.5px var(--f-ui); cursor: pointer; }
+.ps-atr:hover { border-color: var(--line-2); background: var(--panel-3); }
+.ps-atr b { font: 600 16px var(--f-mono); color: var(--lamp-2); }
+.ps-atr.star { border-color: rgba(233, 180, 90, .55); }
+.ps-arma { display: grid; grid-template-columns: 1fr auto auto; gap: 6px; align-items: center; }
+.ps-arma span { display: flex; flex-direction: column; font-size: 13.5px; color: var(--mist); min-width: 0; }
+.ps-arma small, .ps-roll small { font-size: 11.5px; color: var(--mist-3); }
+.ps-dice { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.ps-dice .btn { justify-content: center; padding: 0 4px; }
+.ps-expr { display: flex; gap: 6px; }
+.ps-expr .inp { flex: 1; min-width: 0; }
+.ps-roll { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 8px; background: rgba(0,0,0,.18); }
+.ps-roll span { display: flex; flex-direction: column; font-size: 13px; color: var(--mist-2); min-width: 0; }
+.ps-roll b { font: 600 17px var(--f-mono); color: var(--mist); }
+@media (max-width: 700px) {
+  .pl-sheet { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; height: 54vh; }
+}
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610221210"></script>
-<script src="fb-adapter.js?v=202610221210"></script>
+<script src="firebase-config.js?v=202610221246"></script>
+<script src="fb-adapter.js?v=202610221246"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -5732,6 +5783,7 @@ function onDown(e) {
   if (VIEWMODE !== 'gm' && e.button === 0 && tk) { // jogador: só a peça da própria ficha
     const t = getToken(tk.dataset.id);
     if (t && myToken(t)) {
+      if (Crise.mustRoll()) { Crise.first(); return; }
       if (TRAVAS().pecas) UI.toast('O mestre travou as peças agora.');
       else { Input.mode = 'token'; Input.tok = { id: t.id, el: tk, ox: t.x - wx, oy: t.y - wy }; tk.classList.add('dragging'); return; }
     }
@@ -6063,7 +6115,7 @@ const UI = {
     $('#pl-follow').hidden = !show || PL_FOLLOW || mapLocked();
     { const tv = TRAVAS(), pl = $('#pl-lock'), msg = show && (tv.mapa || tv.pecas) ? (tv.mapa && tv.pecas ? 'O mestre travou o mapa e as peças' : tv.mapa ? 'O mestre travou o mapa' : 'O mestre travou as peças') : '';
       if (pl) { pl.hidden = !msg; if (msg) pl.innerHTML = icon('lock') + esc(msg); } }
-    Abertura.renderBtn(); if (typeof Crise !== 'undefined') Crise.scanSoon();
+    Abertura.renderBtn(); if (typeof Crise !== 'undefined') { Crise.scanSoon(); PlSheet.renderSoon(); }
     $('#pl-mode').hidden = ROLE === 'loading'; // no celular o seletor fica no canto do mapa também para o mestre
     this.renderModeSwitch();
   },
@@ -6665,7 +6717,7 @@ const Sheets = {
           if (PLAYER_CAN && ME && !this.data[ME]) setTimeout(() => UI.toast('Bem-vindo à mesa! Toque em Fichas, no canto de cima, para criar a sua.'), 900);
         }
         this.refresh();
-        if (this.ready) { Crise.check(); Crise.scanSoon(); }
+        if (this.ready) { Crise.check(); Crise.gmCheck(); Crise.scanSoon(); PlSheet.renderSoon(); }
       };
       const watchCol = (col, bag, flag) => {
         const listen = () => db.collection(col).onSnapshot(snap => {
@@ -6698,7 +6750,7 @@ const Sheets = {
   },
   save(id, delay = 450) {
     if (!this.canWrite(id)) return;
-    if (typeof Crise !== 'undefined') Crise.scanSoon();
+    if (typeof Crise !== 'undefined') { Crise.scanSoon(); if (id === ME) PlSheet.renderSoon(); }
     const s = this.data[id]; if (s) s.upd = Date.now();
     if (!this.db) { clearTimeout(this.timers._local); this.timers._local = setTimeout(() => { delete this.timers._local; if (!LS.set('fichas.v1', this.data)) UI.toast('O navegador não tem espaço para guardar as fichas (retratos grandes ocupam muito).', 'err'); }, 300); return; }
     clearTimeout(this.timers[id]);
@@ -7008,7 +7060,8 @@ const Sheets = {
     const sur = s.surto && SURTOS[s.surto];
     $('#sh-stage').innerHTML = `<div class="sh-box" style="--c:${st.c}"><span><b>${esc(st.name)}.</b> ${esc(st.txt)}</span>
       ${s.estresse <= 7 ? `<span>Um aliado pode tentar o <b style="color:var(--mist)">Socorro Emocional</b>: 1D20 + Social (ou Aura, se a crise veio do paranormal) contra DT ${s.estresse >= 4 ? 10 : s.estresse >= 1 ? 13 : 15}. Sucesso recupera 1D4 + o atributo usado.</span>` : ''}
-      ${sur && Crise.multi() && !isNpc(s) ? (ROLE === 'gm' ? `<span><b>${esc(sur.name)} pendente.</b> Role ou escolha o efeito; ele vai direto para esta ficha e o jogador é avisado.</span><div class="row"><button type="button" class="btn sm primary" data-act="crise">${icon('dice')}Resolver a crise</button><button type="button" class="btn sm ghost" data-act="nosurto">Dispensar</button></div>` : `<span><b>${esc(sur.name)}.</b> O mestre foi avisado e vai rolar o que acontece com você.</span>`)
+      ${sur && Crise.multi() && !isNpc(s) && s.surto === 'ansiedade' ? (ROLE === 'gm' ? `<span><b>Primeira Crise.</b> Pela regra, ${esc(firstName(s))} rola 1D20 + Sorte antes de qualquer ação. Você vai receber o resultado.</span>` : `<span><b>Primeira Crise.</b> Antes de qualquer ação, role 1D20 + Sorte. Com 15 ou mais, você segura o pânico.</span><div class="row"><button type="button" class="btn sm primary" data-act="crise1">${icon('dice')}Rolar 1D20 + ${s.atr.sorte || 0}</button></div>`)
+        : sur && Crise.multi() && !isNpc(s) ? (ROLE === 'gm' ? `<span><b>${esc(sur.name)} pendente.</b> Role ou escolha o efeito; ele vai direto para esta ficha e o jogador é avisado.</span><div class="row"><button type="button" class="btn sm primary" data-act="crise">${icon('dice')}Resolver a crise</button><button type="button" class="btn sm ghost" data-act="nosurto">Dispensar</button></div>` : `<span><b>${esc(sur.name)}.</b> O mestre foi avisado e vai rolar o que acontece com você.</span>`)
         : sur ? `<span><b>${esc(sur.name)} pendente.</b> ${esc(sur.how)}</span><div class="row">${ro ? '' : `<button type="button" class="btn sm primary" data-act="surto">${icon('dice')}${esc(sur.btn)}</button><button type="button" class="btn sm ghost" data-act="nosurto">Dispensar</button>`}</div>` : ''}
       ${s.crise && s.crise.efeito ? `<div class="sh-crise" style="--c:${esc(s.crise.cor || '#de6b58')}"><span>${esc(s.crise.crise)}: <b>${esc(s.crise.efeito)}</b></span><span>${esc(s.crise.txt)}</span>${ro ? '' : `<div class="row"><button type="button" class="btn sm ghost" data-act="crisefim">Efeito acabou</button></div>`}</div>` : ''}</div>`;
     $('#sh-emax-o').textContent = n;
@@ -7312,6 +7365,7 @@ function wireSheets() {
       setTimeout(() => $('#sh-nome')?.focus(), 30); return;
     }
     if (!s) return;
+    if (Crise.mustRoll() && Sheets.cur === ME && act !== 'crise1' && (b.dataset.test || b.dataset.step || b.dataset.power || b.dataset.adr || b.dataset.use || ['surto', 'rest', 'scene', 'place'].includes(act))) { Crise.first(); return; }
     if (b.dataset.test) {
       const entry = Sheets.test(s, b.dataset.test);
       if (cw) { Sheets.log(s, entry); commit(s, 0); }
@@ -7351,6 +7405,7 @@ function wireSheets() {
     if (act === 'surto') { const entry = Sheets.surto(s); if (entry) Sheets.log(s, entry); commit(s, 0); return; }
     if (act === 'nosurto') { s.surto = ''; commit(s, 0); return; }
     if (act === 'crise') { Crise.open(Sheets.cur); return; }
+    if (act === 'crise1') { Crise.playerRoll(); return; }
     if (act === 'crisefim') { s.crise = null; commit(s, 0); return; }
     if (act === 'scene') { s.usos = { moderado: false, forte: false, adrenalina: false, cigarro: false }; UI.toast('Nova cena: poderes, Adrenalina e itens liberados.'); commit(s, 0); return; }
     if (act === 'rest') { Sheets.setEstresse(s, s.estresse + 3); Sheets.setVida(s, vidaAt(s) + 2); Sheets.log(s, { l: 'Noite de descanso', txt: '+3 Estresse, +2 Vida' }); commit(s, 0); return; }
@@ -8360,6 +8415,7 @@ function wireArmas() {
     const s = cur(); if (!s) return;
     if (b.dataset.delarma) { if (!Sheets.canWrite()) return; s.armas = (s.armas || []).filter(a => a.id !== b.dataset.delarma); Sheets.save(Sheets.cur, 0); renderArmas(s, false); return; }
     const id = b.dataset.atk || b.dataset.dmg; if (!id) return;
+    if (Crise.mustRoll() && Sheets.cur === ME) { Crise.first(); return; }
     const a = (s.armas || []).find(x => x.id === id); if (!a) return;
     let entry;
     try { entry = b.dataset.atk ? Sheets.attack(s, a) : Sheets.damage(s, a); }
@@ -8948,25 +9004,76 @@ function openAberturaModal() {
    e o resultado vai direto para a ficha do jogador, que recebe o aviso. */
 const CRISE_TAB = { ansiedade: CRISE1, panico: CRISE2, colapso: COLAPSO };
 const Crise = {
-  seen: new Set(), shown: new Set(LS.get('criseVistas', []) || []),
+  seen: new Set(), shown: new Set(LS.get('criseVistas', []) || []), gmSeen: new Set(LS.get('criseGm', []) || []), notes: [],
+  /* Primeira Crise: pelo livro quem rola é o próprio jogador, antes de qualquer ação */
+  mustRoll() { return ROLE !== 'gm' && this.multi() && !!ME && Sheets.data[ME]?.surto === 'ansiedade'; },
+  first() {
+    if (!this.mustRoll()) { $('#crise-first')?.remove(); return; }
+    if ($('#crise-first')) return;
+    const s = Sheets.data[ME], st = stageOf(s.estresse), sorte = s.atr.sorte || 0;
+    const el = h('div', { class: 'crise-note', id: 'crise-first', role: 'alertdialog', 'aria-modal': 'true', 'aria-label': 'Primeira Crise', style: { '--c': st.c } },
+      h('div', { class: 'crise-box' },
+        h('div', { class: 'crise-eye' }, 'Primeira Crise'),
+        h('span', { class: 'sh-av big', style: { '--c': s.cor || '#4fa3a5' }, html: s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome || '?')) }),
+        h('h2', null, st.name),
+        h('p', null, `Seu Estresse caiu para ${s.estresse} de ${s.estresseMax}. Antes de qualquer ação, role 1D20 + Sorte (${sorte}). Com 15 ou mais, você segura o pânico; abaixo disso, vale o número natural do dado.`),
+        h('button', { class: 'btn primary', type: 'button', html: icon('dice') + `Rolar 1D20${sorte ? ' + ' + sorte : ''}`, onclick: () => this.playerRoll() }),
+        h('div', { class: 'crise-meta' }, 'O mestre foi avisado e vai ver o resultado.')));
+    el.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); } }, true);
+    document.body.append(el);
+    setTimeout(() => el.querySelector('button')?.focus(), 50);
+    try { navigator.vibrate?.([120, 60, 120]); } catch {}
+    this.beep();
+  },
+  playerRoll() {
+    const s = Sheets.data[ME]; if (!s || s.surto !== 'ansiedade') { $('#crise-first')?.remove(); return; }
+    const st = stageOf(s.estresse), r = this.roll(s, 'ansiedade', null);
+    if (r.res) Sheets.publish(s, r.crise, r.expr.split(' ')[0], r.res, r.efeito);
+    s.crise = { t: Date.now(), k: 'ansiedade', crise: r.crise, fase: st.name, cor: st.c, efeito: r.efeito, txt: r.txt, total: r.total, expr: r.expr, ok: r.ok, pub: false, est: s.estresse, max: s.estresseMax, visto: true, por: 'jogador' };
+    s.surto = '';
+    Sheets.log(s, { l: r.crise, total: r.total, expr: r.expr, o: `${r.efeito}: ${r.txt}`, k: r.ok ? 'crit' : 'fail' });
+    this.mark(s.crise.t); Sheets.save(ME, 0); Sheets.refresh(); PlSheet.render();
+    $('#crise-first')?.remove();
+    this.notify({ nome: firstName(s), cor: s.cor, retrato: s.retrato, c: s.crise }, true);
+  },
+  /* mestre: avisos dos resultados que os jogadores rolaram */
+  gmCheck() {
+    if (ROLE !== 'gm') return;
+    let added = false;
+    for (const [id, s] of Sheets.sorted()) {
+      const c = s?.crise; if (!c || c.por !== 'jogador' || this.gmSeen.has(c.t)) continue;
+      this.gmSeen.add(c.t); LS.set('criseGm', [...this.gmSeen].slice(-60));
+      if (Date.now() - c.t > 6 * 3600e3) continue;
+      this.notes.push({ id, t: c.t, nome: firstName(s), c }); added = true;
+    }
+    if (added) this.scan();
+  },
   multi() { return Store.mode === 'db'; },
   pending() { return Sheets.sorted().filter(([, s]) => s && !isNpc(s) && s.surto && SURTOS[s.surto]); },
   scanSoon: null,
   scan() {
+    if (ROLE !== 'gm') this.first();
     let box = $('#crise-stack');
     const show = ROLE === 'gm' && VIEWMODE === 'gm' && this.multi();
     const list = show ? this.pending() : [];
     if (!box) { box = h('div', { class: 'crise-stack', id: 'crise-stack', role: 'region', 'aria-label': 'Crises de estresse' }); document.body.append(box); }
     let fresh = false;
-    fill(box, list.map(([id, s]) => {
+    const notes = show ? this.notes : [];
+    fill(box, notes.map(n => h('div', { class: 'crise-card note', style: { '--c': n.c.cor || '#e9b45a' } },
+      h('span', { class: 'crise-ic', html: icon('dice') }),
+      h('div', { class: 'crise-tx' }, h('b', null, `${n.nome} rolou a ${n.c.crise}` + (n.c.total != null ? ` · tirou ${n.c.total}` : '')), h('span', null, n.c.efeito + ' — ' + n.c.txt)),
+      h('button', { class: 'btn sm ghost', type: 'button', onclick: () => { this.notes = this.notes.filter(x => x !== n); this.scan(); } }, 'OK'))),
+    list.map(([id, s]) => {
       const st = stageOf(s.estresse), sur = SURTOS[s.surto], key = id + ':' + s.surto + ':' + s.estresse;
       if (!this.seen.has(key)) { this.seen.add(key); fresh = true; }
       return h('div', { class: 'crise-card', style: { '--c': st.c } },
         h('span', { class: 'sh-av', style: { '--c': s.cor || '#4fa3a5' }, html: s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome || '?')) }),
         h('div', { class: 'crise-tx' }, h('b', null, firstName(s) + ' · Estresse ' + s.estresse + '/' + s.estresseMax), h('span', null, st.name + ' — ' + sur.name)),
-        h('button', { class: 'btn sm primary', type: 'button', html: icon('dice') + 'Resolver', onclick: () => this.open(id) }));
+        s.surto === 'ansiedade' ? h('button', { class: 'btn sm ghost', type: 'button', title: 'Pela regra, na Primeira Crise quem rola é o jogador', onclick: () => Sheets.show(id) }, 'Esperando o jogador rolar')
+          : h('button', { class: 'btn sm primary', type: 'button', html: icon('dice') + 'Resolver', onclick: () => this.open(id) }));
     }));
-    box.hidden = !list.length;
+    box.hidden = !list.length && !notes.length;
+    if (notes.some(n => !this.seen.has('n' + n.t))) { notes.forEach(n => this.seen.add('n' + n.t)); fresh = true; }
     if (fresh) this.beep();
   },
   beep() {
@@ -9007,6 +9114,7 @@ const Crise = {
   },
   open(id) {
     const s = Sheets.data[id]; if (!s || !s.surto) { this.scan(); return; }
+    if (s.surto === 'ansiedade') { UI.toast('Na Primeira Crise quem rola é o próprio jogador (regra do livro).'); return; }
     const k = s.surto, sur = SURTOS[k], st = stageOf(s.estresse), tab = CRISE_TAB[k];
     let pub = false, close;
     const how = k === 'ansiedade' ? `Role 1D20 + Sorte (${s.atr.sorte || 0}). Com 15 ou mais, ${firstName(s)} segura o pânico; abaixo disso, vale o número natural do dado na tabela.`
@@ -9066,7 +9174,7 @@ const Crise = {
         h('span', { class: 'sh-av big', style: { '--c': d.cor || '#4fa3a5' }, html: d.retrato ? `<img src="${esc(imgSrc(d.retrato))}" alt="">` : esc(initials(d.nome || '?')) }),
         h('h2', null, c.efeito),
         h('p', null, c.txt),
-        h('div', { class: 'crise-meta' }, `Estresse ${c.est} de ${c.max} · ${c.fase}` + (c.total != null ? ` · o mestre tirou ${c.total}` : '')),
+        h('div', { class: 'crise-meta' }, `Estresse ${c.est} de ${c.max} · ${c.fase}` + (c.total != null ? (c.por === 'jogador' ? (mine ? ` · você tirou ${c.total}` : ` · tirou ${c.total}`) : ` · o mestre tirou ${c.total}`) : '')),
         h('button', { class: 'btn primary', type: 'button', onclick: ok }, mine ? 'Entendi' : 'Fechar')));
     document.body.append(el);
     setTimeout(() => el.querySelector('button')?.focus(), 50);
@@ -9075,6 +9183,97 @@ const Crise = {
   },
 };
 Crise.scanSoon = rafOnce(() => Crise.scan());
+
+/* ---------- ficha ao lado do mapa (tela do jogador) ---------- */
+const PlSheet = {
+  open: !!LS.get('plSheetOpen', true),
+  can() { return VIEWMODE === 'players' && ROLE !== 'gm' && !!ME && !!Sheets.data[ME] && Sheets.canWrite(ME); },
+  toggle(v = !this.open) { this.open = v; LS.set('plSheetOpen', v); this.render(); },
+  renderSoon: null,
+  commit() { Sheets.save(ME, 0); if (Sheets.open && Sheets.cur === ME) Sheets.derived(); this.render(); },
+  render() {
+    const box = $('#pl-sheet'), btn = $('#pl-me'); if (!box) return;
+    const can = this.can();
+    if (btn) { btn.hidden = VIEWMODE !== 'players' || ROLE === 'gm'; btn.classList.toggle('on', can && this.open); }
+    $('#app')?.classList.toggle('pl-sheet-on', can && this.open);
+    if (!can || !this.open) { box.hidden = true; return; }
+    box.hidden = false;
+    const s = Sheets.data[ME], vm = vidaMax(s), va = vidaAt(s), st = stageOf(s.estresse), o = Sheets.opt;
+    const keepScroll = box.querySelector('.ps-scroll')?.scrollTop || 0, ex = $('#ps-expr'), exv = ex?.value || '', exf = ex && document.activeElement === ex;
+    const rolls = (s.rolls || []).slice(-4).reverse();
+    box.innerHTML = `
+      <div class="ps-head">
+        <span class="sh-av" style="--c:${esc(s.cor || '#4fa3a5')}">${s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome || '?'))}</span>
+        <div class="ps-nm"><b>${esc(s.nome || 'Sua persona')}</b><span>${esc([s.idade ? s.idade + ' anos' : '', s.conceito].filter(Boolean).join(' · '))}</span></div>
+        <button type="button" class="iconbtn" data-ps="full" title="Abrir a ficha completa" aria-label="Abrir a ficha completa">${icon('fullscreen')}</button>
+        <button type="button" class="iconbtn" data-ps="close" title="Esconder a ficha" aria-label="Esconder a ficha">${icon('x')}</button>
+      </div>
+      <div class="ps-scroll">
+        <div class="ps-meter">
+          <div class="ps-row"><span class="ps-lbl">Vida</span><b class="ps-num">${va}<small> / ${vm}</small></b>
+            <button type="button" class="iconbtn" data-ps="vida" data-d="-1" aria-label="Perder 1 de Vida">${icon('minus')}</button><button type="button" class="iconbtn" data-ps="vida" data-d="1" aria-label="Recuperar 1 de Vida">${icon('plus')}</button></div>
+          <div class="ps-bar"><i style="width:${Math.round((va / vm) * 100)}%;background:${va <= Math.ceil(vm / 4) ? 'var(--danger)' : 'var(--sea)'}"></i></div>
+          ${s.sangrando ? '<span class="ps-warn">Sangrando: perde 1 de Vida por rodada até estancar.</span>' : ''}
+        </div>
+        <div class="ps-meter">
+          <div class="ps-row"><span class="ps-lbl">Estresse</span><b class="ps-num">${s.estresse}<small> / ${s.estresseMax}</small></b>
+            <button type="button" class="iconbtn" data-ps="est" data-d="-1" aria-label="Perder 1 de Estresse">${icon('minus')}</button><button type="button" class="iconbtn" data-ps="est" data-d="1" aria-label="Recuperar 1 de Estresse">${icon('plus')}</button></div>
+          <div class="ps-pips" style="--n:${s.estresseMax}">${Array.from({ length: s.estresseMax }, (_, i) => `<i class="${i < s.estresse ? 'on' : ''}" style="--c:${st.c}"></i>`).join('')}</div>
+          <span class="ps-stage" style="--c:${st.c}"><b>${esc(st.name)}.</b> ${esc(st.txt)}</span>
+          ${s.surto && SURTOS[s.surto] ? `<span class="ps-warn">${esc(SURTOS[s.surto].name)}: ${s.surto === 'ansiedade' ? 'role antes de qualquer ação.' : 'o mestre vai rolar o que acontece.'}</span>` : ''}
+          ${s.crise && s.crise.efeito ? `<div class="sh-crise" style="--c:${esc(s.crise.cor || '#de6b58')}"><span>${esc(s.crise.crise)}: <b>${esc(s.crise.efeito)}</b></span><span>${esc(s.crise.txt)}</span><div class="row"><button type="button" class="btn sm ghost" data-ps="crisefim">Efeito acabou</button></div></div>` : ''}
+        </div>
+        <div class="ps-sec">
+          <div class="ps-sech"><span>Testes</span><div class="seg ps-mode">${[['dis', 'Desv.'], ['norm', 'Normal'], ['adv', 'Vant.']].map(([v, l]) => `<button type="button" data-ps="mode" data-v="${v}" class="${o.mode === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+          <div class="ps-atrs">${ATRS.map(([k, n]) => `<button type="button" class="ps-atr${s.destaque === k ? ' star' : ''}" data-ps="test" data-k="${k}"><span>${n}</span><b>${s.atr[k] || 0}</b></button>`).join('')}</div>
+        </div>
+        ${(s.armas || []).length ? `<div class="ps-sec"><div class="ps-sech"><span>Armas</span></div>${s.armas.map(a => `<div class="ps-arma"><span>${esc(a.nome)}<small>${esc(a.dano)}${a.bonus ? ' + ' + esc(ATRN[a.bonus] || '') : ''}</small></span><button type="button" class="btn sm" data-ps="atk" data-id="${esc(a.id)}">Atacar</button><button type="button" class="btn sm primary" data-ps="dmg" data-id="${esc(a.id)}">Dano</button></div>`).join('')}</div>` : ''}
+        <div class="ps-sec">
+          <div class="ps-sech"><span>Dados</span></div>
+          <div class="ps-dice">${[4, 6, 8, 10, 12, 20, 100].map(d => `<button type="button" class="btn sm" data-ps="die" data-v="1d${d}">d${d}</button>`).join('')}</div>
+          <form class="ps-expr" data-ps-form><input class="inp" id="ps-expr" placeholder="Ex.: 2d6+1" maxlength="30" aria-label="Rolagem livre"><button type="submit" class="btn sm primary">${icon('dice')}Rolar</button></form>
+        </div>
+        ${rolls.length ? `<div class="ps-sec"><div class="ps-sech"><span>Últimas rolagens</span></div>${rolls.map(r => `<div class="ps-roll"><span>${esc(r.l || '')}${r.o ? `<small>${esc(r.o)}</small>` : r.txt ? `<small>${esc(r.txt)}</small>` : ''}</span>${r.total != null ? `<b>${esc(String(r.total))}</b>` : ''}</div>`).join('')}</div>` : ''}
+      </div>`;
+    const sc = box.querySelector('.ps-scroll'); if (sc) sc.scrollTop = keepScroll;
+    const ex2 = $('#ps-expr'); if (ex2 && exv) ex2.value = exv; if (ex2 && exf) ex2.focus();
+  },
+  act(b) {
+    const s = Sheets.data[ME]; if (!s) return;
+    const a = b.dataset.ps;
+    if (a === 'close') { this.toggle(false); return; }
+    if (a === 'full') { Sheets.show(ME); return; }
+    if (a === 'mode') { Sheets.opt.mode = b.dataset.v; this.render(); return; }
+    if (Crise.mustRoll()) { Crise.first(); return; } // Primeira Crise: rolar antes de qualquer ação
+    if (a === 'vida') { Sheets.setVida(s, vidaAt(s) + +b.dataset.d); this.commit(); return; }
+    if (a === 'est') { Sheets.setEstresse(s, s.estresse + +b.dataset.d); this.commit(); return; }
+    if (a === 'crisefim') { s.crise = null; this.commit(); return; }
+    if (a === 'test') { Sheets.log(s, Sheets.test(s, b.dataset.k)); this.commit(); return; }
+    if (a === 'atk' || a === 'dmg') {
+      const w = (s.armas || []).find(x => x.id === b.dataset.id); if (!w) return;
+      try { Sheets.log(s, a === 'atk' ? Sheets.attack(s, w) : Sheets.damage(s, w)); } catch { UI.toast(`O dano "${w.dano}" não é uma rolagem válida.`, 'err'); return; }
+      this.commit(); return;
+    }
+    if (a === 'die') { this.roll(b.dataset.v); return; }
+  },
+  roll(expr) {
+    const s = Sheets.data[ME]; if (!s) return;
+    if (Crise.mustRoll()) { Crise.first(); return; }
+    expr = String(expr || '').trim().toLowerCase().replace(/\s+/g, '');
+    let res; try { res = rollExpr(expr); } catch { UI.toast('Use uma rolagem como 1d20, 2d6+1 ou 3d6.', 'err'); return; }
+    Sheets.publish(s, 'Rolou ' + expr, expr, res, '');
+    Sheets.log(s, { l: 'Rolou ' + expr, total: res.total, expr: normExpr(expr), parts: res.parts });
+    this.commit();
+  },
+  wire() {
+    const box = $('#pl-sheet'); if (!box) return;
+    box.addEventListener('click', e => { const b = e.target.closest('[data-ps]'); if (b && box.contains(b) && b.tagName === 'BUTTON') this.act(b); });
+    box.addEventListener('submit', e => { e.preventDefault(); const i = $('#ps-expr'); const v = i?.value.trim(); if (v) { i.value = ''; this.roll(v); } });
+    box.addEventListener('pointerdown', e => e.stopPropagation());
+    box.addEventListener('wheel', e => e.stopPropagation(), { passive: true });
+  },
+};
+PlSheet.renderSoon = rafOnce(() => PlSheet.render());
 
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
@@ -9120,8 +9319,9 @@ function buildShell() {
       h('div', { class: 'titlecard', id: 'titlecard', 'aria-hidden': 'true' }, h('div', { class: 'ov' }), h('h2'), h('p')),
       h('div', { class: 'pl-title', id: 'pl-title', hidden: true }, h('div', { class: 'ov', id: 'pl-title-ov' }), h('h1', { id: 'pl-title-h' })),
       h('div', { class: 'pl-lock', id: 'pl-lock', hidden: true, role: 'status' }),
+      h('aside', { class: 'pl-sheet', id: 'pl-sheet', hidden: true, 'aria-label': 'Sua ficha' }),
       h('div', { class: 'pl-follow', id: 'pl-follow', hidden: true }, h('button', { class: 'btn primary', type: 'button', html: icon('target') + 'Seguir o mestre', onclick: () => { PL_FOLLOW = true; const sc = Store.data.vtt.scene; if (sc?.cam && sc.map === CUR) applyCamRect(sc.cam); else fitView(); UI.renderPlayerChrome(); } })),
-      h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-ab', type: 'button', title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', html: icon('film') + '<span>Abertura</span>', onclick: () => Abertura.local() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
+      h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-me', type: 'button', hidden: true, title: 'Minha ficha ao lado do mapa', 'aria-label': 'Minha ficha ao lado do mapa', html: icon('user') + '<span>Minha ficha</span>', onclick: () => (PlSheet.can() ? PlSheet.toggle() : Sheets.show(ME && Sheets.data[ME] ? ME : null)) }), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-ab', type: 'button', title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', html: icon('film') + '<span>Abertura</span>', onclick: () => Abertura.local() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
       h('div', { class: 'init-float', id: 'init-float', hidden: true, role: 'region', 'aria-label': 'Ordem de iniciativa' }),
       h('button', { class: 'btn primary som-pill', id: 'som-pill', type: 'button', hidden: true, html: icon('sound') + 'Toque para ouvir os sons da mesa', onclick: () => Som.unlock() }),
       h('div', { class: 'loader', id: 'loader', hidden: true, role: 'status' }, h('i'), h('span', null, 'Carregando…')),
@@ -9224,6 +9424,7 @@ async function boot(hot) {
   $('#app').classList.remove('booting');
   for (const r of Store.data.vtt.rolls?.list || []) if (r?.id) ROLLS_SEEN.add(r.id);
   Live.init(room);
+  PlSheet.wire();
   setTimeout(() => { ensureOwners(); onTravas(); }, 3500); setInterval(ensureOwners, 30000);
   Sheets.init(db);
   VIEWMODE = gm ? (hot.viewmode || SS.get('view', 'gm')) : 'players';
