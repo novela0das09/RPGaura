@@ -800,14 +800,48 @@ textarea.notes:focus { border-color: var(--lamp); }
 .ab-mv .iconbtn { width: 30px; height: 26px; font-size: 14px; }
 .ab-mv .iconbtn:disabled { opacity: .3; }
 #ab-top.off { opacity: .45; }
+
+/* ---------- crises de estresse ---------- */
+.crise-stack { position: fixed; top: 64px; left: 50%; transform: translateX(-50%); z-index: 58; display: flex; flex-direction: column; gap: 8px; width: min(340px, calc(100vw - 32px)); }
+.crise-card { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: rgba(17, 27, 31, 0.97); border: 1px solid var(--c); box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.5), 0 0 24px color-mix(in srgb, var(--c) 35%, transparent); animation: crise-in .4s cubic-bezier(.2,.9,.3,1.2) both, crise-glow 1.6s ease-in-out infinite; }
+.crise-card .sh-av { width: 38px; height: 38px; }
+.crise-card .sh-av img, .crise-head .sh-av img, .crise-note .sh-av img { width: 100%; height: 100%; object-fit: cover; }
+.crise-tx { display: flex; flex-direction: column; min-width: 0; font-size: 13px; color: var(--mist-2); }
+.crise-tx b { color: var(--mist); font-size: 14px; }
+.crise-tx span { color: var(--c); }
+@keyframes crise-in { from { transform: translateX(30px); opacity: 0; } }
+@keyframes crise-glow { 50% { box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.5), 0 0 36px color-mix(in srgb, var(--c) 60%, transparent); } }
+.crise-m { display: flex; flex-direction: column; gap: 12px; }
+.crise-head { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 10px; background: color-mix(in srgb, var(--c) 12%, var(--panel-2)); border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); }
+.crise-head .sh-av { width: 46px; height: 46px; }
+.crise-head div { display: flex; flex-direction: column; }
+.crise-head span { color: var(--c); font-size: 13.5px; }
+.crise-pick summary { cursor: pointer; color: var(--mist-2); font-size: 13.5px; }
+.crise-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.crise-rows .btn { justify-content: flex-start; text-align: left; }
+.crise-res { padding: 14px; border-radius: 12px; border: 1px solid var(--c); background: color-mix(in srgb, var(--c) 10%, var(--panel-2)); }
+.crise-res h3 { margin: 4px 0 6px; font: 600 26px/1.1 var(--f-display); color: var(--c); }
+.crise-res p { margin: 0; }
+.crise-note { position: fixed; inset: 0; z-index: 85; display: grid; place-items: center; padding: 16px; background: radial-gradient(ellipse at center, color-mix(in srgb, var(--c) 22%, rgba(4,8,10,.75)), rgba(4,8,10,.9)); animation: ab-fadein .4s ease both; }
+.crise-box { width: min(440px, 100%); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 26px 22px; border-radius: 16px; background: var(--panel); border: 1px solid var(--c); box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 50px color-mix(in srgb, var(--c) 40%, transparent); animation: crise-shake .5s .1s ease both; }
+.crise-note.ok .crise-box { animation: none; }
+@keyframes crise-shake { 20% { transform: translateX(-8px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(2px); } }
+.crise-eye { font: 600 11px/1 var(--f-mono); letter-spacing: .3em; text-transform: uppercase; color: var(--c); }
+.crise-note .sh-av.big { width: 76px; height: 76px; font-size: 24px; box-shadow: 0 0 0 3px var(--c); }
+.crise-box h2 { margin: 0; font: 600 32px/1.1 var(--f-display); color: var(--mist); }
+.crise-box p { margin: 0; color: var(--mist-2); max-width: 36ch; }
+.crise-meta { font-size: 12.5px; color: var(--mist-3); }
+.sh-crise { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--c); background: rgba(0,0,0,.2); }
+.sh-crise b { color: var(--c); }
+@media (prefers-reduced-motion: reduce) { .crise-card, .crise-box { animation: none; } }
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610221204"></script>
-<script src="fb-adapter.js?v=202610221204"></script>
+<script src="firebase-config.js?v=202610221210"></script>
+<script src="fb-adapter.js?v=202610221210"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -5012,7 +5046,7 @@ const Store = {
 };
 
 /* ---------- canal ao vivo (sala + abas do mesmo navegador) ---------- */
-const LIVE_TOPICS = ['ping', 'tok', 'fog', 'roll', 'cam', 'scene', 'sfx', 'intro'];
+const LIVE_TOPICS = ['ping', 'tok', 'fog', 'roll', 'cam', 'scene', 'sfx', 'intro', 'crise'];
 const Live = {
   room: null, bc: null, handlers: {},
   init(room) {
@@ -6029,7 +6063,7 @@ const UI = {
     $('#pl-follow').hidden = !show || PL_FOLLOW || mapLocked();
     { const tv = TRAVAS(), pl = $('#pl-lock'), msg = show && (tv.mapa || tv.pecas) ? (tv.mapa && tv.pecas ? 'O mestre travou o mapa e as peças' : tv.mapa ? 'O mestre travou o mapa' : 'O mestre travou as peças') : '';
       if (pl) { pl.hidden = !msg; if (msg) pl.innerHTML = icon('lock') + esc(msg); } }
-    Abertura.renderBtn();
+    Abertura.renderBtn(); if (typeof Crise !== 'undefined') Crise.scanSoon();
     $('#pl-mode').hidden = ROLE === 'loading'; // no celular o seletor fica no canto do mapa também para o mestre
     this.renderModeSwitch();
   },
@@ -6631,6 +6665,7 @@ const Sheets = {
           if (PLAYER_CAN && ME && !this.data[ME]) setTimeout(() => UI.toast('Bem-vindo à mesa! Toque em Fichas, no canto de cima, para criar a sua.'), 900);
         }
         this.refresh();
+        if (this.ready) { Crise.check(); Crise.scanSoon(); }
       };
       const watchCol = (col, bag, flag) => {
         const listen = () => db.collection(col).onSnapshot(snap => {
@@ -6663,6 +6698,7 @@ const Sheets = {
   },
   save(id, delay = 450) {
     if (!this.canWrite(id)) return;
+    if (typeof Crise !== 'undefined') Crise.scanSoon();
     const s = this.data[id]; if (s) s.upd = Date.now();
     if (!this.db) { clearTimeout(this.timers._local); this.timers._local = setTimeout(() => { delete this.timers._local; if (!LS.set('fichas.v1', this.data)) UI.toast('O navegador não tem espaço para guardar as fichas (retratos grandes ocupam muito).', 'err'); }, 300); return; }
     clearTimeout(this.timers[id]);
@@ -6972,7 +7008,9 @@ const Sheets = {
     const sur = s.surto && SURTOS[s.surto];
     $('#sh-stage').innerHTML = `<div class="sh-box" style="--c:${st.c}"><span><b>${esc(st.name)}.</b> ${esc(st.txt)}</span>
       ${s.estresse <= 7 ? `<span>Um aliado pode tentar o <b style="color:var(--mist)">Socorro Emocional</b>: 1D20 + Social (ou Aura, se a crise veio do paranormal) contra DT ${s.estresse >= 4 ? 10 : s.estresse >= 1 ? 13 : 15}. Sucesso recupera 1D4 + o atributo usado.</span>` : ''}
-      ${sur ? `<span><b>${esc(sur.name)} pendente.</b> ${esc(sur.how)}</span><div class="row">${ro ? '' : `<button type="button" class="btn sm primary" data-act="surto">${icon('dice')}${esc(sur.btn)}</button><button type="button" class="btn sm ghost" data-act="nosurto">Dispensar</button>`}</div>` : ''}</div>`;
+      ${sur && Crise.multi() && !isNpc(s) ? (ROLE === 'gm' ? `<span><b>${esc(sur.name)} pendente.</b> Role ou escolha o efeito; ele vai direto para esta ficha e o jogador é avisado.</span><div class="row"><button type="button" class="btn sm primary" data-act="crise">${icon('dice')}Resolver a crise</button><button type="button" class="btn sm ghost" data-act="nosurto">Dispensar</button></div>` : `<span><b>${esc(sur.name)}.</b> O mestre foi avisado e vai rolar o que acontece com você.</span>`)
+        : sur ? `<span><b>${esc(sur.name)} pendente.</b> ${esc(sur.how)}</span><div class="row">${ro ? '' : `<button type="button" class="btn sm primary" data-act="surto">${icon('dice')}${esc(sur.btn)}</button><button type="button" class="btn sm ghost" data-act="nosurto">Dispensar</button>`}</div>` : ''}
+      ${s.crise && s.crise.efeito ? `<div class="sh-crise" style="--c:${esc(s.crise.cor || '#de6b58')}"><span>${esc(s.crise.crise)}: <b>${esc(s.crise.efeito)}</b></span><span>${esc(s.crise.txt)}</span>${ro ? '' : `<div class="row"><button type="button" class="btn sm ghost" data-act="crisefim">Efeito acabou</button></div>`}</div>` : ''}</div>`;
     $('#sh-emax-o').textContent = n;
     // atributos
     const chk = atrCheck(s);
@@ -7312,6 +7350,8 @@ function wireSheets() {
     }
     if (act === 'surto') { const entry = Sheets.surto(s); if (entry) Sheets.log(s, entry); commit(s, 0); return; }
     if (act === 'nosurto') { s.surto = ''; commit(s, 0); return; }
+    if (act === 'crise') { Crise.open(Sheets.cur); return; }
+    if (act === 'crisefim') { s.crise = null; commit(s, 0); return; }
     if (act === 'scene') { s.usos = { moderado: false, forte: false, adrenalina: false, cigarro: false }; UI.toast('Nova cena: poderes, Adrenalina e itens liberados.'); commit(s, 0); return; }
     if (act === 'rest') { Sheets.setEstresse(s, s.estresse + 3); Sheets.setVida(s, vidaAt(s) + 2); Sheets.log(s, { l: 'Noite de descanso', txt: '+3 Estresse, +2 Vida' }); commit(s, 0); return; }
     if (act === 'photo') { $('#sh-file')?.click(); return; }
@@ -8902,6 +8942,140 @@ function openAberturaModal() {
   body.addEventListener('change', e => { if (e.target.type === 'checkbox') setTimeout(render, 0); });
 }
 
+/* ---------- crises de estresse (regra do livro, automática) ----------
+   Quando a ficha de um jogador cai para uma faixa pior de Estresse, a tela do mestre
+   recebe um alerta. O mestre rola (ou escolhe) o efeito, decide quem fica sabendo,
+   e o resultado vai direto para a ficha do jogador, que recebe o aviso. */
+const CRISE_TAB = { ansiedade: CRISE1, panico: CRISE2, colapso: COLAPSO };
+const Crise = {
+  seen: new Set(), shown: new Set(LS.get('criseVistas', []) || []),
+  multi() { return Store.mode === 'db'; },
+  pending() { return Sheets.sorted().filter(([, s]) => s && !isNpc(s) && s.surto && SURTOS[s.surto]); },
+  scanSoon: null,
+  scan() {
+    let box = $('#crise-stack');
+    const show = ROLE === 'gm' && VIEWMODE === 'gm' && this.multi();
+    const list = show ? this.pending() : [];
+    if (!box) { box = h('div', { class: 'crise-stack', id: 'crise-stack', role: 'region', 'aria-label': 'Crises de estresse' }); document.body.append(box); }
+    let fresh = false;
+    fill(box, list.map(([id, s]) => {
+      const st = stageOf(s.estresse), sur = SURTOS[s.surto], key = id + ':' + s.surto + ':' + s.estresse;
+      if (!this.seen.has(key)) { this.seen.add(key); fresh = true; }
+      return h('div', { class: 'crise-card', style: { '--c': st.c } },
+        h('span', { class: 'sh-av', style: { '--c': s.cor || '#4fa3a5' }, html: s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome || '?')) }),
+        h('div', { class: 'crise-tx' }, h('b', null, firstName(s) + ' · Estresse ' + s.estresse + '/' + s.estresseMax), h('span', null, st.name + ' — ' + sur.name)),
+        h('button', { class: 'btn sm primary', type: 'button', html: icon('dice') + 'Resolver', onclick: () => this.open(id) }));
+    }));
+    box.hidden = !list.length;
+    if (fresh) this.beep();
+  },
+  beep() {
+    const ac = Som.ac; if (!ac || ac.state !== 'running' || Som.mudo) return;
+    const t = ac.currentTime + 0.02;
+    [[392, 0], [311, 0.16]].forEach(([f, d]) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t + d); g.gain.exponentialRampToValueAtTime(0.18 * Som.vol, t + d + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.35); o.connect(g); g.connect(ac.destination); o.start(t + d); o.stop(t + d + 0.4); });
+  },
+  /* rola (ou usa o efeito escolhido) e devolve o resultado */
+  roll(s, k, pick) {
+    const tab = CRISE_TAB[k], name = SURTOS[k].name;
+    let row, total, expr, res = null, nat = null, ok = false, extra = '';
+    if (k === 'ansiedade') {
+      const sorte = s.atr.sorte || 0; expr = '1d20' + (sorte ? '+' + sorte : '');
+      if (pick === 'ok') { ok = true; total = null; }
+      else if (pick != null) { row = tab[pick]; total = null; }
+      else { res = rollExpr(expr); nat = res.parts[0].vals[0]; total = res.total; if (total >= 15) ok = true; else row = tab.find(r => nat >= r[0] && nat <= r[1]) || tab[tab.length - 1]; }
+    } else {
+      expr = '1d6';
+      if (pick != null) { row = tab[pick]; total = null; }
+      else { res = rollExpr('1d6'); total = res.total; row = tab.find(r => total >= r[0] && total <= r[1]); }
+      if (k === 'panico') extra = ` Dura ${rollDie(4)} rodada(s) ou até um Socorro Emocional dar certo.`;
+      if (k === 'colapso' && row === tab[0]) { const dmg = rollExpr('2d6').total; Sheets.setVida(s, vidaAt(s) - dmg); extra = ` Sofreu ${dmg} de dano na Vida.`; }
+      if (k === 'colapso' && row === tab[1]) { const dmg = rollDie(8); Sheets.setVida(s, vidaAt(s) - dmg); s.sangrando = true; extra = ` Sofreu ${dmg} de dano e está sangrando.`; }
+    }
+    const efeito = ok ? 'Segurou o pânico' : row[2], txt = ok ? 'Respirou fundo e não sofre nada desta vez.' : row[3].charAt(0).toUpperCase() + row[3].slice(1) + extra;
+    return { k, crise: name, efeito, txt, total, expr: res ? normExpr(expr) + (nat != null ? ` (d20: ${nat})` : '') : 'escolhido pelo mestre', ok, res };
+  },
+  resolve(id, pick, pub) {
+    const s = Sheets.data[id]; if (!s || !s.surto) return null;
+    const k = s.surto, st = stageOf(s.estresse), r = this.roll(s, k, pick);
+    if (r.res) Sheets.publish(s, r.crise, r.expr.split(' ')[0], r.res, r.efeito);
+    s.crise = { t: Date.now(), k, crise: r.crise, fase: st.name, cor: st.c, efeito: r.efeito, txt: r.txt, total: r.total, expr: r.expr, ok: r.ok, pub: !!pub, est: s.estresse, max: s.estresseMax, visto: false };
+    s.surto = '';
+    Sheets.log(s, { l: r.crise, total: r.total ?? '—', expr: r.expr, o: `${r.efeito}: ${r.txt}`, k: r.ok ? 'crit' : 'fail' });
+    Sheets.save(id, 0); Sheets.refresh(); this.scan();
+    if (pub) Live.emit('crise', { n: uid(), id, nome: shName(s), cor: s.cor || '', retrato: s.retrato && String(s.retrato).length < 200000 ? s.retrato : '', c: s.crise });
+    return s.crise;
+  },
+  open(id) {
+    const s = Sheets.data[id]; if (!s || !s.surto) { this.scan(); return; }
+    const k = s.surto, sur = SURTOS[k], st = stageOf(s.estresse), tab = CRISE_TAB[k];
+    let pub = false, close;
+    const how = k === 'ansiedade' ? `Role 1D20 + Sorte (${s.atr.sorte || 0}). Com 15 ou mais, ${firstName(s)} segura o pânico; abaixo disso, vale o número natural do dado na tabela.`
+      : k === 'panico' ? 'Role 1D6 (ou escolha). Dura 1D4 rodadas ou até um Socorro Emocional dar certo.' : 'O Trauma Pessoal assume o controle e a morte vira possibilidade real. Role 1D6 (ou escolha).';
+    const body = h('div', { class: 'crise-m' });
+    const done = c => {
+      fill(body,
+        h('div', { class: 'crise-res', style: { '--c': st.c } },
+          h('div', { class: 'eyebrow' }, c.crise + (c.total != null ? ' · tirou ' + c.total : ' · escolhido')),
+          h('h3', null, c.efeito), h('p', null, c.txt)),
+        h('p', { class: 'hint' }, (pub ? 'A mesa toda recebeu o aviso. ' : 'Só ' + firstName(s) + ' recebeu o aviso. ') + 'O efeito ficou anotado na ficha.'),
+        h('div', { class: 'acts' }, h('button', { class: 'btn primary', type: 'button', onclick: () => close() }, 'Fechar')));
+    };
+    const go = pick => { const c = this.resolve(id, pick, pub); if (c) done(c); else close(); };
+    const render = () => fill(body,
+      h('div', { class: 'crise-head', style: { '--c': st.c } },
+        h('span', { class: 'sh-av', style: { '--c': s.cor || '#4fa3a5' }, html: s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome || '?')) }),
+        h('div', null, h('b', null, s.nome || 'Persona'), h('span', null, `Estresse ${s.estresse} de ${s.estresseMax} · ${st.name}`))),
+      h('p', null, h('b', null, sur.name + '. '), how),
+      h('div', { class: 'field' }, h('span', null, 'Quem fica sabendo do resultado'), seg([['eu', 'Só o jogador'], ['todos', 'A mesa toda']], pub ? 'todos' : 'eu', v => { pub = v === 'todos'; render(); }, 'crise-pub')),
+      h('details', { class: 'crise-pick' }, h('summary', null, 'Escolher o efeito em vez de rolar'),
+        h('div', { class: 'crise-rows' },
+          k === 'ansiedade' ? h('button', { class: 'btn sm', type: 'button', onclick: () => go('ok') }, 'Segurou o pânico (nada acontece)') : null,
+          tab.map((r, i) => h('button', { class: 'btn sm', type: 'button', title: r[3], onclick: () => go(i) }, `${r[0]}–${r[1]} · ${r[2]}`)))),
+      h('div', { class: 'acts' },
+        h('button', { class: 'btn ghost', type: 'button', onclick: () => { s.surto = ''; Sheets.save(id, 0); Sheets.refresh(); this.scan(); close(); } }, 'Dispensar'),
+        h('button', { class: 'btn ghost', type: 'button', onclick: () => close() }, 'Depois'),
+        h('button', { class: 'btn primary', type: 'button', html: icon('dice') + (k === 'ansiedade' ? `Rolar 1D20 + ${s.atr.sorte || 0}` : 'Rolar 1D6'), onclick: () => go(null) })));
+    render();
+    close = modal(h('h2', null, 'Crise de estresse'), body);
+  },
+  /* jogador: o efeito chegou na própria ficha */
+  check() {
+    if (!ME || ROLE === 'gm') return;
+    const s = Sheets.data[ME], c = s?.crise;
+    if (!c || c.visto || this.shown.has(c.t)) return;
+    this.mark(c.t);
+    this.notify({ nome: firstName(s), cor: s.cor, retrato: s.retrato, c }, true);
+  },
+  onLive(d) {
+    if (!d?.c || ROLE === 'gm' && VIEWMODE === 'gm') return;
+    if (this.shown.has(d.c.t)) return;
+    this.mark(d.c.t);
+    this.notify(d, d.id === ME);
+  },
+  mark(t) { this.shown.add(t); LS.set('criseVistas', [...this.shown].slice(-40)); },
+  notify(d, mine) {
+    const c = d.c;
+    $('#crise-note')?.remove();
+    const ok = () => {
+      el.remove();
+      if (mine) { const s = Sheets.data[ME]; if (s?.crise && s.crise.t === c.t) { s.crise.visto = true; Sheets.save(ME, 0); } }
+    };
+    const el = h('div', { class: 'crise-note' + (c.ok ? ' ok' : ''), id: 'crise-note', role: 'alertdialog', 'aria-modal': 'true', style: { '--c': c.cor || '#de6b58' } },
+      h('div', { class: 'crise-box' },
+        h('div', { class: 'crise-eye' }, (mine ? 'Você' : d.nome) + ' · ' + c.crise),
+        h('span', { class: 'sh-av big', style: { '--c': d.cor || '#4fa3a5' }, html: d.retrato ? `<img src="${esc(imgSrc(d.retrato))}" alt="">` : esc(initials(d.nome || '?')) }),
+        h('h2', null, c.efeito),
+        h('p', null, c.txt),
+        h('div', { class: 'crise-meta' }, `Estresse ${c.est} de ${c.max} · ${c.fase}` + (c.total != null ? ` · o mestre tirou ${c.total}` : '')),
+        h('button', { class: 'btn primary', type: 'button', onclick: ok }, mine ? 'Entendi' : 'Fechar')));
+    document.body.append(el);
+    setTimeout(() => el.querySelector('button')?.focus(), 50);
+    try { if (mine) navigator.vibrate?.([120, 60, 120]); } catch {}
+    this.beep();
+  },
+};
+Crise.scanSoon = rafOnce(() => Crise.scan());
+
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
   const toolbar = h('div', { class: 'toolbar', role: 'toolbar', 'aria-label': 'Ferramentas', 'aria-orientation': 'vertical' },
@@ -9012,6 +9186,7 @@ function wireStore() {
   Live.on('fog', d => { if (!d || d.map !== CUR || Input.mode === 'fog' || Input.mode === 'fogrect') return; Fog.applyRemote(d); });
   Live.on('ping', d => { if (d && d.map === CUR && isFinite(d.x) && isFinite(d.y)) showPing(+d.x, +d.y, String(d.id || '')); });
   Live.on('intro', d => Abertura.onRemote(d));
+  Live.on('crise', d => Crise.onLive(d));
   Live.on('sfx', d => { if (d?.stop) Som.stopOnes(); else if (d?.id) Som.once(String(d.id), true); });
   Live.on('roll', d => { if (d && d.id && !ROLLS_SEEN.has(d.id)) { ROLLS_SEEN.add(d.id); if (ROLE === 'gm') { SECRET_ROLLS.unshift(Object.assign(sanitizeRoll(d), { secret: true })); SECRET_ROLLS = SECRET_ROLLS.slice(0, 30); LS.set('secretRolls', SECRET_ROLLS); } UI.rollToast(sanitizeRoll(d)); if (UI.tab === 'dados') UI.renderRightSoon(); } });
 }
