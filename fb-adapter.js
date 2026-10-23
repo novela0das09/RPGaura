@@ -33,7 +33,9 @@
   .acc-row img,.acc-row .ph{width:30px;height:30px;border-radius:50%;flex:none;background:#22353b}
   .acc-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
   @media (max-width:520px){.pl-mode .pl-ic span{display:none}.pl-mode .pl-ic{padding:0 10px}}
-  .acc-row .nm small{display:block;font-weight:400;color:#6f8387;font-size:12px}`;
+  .acc-row .nm small{display:block;font-weight:400;color:#6f8387;font-size:12px}
+  .acc-row.banned{opacity:.7;border-style:dashed}
+  .acc-row.banned .nm small{color:#de6b58}`;
   function addCss() { if (document.getElementById('gate-css')) return; const s = document.createElement('style'); s.id = 'gate-css'; s.textContent = css; document.head.appendChild(s); }
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const GOOGLE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.3-1.6 3.9-5.4 3.9-3.3 0-5.9-2.7-5.9-6s2.6-6 5.9-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6H12z"/></svg>';
@@ -123,9 +125,11 @@
       FB.user = u;
       gate('<p>Abrindo a mesa…</p>');
       try {
-        rtdb.ref('users/' + u.uid).set({ nome: u.displayName || u.email || 'Sem nome', foto: u.photoURL || '', visto: Date.now() }).catch(() => {});
         const ms = (await rtdb.ref('mesa/mestres').once('value')).val() || {};
         FB.mestres = ms; FB.isGM = ms[u.uid] === true;
+        const ban = FB.isGM ? null : (await rtdb.ref('mesa/banidos/' + u.uid).once('value').catch(() => null))?.val();
+        if (ban === true) { banGate(); return; }
+        rtdb.ref('users/' + u.uid).set({ nome: u.displayName || u.email || 'Sem nome', foto: u.photoURL || '', visto: Date.now() }).catch(() => {});
         let asPlayer = false; try { asPlayer = sessionStorage.getItem('apogeu.asPlayer') === u.uid; sessionStorage.removeItem('apogeu.asPlayer'); } catch {}
         if (!Object.keys(ms).length && !asPlayer) { askGM(start); return; }
         go(start);
@@ -136,6 +140,15 @@
   function go(start) {
     window.claude = { use: async name => (name === 'db' ? db : name === 'user' ? user : name === 'room' ? room : null) };
     started = true; closeGate(); start();
+    /* se o mestre expulsar esta conta com o site aberto, ela sai na hora */
+    if (!FB.isGM && FB.user) rtdb.ref('mesa/banidos/' + FB.user.uid).on('value', s => { if (s.val() === true) location.reload(); }, () => {});
+  }
+  function banGate() {
+    const u = FB.user;
+    const g = gate(`<div class="gate-who">${u.photoURL ? `<img src="${esc(u.photoURL)}" alt="">` : ''}${esc(u.displayName || u.email)}</div>
+      <p>Você foi removido desta mesa pelo mestre. Se acha que foi engano, fale com ele no Discord.</p>
+      <div class="gate-row">${discordBtn()}<button class="gate-btn" type="button" id="g-out">Entrar com outra conta</button></div>`);
+    g.querySelector('#g-out').onclick = () => auth.signOut();
   }
   function showLogin(start, err) {
     const g = gate(`<p>Entre com a sua conta do Google para abrir o mapa, as fichas e o mural da mesa.</p>
@@ -198,24 +211,36 @@
     close = modal(
       h('h2', null, FB.isGM ? 'Mestre e jogadores' : 'Sua conta'),
       me,
-      FB.isGM ? h('p', null, 'Para outra pessoa assumir, toque em ', h('b', null, 'Passar o posto'), ' ao lado do nome dela: ela vira mestre e você vira jogador. ', h('b', null, 'Tornar mestre'), ' deixa vocês dois como mestres.') : h('p', null, 'Você está na mesa como jogador. Só o mestre mexe no mapa, no mural e nas notas.'),
+      FB.isGM ? h('p', null, 'Para outra pessoa assumir, toque em ', h('b', null, 'Passar o posto'), ' ao lado do nome dela: ela vira mestre e você vira jogador. ', h('b', null, 'Tornar mestre'), ' deixa vocês dois como mestres. ', h('b', null, 'Expulsar'), ' tira a pessoa da mesa na hora; ela só volta se você tocar em ', h('b', null, 'Readmitir'), '.') : h('p', null, 'Você está na mesa como jogador. Só o mestre mexe no mapa, no mural e nas notas.'),
       FB.isGM ? list : null,
       FB.isGM ? leave : null,
       FB.isGM ? h('p', { class: 'hint', style: { margin: '0' } }, 'Se não sobrar nenhum mestre, a próxima pessoa que entrar no site pode assumir a mesa.') : null,
       h('div', { class: 'acts' }, DISCORD ? h('a', { class: 'btn', href: DISCORD, target: '_blank', rel: 'noopener', style: { marginRight: 'auto', textDecoration: 'none' } }, 'Discord da mesa') : null, h('button', { class: 'btn ghost', type: 'button', onclick: async () => { await auth.signOut(); } }, 'Sair da conta'), h('button', { class: 'btn primary', type: 'button', onclick: () => close() }, 'Fechar')));
     if (!FB.isGM) return;
     const draw = async () => {
-      const [us, ms] = await Promise.all([rtdb.ref('users').once('value'), rtdb.ref('mesa/mestres').once('value')]);
-      const users = us.val() || {}, mest = ms.val() || {};
-      const rows = Object.entries(users).filter(([uid]) => uid !== u.uid).sort((a, b) => (b[1].visto || 0) - (a[1].visto || 0));
+      const [us, ms, bs] = await Promise.all([rtdb.ref('users').once('value'), rtdb.ref('mesa/mestres').once('value'), rtdb.ref('mesa/banidos').once('value')]);
+      const users = us.val() || {}, mest = ms.val() || {}, bans = bs.val() || {};
+      const rows = Object.entries(users).filter(([uid]) => uid !== u.uid).sort((a, b) => ((bans[a[0]] === true) - (bans[b[0]] === true)) || (b[1].visto || 0) - (a[1].visto || 0));
       if (!rows.length) { list.replaceChildren(h('p', { class: 'hint', style: { margin: '0' } }, 'Ninguém mais entrou na mesa ainda. Quando os jogadores fizerem login, eles aparecem aqui.')); return; }
-      const act = (label, cls, fn) => h('button', { class: 'btn sm' + cls, type: 'button', onclick: async e => { e.currentTarget.disabled = true; try { await fn(); } catch (err) { UI.toast('Não foi possível mudar o mestre agora.', 'err'); } draw(); } }, label);
+      const act = (label, cls, fn) => h('button', { class: 'btn sm' + cls, type: 'button', onclick: async e => { e.currentTarget.disabled = true; try { await fn(); } catch (err) { UI.toast('Não foi possível fazer isso agora. Tente de novo.', 'err'); } draw(); } }, label);
+      /* expulsar pede dois toques para não acontecer sem querer */
+      const kick = (uid, nome) => { let armed = false; const b = h('button', { class: 'btn sm danger', type: 'button', onclick: async () => {
+        if (!armed) { armed = true; b.textContent = 'Toque de novo para expulsar'; setTimeout(() => { if (b.isConnected && armed) { armed = false; b.textContent = 'Expulsar'; } }, 4000); return; }
+        b.disabled = true;
+        try {
+          await rtdb.ref('mesa/banidos/' + uid).set(true);
+          await Promise.all([rtdb.ref('mesa/fichasOk/' + uid).remove(), rtdb.ref('pedidos/' + uid).remove()]).catch(() => {});
+          UI.toast(nome + ' foi expulso da mesa.');
+        } catch (err) { UI.toast('Não foi possível expulsar agora. Tente de novo.', 'err'); }
+        draw();
+      } }, 'Expulsar'); return b; };
       list.replaceChildren(...rows.map(([uid, x]) => {
-        const isM = mest[uid] === true;
-        return h('div', { class: 'acc-row' }, x.foto ? h('img', { src: x.foto, alt: '' }) : h('span', { class: 'ph' }),
-          h('span', { class: 'nm' }, x.nome || 'Sem nome', h('small', null, isM ? 'Mestre' : 'Jogador')),
+        const isM = mest[uid] === true, isB = !isM && bans[uid] === true, nome = x.nome || 'Sem nome';
+        return h('div', { class: 'acc-row' + (isB ? ' banned' : '') }, x.foto ? h('img', { src: x.foto, alt: '' }) : h('span', { class: 'ph' }),
+          h('span', { class: 'nm' }, nome, h('small', null, isM ? 'Mestre' : isB ? 'Expulso da mesa' : 'Jogador')),
           isM ? act('Tirar de mestre', ' danger', () => rtdb.ref('mesa/mestres/' + uid).remove())
-              : [act('Tornar mestre', '', () => rtdb.ref('mesa/mestres/' + uid).set(true)), act('Passar o posto', ' primary', () => stepDown(uid))]);
+            : isB ? act('Readmitir', ' primary', () => rtdb.ref('mesa/banidos/' + uid).remove())
+              : [act('Tornar mestre', '', () => rtdb.ref('mesa/mestres/' + uid).set(true)), act('Passar o posto', ' primary', () => stepDown(uid)), kick(uid, nome)]);
       }));
     };
     draw();
