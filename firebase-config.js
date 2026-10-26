@@ -11,4 +11,4 @@ window.APOGEU_FIREBASE = {
 };
 
 /* Convite do servidor do Discord da mesa (aparece como botão no site). Deixe "" para esconder. */
-window.APOGEU_DISCORD = "https://discord.gg/UQPBxQJGQ";
+window.APOGEU_DISCORD = ""; // sem Discord no site

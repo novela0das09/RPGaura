@@ -146,7 +146,7 @@
   function banGate() {
     const u = FB.user;
     const g = gate(`<div class="gate-who">${u.photoURL ? `<img src="${esc(u.photoURL)}" alt="">` : ''}${esc(u.displayName || u.email)}</div>
-      <p>Você foi removido desta mesa pelo mestre. Se acha que foi engano, fale com ele no Discord.</p>
+      <p>Você foi removido desta mesa pelo mestre. Se acha que foi engano, fale com o mestre.</p>
       <div class="gate-row">${discordBtn()}<button class="gate-btn" type="button" id="g-out">Entrar com outra conta</button></div>`);
     g.querySelector('#g-out').onclick = () => auth.signOut();
   }

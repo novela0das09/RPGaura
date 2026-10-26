@@ -892,8 +892,8 @@ textarea.notes:focus { border-color: var(--lamp); }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610232017"></script>
-<script src="fb-adapter.js?v=202610232017"></script>
+<script src="firebase-config.js?v=202610261601"></script>
+<script src="fb-adapter.js?v=202610261601"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -6484,11 +6484,11 @@ function openPlayersModal() {
   const fc = h('input', { type: 'checkbox', checked: FOLLOW_CAM || null, onchange: e => { FOLLOW_CAM = e.target.checked; LS.set('followCam', FOLLOW_CAM); if (FOLLOW_CAM) emitCam(); } });
   close = modal(
     h('h2', null, 'Tela dos jogadores'),
-    h('p', null, 'Mostre o mapa no Discord sem revelar suas notas, as fichas escondidas e o que está debaixo da névoa.'),
+    h('p', null, 'Mostre o mapa na chamada sem revelar suas notas, as fichas escondidas e o que está debaixo da névoa.'),
     h('ol', null,
       h('li', null, 'Abra esta mesma página em outra aba ou janela do navegador.'),
       h('li', null, 'Nela, troque de ', h('b', null, 'Mestre'), ' para ', h('b', null, 'Jogador'), ' no seletor do canto de cima.'),
-      h('li', null, 'No Discord, compartilhe essa aba (ou a janela). O que você fizer aqui aparece lá na hora.')),
+      h('li', null, 'Na chamada, compartilhe essa aba (ou a janela). O que você fizer aqui aparece lá na hora.')),
     h('label', { class: 'chk' }, fm, 'Os jogadores vão junto quando eu abro outro mapa'),
     h('label', { class: 'chk' }, fc, 'Os jogadores acompanham meu zoom e posição'),
     h('p', { class: 'hint' }, Store.mode === 'db' ? 'Os jogadores entram pelo endereço do site com a conta do Google e acompanham tudo ao vivo no próprio aparelho, sem poder mexer no mapa.' : 'Neste modo, a tela dos jogadores acompanha você entre abas deste mesmo navegador.'),
@@ -6864,7 +6864,7 @@ const Sheets = {
     const places = full.filter(([, s]) => String(s.localNome || '').trim() || String(s.localMisterio || '').trim());
     $('#sh-list').innerHTML = `
       <div class="sh-lhead"><div><div class="eyebrow">Névoa Sobre Apogeu</div><h2>Fichas</h2></div>${canMine ? `<button type="button" class="btn sm primary" data-act="new" ${Pedidos.mine?.status === 'pendente' && !Pedidos.can() ? 'disabled' : ''}>${icon('plus')}${esc(Pedidos.label())}</button>` : ''}</div>
-      ${canMine && !Pedidos.can() ? `<div class="sh-empty" style="margin:0 0 10px">${Pedidos.mine?.status === 'pendente' ? 'Seu pedido está com o mestre. Assim que ele aprovar, o botão vira <b>Criar minha ficha</b>.' : Pedidos.mine?.status === 'recusado' ? 'O mestre recusou o pedido por enquanto. Fale com ele no Discord e peça de novo.' : 'Para criar uma ficha nesta mesa, o mestre precisa aprovar. Toque em <b>Pedir para criar ficha</b>.'}</div>` : ''}
+      ${canMine && !Pedidos.can() ? `<div class="sh-empty" style="margin:0 0 10px">${Pedidos.mine?.status === 'pendente' ? 'Seu pedido está com o mestre. Assim que ele aprovar, o botão vira <b>Criar minha ficha</b>.' : Pedidos.mine?.status === 'recusado' ? 'O mestre recusou o pedido por enquanto. Fale com ele e peça de novo.' : 'Para criar uma ficha nesta mesa, o mestre precisa aprovar. Toque em <b>Pedir para criar ficha</b>.'}</div>` : ''}
       ${cw ? `<div class="sh-newrow"><span class="sh-lbl">Nova ficha</span><button type="button" class="btn sm primary" data-act="new" data-tipo="pj">${icon('plus')}Persona</button><button type="button" class="btn sm" data-act="new" data-tipo="npc">${icon('plus')}NPC</button><button type="button" class="btn sm" data-act="new" data-tipo="inimigo">${icon('plus')}Inimigo</button></div>` : ''}
       ${!cw && !PLAYER_CAN && Store.mode === 'db' ? '<p class="hint" style="margin:0">Para criar e editar a sua ficha, entre no site com a sua conta do Google.</p>' : ''}
       <button type="button" class="btn sm" data-act="map">${icon('back')}Voltar ao mapa</button>
@@ -9360,7 +9360,7 @@ function buildShell() {
       h('div', { class: 'top-sp' }),
       h('div', { class: 'scene-pill', id: 'scene-pill' }),
       h('span', { class: 'saved', id: 'save-state', 'aria-live': 'polite' }),
-      h('button', { class: 'iconbtn hide-xs', type: 'button', html: icon('screen'), title: 'Como mostrar a tela dos jogadores no Discord', 'aria-label': 'Como mostrar a tela dos jogadores no Discord', onclick: openPlayersModal }),
+      h('button', { class: 'iconbtn hide-xs', type: 'button', html: icon('screen'), title: 'Como mostrar a tela dos jogadores na chamada', 'aria-label': 'Como mostrar a tela dos jogadores na chamada', onclick: openPlayersModal }),
       h('button', { class: 'iconbtn', id: 'lock-top', type: 'button', html: icon('lock'), title: 'Travar o mapa e as peças', 'aria-label': 'Travar o mapa e as peças', onclick: () => { if (UI.tab !== 'fichas') UI.setTab('fichas'); UI.openRight(); setTimeout(() => $('#tv-pecas')?.focus(), 50); } }),
       h('button', { class: 'iconbtn', id: 'ab-top', type: 'button', html: icon('film'), title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', onclick: () => (ROLE === 'gm' ? openAberturaModal() : Abertura.local()) }),
       modeSwitch('mode-top'),
