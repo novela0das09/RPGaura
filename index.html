@@ -1012,8 +1012,8 @@ textarea.notes:focus { border-color: var(--lamp); }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610271049"></script>
-<script src="fb-adapter.js?v=202610271049"></script>
+<script src="firebase-config.js?v=202610271101"></script>
+<script src="fb-adapter.js?v=202610271101"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -9505,7 +9505,7 @@ const Abalo = {
   kinds(s) {
     const L = this.lvl(s), c = this.crise(s), k = new Set(c ? ABALO_CRISE[c.efeito] || [] : []);
     if (c) k.add('crise');
-    if (s && (s.destaque === 'sorte' || /apostador/i.test((s.origem || '') + ' ' + (s.conceito || ''))) && (L >= 1 || c)) k.add('luck');
+    if (s && s.destaque && ATRN[s.destaque] && (L >= 1 || c)) k.add('luck'); // o número do Destaque (atributo da estrela) fica instável
     return [...k];
   },
   can(id) { return !!id && (ROLE === 'gm' || (!!ME && id === ME)); },
@@ -9513,7 +9513,6 @@ const Abalo = {
   atrShow(s, k, L) {
     const v = s.atr[k] || 0;
     if (L >= 3 && k === s.destaque) return `<b title="Valor real: ${v}">???</b>`;
-    if (L >= 3 && k === this.lost(s)) return `<b title="Valor real: ${v}">–</b>`;
     if (L === 2 && k === s.destaque) return `<b title="Valor real: ${v}">?</b>`;
     return `<b>${v}</b>`;
   },
@@ -9524,11 +9523,11 @@ const Abalo = {
     if (!box || box.hidden || !s) return;
     const L = this.lvl(s), k = this.kinds(s);
     if (k.includes('luck')) {
-      const b = box.querySelector('.ps-atr[data-k="sorte"] b');
+      const b = box.querySelector(`.ps-atr[data-k="${s.destaque}"] b`);
       if (b) b.textContent = L >= 3 && Math.random() < 0.35 ? '???' : Math.random() < 0.15 ? '?' : String(1 + Math.floor(Math.random() * 20));
     }
     if (k.includes('halluc') && Math.random() < 0.55) {
-      const cands = [...box.querySelectorAll('.ps-atr b, .ps-roll b')]; const b = cands[Math.floor(Math.random() * cands.length)];
+      const cands = [...box.querySelectorAll('.ps-roll b')]; const b = cands[Math.floor(Math.random() * cands.length)];
       if (b && !b.dataset.fake) { const o = b.textContent; b.dataset.fake = '1'; b.textContent = String(Math.floor(Math.random() * 21)); b.classList.add('fake'); setTimeout(() => { if (b.isConnected) { b.textContent = o; b.classList.remove('fake'); delete b.dataset.fake; } }, 700); }
     }
     if (k.includes('paranoia') && ++this.whisper % 9 === 0) { const w = box.querySelector('.ps-whisper span'); if (w) w.textContent = ABALO_SUSSURROS[Math.floor(Math.random() * ABALO_SUSSURROS.length)]; }
