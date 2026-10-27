@@ -886,14 +886,73 @@ textarea.notes:focus { border-color: var(--lamp); }
 @media (max-width: 700px) {
   .pl-sheet { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; height: 54vh; }
 }
+/* ---------- escuridão do estresse ---------- */
+.fx-dark { position: fixed; inset: 0; z-index: 52; pointer-events: none; transition: opacity .6s; }
+.fx-dark.dim { opacity: .55; }
+.fx-smoke { position: absolute; inset: 0; width: 100%; height: 100%; filter: blur(2px); }
+.fx-tint { position: absolute; inset: 0; }
+.fx-dark.fx-red .fx-tint { background: radial-gradient(ellipse at center, transparent 45%, rgba(120, 10, 10, .45) 100%); animation: fx-flick 2.6s steps(1) infinite; }
+@keyframes fx-flick { 0%, 100% { opacity: .55; } 12% { opacity: .9; } 14% { opacity: .3; } 47% { opacity: .75; } 49% { opacity: .2; } 70% { opacity: .8; } }
+.fx-dark.fx-heart .fx-tint { background: radial-gradient(ellipse at center, transparent 35%, rgba(150, 0, 0, .7) 100%); animation: fx-heart 1.1s ease-out infinite; }
+@keyframes fx-heart { 0% { opacity: .15; } 8% { opacity: .95; } 18% { opacity: .3; } 26% { opacity: .8; } 45%, 100% { opacity: .1; } }
+.fx-dark.fx-blood .fx-tint { background: radial-gradient(ellipse at center, transparent 50%, rgba(90, 0, 0, .55) 100%); }
+.fx-blood i { position: absolute; top: 0; width: 1.1vw; min-width: 7px; height: 0; border-radius: 0 0 50% 50% / 0 0 30% 30%; background: linear-gradient(#3a0000, #7a0606 70%, #a10d0d); opacity: .85; animation: fx-drip 7s var(--dl) ease-in infinite; filter: blur(.4px); }
+@keyframes fx-drip { 0% { height: 0; opacity: .9; } 70% { height: var(--h); opacity: .9; } 100% { height: calc(var(--h) + 4vh); opacity: 0; } }
+.fx-hands { position: absolute; inset: 0; overflow: hidden; }
+.fx-hands svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fx-hands path, .pc-hands path { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: var(--L); stroke-dashoffset: var(--L); animation: ck-grow 2.4s var(--dl) cubic-bezier(.2,.7,.3,1) forwards; }
+.ck-dark path { stroke: rgba(0, 0, 0, .78); filter: blur(7px); }
+.ck-line path { stroke: rgba(4, 6, 7, .96); }
+.ck-glint path { stroke: rgba(205, 220, 225, .3); }
+@keyframes ck-grow { to { stroke-dashoffset: 0; } }
+.fx-dark.fx-hands .fx-tint { background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.6) 100%); animation: fx-flick 4s steps(1) infinite; }
+.fx-dark.fx-hands .fx-hands { animation: ck-shudder 5s ease-in-out infinite; }
+@keyframes ck-shudder { 0%, 90%, 100% { transform: none; } 92% { transform: translate(2px, -1px); } 94% { transform: translate(-2px, 1px); } }
+.app.fx-grey .viewport { filter: grayscale(.85) contrast(1.15) brightness(.9); transition: filter 1s; }
+.app.fx-shake .viewport { animation: fx-shake 3.2s ease-in-out infinite; }
+@keyframes fx-shake { 0%, 80%, 100% { translate: 0 0; } 82% { translate: -6px 2px; } 84% { translate: 5px -3px; } 86% { translate: -4px 3px; } 88% { translate: 3px -2px; } 90% { translate: -2px 1px; } }
+.fx-dark.calm *, .app.fx-shake.calm .viewport { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .fx-dark *, .app.fx-shake .viewport { animation: none !important; } }
+/* mestre: cards dos jogadores envoltos por trevas */
+.gm-party { position: absolute; right: 18px; top: 18px; z-index: 11; display: flex; flex-direction: column; gap: 16px; padding: 4px; pointer-events: none; }
+.gm-party .pc { pointer-events: auto; }
+.app.players .gm-party, .app.sheets-open .gm-party { display: none; }
+.pc { position: relative; flex: none; width: 168px; display: grid; grid-template-columns: auto 1fr; gap: 4px 9px; align-items: center; padding: 8px 10px 9px; border-radius: 12px; border: 1px solid var(--line-2); background: #1d2e33; color: var(--mist); text-align: left; cursor: pointer; overflow: visible; box-shadow: var(--shadow), 0 0 calc(40px * var(--dk)) calc(14px * var(--dk)) rgba(0, 0, 0, calc(.95 * var(--dk))); isolation: isolate; }
+.pc:hover { border-color: var(--sc); }
+.pc .sh-av { width: 36px; height: 36px; position: relative; z-index: 2; filter: saturate(calc(1 - var(--dk) * .7)) brightness(calc(1 - var(--dk) * .45)); }
+.pc .sh-av img { width: 100%; height: 100%; object-fit: cover; }
+.pc-tx { display: flex; flex-direction: column; min-width: 0; position: relative; z-index: 2; font-size: 12px; color: var(--mist-2); }
+.pc-tx b { font-size: 14px; color: var(--mist); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-tx em { font-style: normal; font-size: 11.5px; color: #e07a6a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-bar { grid-column: 1 / -1; height: 5px; border-radius: 99px; background: var(--panel-3); overflow: hidden; position: relative; z-index: 2; }
+.pc-bar i { display: block; height: 100%; background: var(--sc); border-radius: 99px; }
+.pc.pend { animation: pc-pend 1.4s ease-in-out infinite; }
+@keyframes pc-pend { 50% { border-color: var(--sc); } }
+.pc-smoke { position: absolute; inset: -22px; border-radius: 30px; z-index: 1; pointer-events: none; opacity: min(1, calc(var(--dk) * 1.25));
+  background: radial-gradient(closest-side at 20% 30%, rgba(0,0,0,.95), transparent), radial-gradient(closest-side at 80% 70%, rgba(0,0,0,.9), transparent), radial-gradient(closest-side at 60% 10%, rgba(0,0,0,.85), transparent), radial-gradient(closest-side at 10% 90%, rgba(0,0,0,.9), transparent), radial-gradient(closest-side at 50% 50%, rgba(0,0,0,.55), transparent);
+  background-size: 120% 120%; filter: blur(7px); animation: pc-smoke 7s ease-in-out infinite alternate; }
+.pc.dark .pc-tx b { opacity: calc(1 - var(--dk) * .35); }
+.pc.dark .pc-smoke::before, .pc.dark .pc-smoke::after { content: ""; position: absolute; width: 46%; height: 70%; border-radius: 50%; background: radial-gradient(closest-side, rgba(0,0,0,.95), transparent); animation: pc-wisp 5s ease-in-out infinite alternate; }
+.pc.dark .pc-smoke::before { left: -12%; top: -20%; }
+.pc.dark .pc-smoke::after { right: -14%; bottom: -24%; animation-delay: -2.5s; }
+@keyframes pc-smoke { 0% { background-position: 0% 0%; transform: scale(1); } 100% { background-position: 100% 100%; transform: scale(1.06) rotate(1.5deg); } }
+@keyframes pc-wisp { 0% { transform: translate(0, 0) scale(.9); } 100% { transform: translate(10px, 6px) scale(1.15); } }
+.pc-hands { position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: 12px; overflow: hidden; }
+.pc-hands svg { width: 100%; height: 100%; display: block; }
+.pc-hands .ck-dark path { filter: blur(2px); }
+@media (max-width: 900px) { .gm-party { top: auto; bottom: 60px; right: 8px; max-height: 50%; } .pc { width: 150px; } }
+@media (prefers-reduced-motion: reduce) { .pc-smoke, .pc-smoke::before, .pc-smoke::after, .pc-hands svg, .pc.pend { animation: none !important; } }
+/* peça no mapa (visão do mestre): aura escura */
+.tok.dark .disc { box-shadow: 0 0 0 2px rgba(0,0,0,.6), 0 0 calc(var(--s) * .6px * var(--dk)) calc(var(--s) * .22px * var(--dk)) rgba(0, 0, 0, calc(.9 * var(--dk))); }
+.tok.dark::before { content: ""; position: absolute; inset: calc(var(--s) * -.35px * var(--dk)); border-radius: 50%; background: radial-gradient(closest-side, rgba(0,0,0,calc(.75 * var(--dk))), transparent); filter: blur(3px); animation: pc-wisp 4s ease-in-out infinite alternate; pointer-events: none; z-index: -1; }
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610261601"></script>
-<script src="fb-adapter.js?v=202610261601"></script>
+<script src="firebase-config.js?v=202610262357"></script>
+<script src="fb-adapter.js?v=202610262357"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -5625,6 +5684,8 @@ function drawTokens(rebuild) {
     el.classList.toggle('sel', SEL_TOKEN === t.id && VIEWMODE === 'gm');
     el.classList.toggle('hidden-tok', !!t.hidden);
     el.classList.toggle('mine', VIEWMODE !== 'gm' && myToken(t));
+    { const sid = VIEWMODE === 'gm' && t.kind === 'pj' ? Sheets.byToken(t.id) : null, sh = sid && Sheets.data[sid], dk = sh && !isNpc(sh) ? darkOf(sh) : 0;
+      el.classList.toggle('dark', dk > 0); if (dk > 0) el.style.setProperty('--dk', dk.toFixed(3)); }
     el.hidden = VIEWMODE !== 'gm' && Fog.fogged(t.x, t.y);
   }
   if (Night.on) Night.drawSoon();
@@ -6116,7 +6177,7 @@ const UI = {
     $('#pl-follow').hidden = !show || PL_FOLLOW || mapLocked();
     { const tv = TRAVAS(), pl = $('#pl-lock'), msg = show && (tv.mapa || tv.pecas) ? (tv.mapa && tv.pecas ? 'O mestre travou o mapa e as peças' : tv.mapa ? 'O mestre travou o mapa' : 'O mestre travou as peças') : '';
       if (pl) { pl.hidden = !msg; if (msg) pl.innerHTML = icon('lock') + esc(msg); } }
-    Abertura.renderBtn(); if (typeof Crise !== 'undefined') { Crise.scanSoon(); PlSheet.renderSoon(); }
+    Abertura.renderBtn(); if (typeof Crise !== 'undefined') { Crise.scanSoon(); PlSheet.renderSoon(); Fx.updateSoon(); }
     $('#pl-mode').hidden = ROLE === 'loading'; // no celular o seletor fica no canto do mapa também para o mestre
     this.renderModeSwitch();
   },
@@ -6718,7 +6779,7 @@ const Sheets = {
           if (PLAYER_CAN && ME && !this.data[ME]) setTimeout(() => UI.toast(Pedidos.can() ? 'Bem-vindo à mesa! Toque em Fichas, no canto de cima, para criar a sua.' : 'Bem-vindo à mesa! Toque em Fichas, no canto de cima, para pedir ao mestre a sua ficha.'), 900);
         }
         this.refresh();
-        if (this.ready) { Crise.check(); Crise.gmCheck(); Crise.scanSoon(); PlSheet.renderSoon(); }
+        if (this.ready) { Crise.check(); Crise.gmCheck(); Crise.scanSoon(); PlSheet.renderSoon(); Fx.updateSoon(); if (ROLE === 'gm') drawTokens(); }
       };
       const watchCol = (col, bag, flag) => {
         const listen = () => db.collection(col).onSnapshot(snap => {
@@ -6751,7 +6812,7 @@ const Sheets = {
   },
   save(id, delay = 450) {
     if (!this.canWrite(id)) return;
-    if (typeof Crise !== 'undefined') { Crise.scanSoon(); if (id === ME) PlSheet.renderSoon(); }
+    if (typeof Crise !== 'undefined') { Crise.scanSoon(); if (id === ME) PlSheet.renderSoon(); Fx.updateSoon(); }
     const s = this.data[id]; if (s) s.upd = Date.now();
     if (!this.db) { clearTimeout(this.timers._local); this.timers._local = setTimeout(() => { delete this.timers._local; if (!LS.set('fichas.v1', this.data)) UI.toast('O navegador não tem espaço para guardar as fichas (retratos grandes ocupam muito).', 'err'); }, 300); return; }
     clearTimeout(this.timers[id]);
@@ -7321,7 +7382,7 @@ function viewSwitch() {
   const b = (v, ic, label) => h('button', { type: 'button', 'data-view': v, html: icon(ic) + `<span>${label}</span>`, onclick: () => { if (v === 'fichas') { if (!Sheets.open) Sheets.show(null); } else if (Sheets.open) Sheets.hide(); } });
   return h('div', { class: 'viewsw', id: 'viewsw', role: 'group', 'aria-label': 'Mapa ou fichas' }, b('mapa', 'compass', 'Mapa'), b('fichas', 'users', 'Fichas'));
 }
-UI.renderViewSwitch = () => { for (const b of document.querySelectorAll('#viewsw button')) { const on = (b.dataset.view === 'fichas') === Sheets.open; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); } };
+UI.renderViewSwitch = () => { if (typeof Fx !== 'undefined') Fx.updateSoon(); for (const b of document.querySelectorAll('#viewsw button')) { const on = (b.dataset.view === 'fichas') === Sheets.open; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); } };
 
 function wireSheets() {
   const root = $('#sheets');
@@ -8143,6 +8204,7 @@ function openSomModal() {
     h('p', null, 'O mestre escolhe o que toca. Aqui você ajusta só o volume deste aparelho.'),
     rangeField('Volume', 'som-vol-m', 0, 1, 0.05, Som.vol, v => Som.setVol(v), pct),
     kvSwitch('Silenciar tudo neste aparelho', Som.mudo, v => Som.setMudo(v), 'som-mudo-m'),
+    ROLE !== 'gm' ? kvSwitch('Escuridão do estresse na tela', Fx.on, v => Fx.set(v), 'fx-on-m') : null,
     h('div', { class: 'acts' }, h('button', { class: 'btn primary', type: 'button', onclick: () => close() }, 'Fechar')));
 }
 
@@ -9345,6 +9407,158 @@ const Pedidos = {
         h('button', { class: 'btn sm primary', type: 'button', onclick: () => this.aprovar(uid) }, 'Aprovar'))));
   },
 };
+
+/* ---------- escuridão do estresse (efeitos visuais) ----------
+   Jogador: a tela escurece pelas bordas conforme o Estresse cai, e cada efeito de crise tem um visual.
+   Mestre: barra com o card de cada jogador envolto por trevas; a peça no mapa ganha uma aura escura. */
+const darkOf = s => (!s ? 0 : s.estresse >= 8 ? 0 : clampN((8 - s.estresse) / 8, 0, 1));
+/* efeito de crise → visual */
+const FX_CRISE = {
+  'Hiperventilação': ['breath'], 'Visão de túnel': ['tunel'], 'Paranoia do Trauma': ['red'], 'Fuga desesperada': ['shake'], 'Negação rígida': ['grey'],
+  'Pânico catatônico': ['grey', 'static'], 'Histeria persecutória': ['red', 'shake'], 'Fuga cega': ['tunel', 'shake'],
+  'Parada cardíaca por pânico': ['heart'], 'Ferimento desesperado': ['blood'], 'Entrega à Entidade': ['hands'], // rachaduras na tela
+};
+const fxOf = s => (s?.crise?.efeito && !s.crise.ok ? FX_CRISE[s.crise.efeito] || [] : []);
+/* mão de sombra (desenho próprio): pulso embaixo, dedos longos para cima */
+/* rachaduras: linhas finas que nascem num ponto de impacto e se ramificam, com brilho de vidro trincado */
+function cracksSVG(W, H, seed, n = 4) {
+  let r = (seed * 2654435761) % 2147483647 || 7; const rnd = () => ((r = (r * 16807) % 2147483647) / 2147483647);
+  const lines = [], rings = [];
+  const origins = [[0.07, 0.9], [0.93, 0.88], [0.1, 0.12], [0.9, 0.14], [0.52, 0.97], [0.03, 0.5], [0.97, 0.47]].slice(0, n);
+  for (const [ox, oy] of origins) {
+    const x0 = ox * W, y0 = oy * H, toward = Math.atan2(H / 2 - y0, W / 2 - x0), arms = 4 + Math.floor(rnd() * 3);
+    for (let a = 0; a < arms; a++) {
+      let ang = toward + (rnd() - 0.5) * 3.4, x = x0 + (rnd() - 0.5) * 14, y = y0 + (rnd() - 0.5) * 14, len = (0.22 + rnd() * 0.4) * Math.min(W, H);
+      const pts = [[x, y]];
+      const branch = (bx, by, bang, blen, depth) => {
+        const bp = [[bx, by]]; let cx = bx, cy = by, ca = bang;
+        const steps = 4 + Math.floor(rnd() * 4);
+        for (let i = 0; i < steps; i++) { ca += (rnd() - 0.5) * 1.1; const st = blen / steps * (0.4 + rnd() * 1.2); cx += Math.cos(ca) * st; cy += Math.sin(ca) * st; bp.push([cx, cy]); if (depth < 2 && rnd() < 0.25) branch(cx, cy, ca + (rnd() < 0.5 ? -1 : 1) * (0.6 + rnd() * 0.6), blen * 0.45, depth + 1); }
+        lines.push({ p: bp, w: Math.max(0.5, 2 - depth * 0.6), d: depth });
+      };
+      const steps = 12 + Math.floor(rnd() * 8);
+      for (let i = 0; i < steps; i++) {
+        ang += (rnd() - 0.5) * 0.95; const st = len / steps * (0.3 + rnd() * 1.4);
+        x += Math.cos(ang) * st; y += Math.sin(ang) * st; pts.push([x, y]);
+        if (rnd() < 0.3) branch(x, y, ang + (rnd() < 0.5 ? -1 : 1) * (0.5 + rnd() * 0.7), len * (0.2 + rnd() * 0.3), 1);
+      }
+      lines.push({ p: pts, w: 2.6 + rnd() * 1.2, d: 0 });
+    }
+    // anéis de estilhaço perto do impacto
+    for (let k = 1; k <= 2; k++) {
+      const rr = (0.04 + k * 0.035) * Math.min(W, H), seg = [];
+      for (let t = 0; t <= 14; t++) { const a = toward - 1.6 + (t / 14) * 3.2 + (rnd() - 0.5) * 0.12; seg.push([x0 + Math.cos(a) * rr * (0.9 + rnd() * 0.2), y0 + Math.sin(a) * rr * (0.9 + rnd() * 0.2)]); }
+      rings.push({ p: seg, w: 1.1, d: 1 });
+    }
+  }
+  const all = lines.concat(rings);
+  const pathOf = l => 'M' + l.p.map(([x, y]) => x.toFixed(1) + ' ' + y.toFixed(1)).join(' L');
+  const lenOf = l => l.p.reduce((a, q, i) => (i ? a + Math.hypot(q[0] - l.p[i - 1][0], q[1] - l.p[i - 1][1]) : 0), 0);
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+    <g class="ck-dark">${all.map(l => `<path d="${pathOf(l)}" stroke-width="${(l.w * 5).toFixed(1)}" style="--L:${lenOf(l).toFixed(0)};--dl:${(l.d * 0.9).toFixed(1)}s"/>`).join('')}</g>
+    <g class="ck-line">${all.map(l => `<path d="${pathOf(l)}" stroke-width="${l.w.toFixed(1)}" style="--L:${lenOf(l).toFixed(0)};--dl:${(l.d * 0.9).toFixed(1)}s"/>`).join('')}</g>
+    <g class="ck-glint">${lines.filter(l => !l.d).map(l => `<path d="${pathOf(l)}" stroke-width="0.8" transform="translate(1.4 -1)" style="--L:${lenOf(l).toFixed(0)};--dl:0s"/>`).join('')}</g>
+  </svg>`;
+}
+const Fx = {
+  on: LS.get('fxOn', true) !== false, d: 0, dShow: 0, kinds: [], raf: 0, cv: null, g: null, parts: [], last: 0, sig: '',
+  updateSoon: null,
+  mine() { return ROLE !== 'gm' && VIEWMODE === 'players' && ME ? Sheets.data[ME] : null; },
+  set(v) { this.on = !!v; LS.set('fxOn', this.on); this.update(); },
+  update() {
+    const s = this.on ? this.mine() : null;
+    this.d = s ? darkOf(s) : 0; this.kinds = s ? fxOf(s) : [];
+    const app = $('#app');
+    for (const k of ['grey', 'shake', 'static']) app?.classList.toggle('fx-' + k, this.kinds.includes(k));
+    this.layer();
+    if ((this.d > 0 || this.kinds.length) && !this.raf) this.loop();
+    this.party();
+  },
+  layer() {
+    let el = $('#fx-dark');
+    const want = this.d > 0 || this.kinds.length || this.dShow > 0.01;
+    if (!want) { el?.remove(); this.cv = null; return; }
+    if (!el) {
+      el = h('div', { class: 'fx-dark' + (REDUCED ? ' calm' : ''), id: 'fx-dark', 'aria-hidden': 'true' }, h('canvas', { class: 'fx-smoke' }), h('div', { class: 'fx-tint' }), h('div', { class: 'fx-hands' }), h('div', { class: 'fx-blood' }));
+      document.body.append(el);
+      this.cv = el.querySelector('canvas'); this.g = this.cv.getContext('2d'); this.size(); this.parts = [];
+      if (!this._rs) { this._rs = () => this.size(); addEventListener('resize', this._rs); }
+    }
+    const sig = this.kinds.join(',');
+    if (sig !== this.sig) {
+      this.sig = sig;
+      el.className = 'fx-dark' + (REDUCED ? ' calm' : '') + this.kinds.map(k => ' fx-' + k).join('');
+      const hands = el.querySelector('.fx-hands');
+      hands.innerHTML = this.kinds.includes('hands') ? cracksSVG(1600, 1000, 11, 5) : '';
+      el.querySelector('.fx-blood').innerHTML = this.kinds.includes('blood') ? Array.from({ length: 9 }, (_, i) => `<i style="left:${4 + i * 11 + (i % 3) * 2}%;--h:${18 + (i * 37) % 26}vh;--dl:${(i * 1.3) % 5}s"></i>`).join('') : '';
+    }
+    el.classList.toggle('dim', !!Sheets.open);
+  },
+  size() { if (!this.cv) return; const k = 0.25; this.cv.width = Math.max(80, Math.round(innerWidth * k)); this.cv.height = Math.max(60, Math.round(innerHeight * k)); },
+  loop() {
+    const step = now => {
+      this.raf = 0;
+      if (!this.cv) return;
+      if (now - this.last > 40) { this.last = now; this.draw(now / 1000); }
+      if (this.d > 0 || this.kinds.length || this.dShow > 0.01) this.raf = requestAnimationFrame(step); else this.layer();
+    };
+    this.raf = requestAnimationFrame(step);
+  },
+  draw(t) {
+    const g = this.g, W = this.cv.width, H = this.cv.height;
+    this.dShow += ((this.kinds.includes('hands') ? Math.min(this.d, 0.55) : this.d + (this.kinds.includes('tunel') ? 0.45 : 0)) - this.dShow) * 0.08;
+    const d = clampN(this.dShow, 0, 1.4), calm = REDUCED;
+    g.clearRect(0, 0, W, H);
+    if (d <= 0.005) return;
+    const cx = W / 2, cy = H / 2, R = (H / 2) * 1.18;
+    const breath = this.kinds.includes('breath') && !calm ? Math.sin(t * 3.4) * 0.07 : 0;
+    const inner = clampN(0.9 - d * 0.78 + breath, 0.04, 0.95);
+    g.save(); g.translate(cx, cy); g.scale(W / H, 1);
+    const vg = g.createRadialGradient(0, 0, R * inner, 0, 0, R);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(0.45, `rgba(0,0,0,${Math.min(0.97, 0.38 + d * 0.62)})`); vg.addColorStop(1, `rgba(0,0,0,${Math.min(1, 0.7 + d * 0.3)})`);
+    g.fillStyle = vg; g.fillRect(-W, -H, W * 2 * H / W + W, H * 2); g.restore();
+    // fumaça escura que nasce nas bordas e avança
+    const want = Math.round(6 + d * 22);
+    while (this.parts.length < want) {
+      const side = Math.floor(Math.random() * 4), u = Math.random();
+      const x = side === 0 ? u * W : side === 1 ? W : side === 2 ? u * W : 0, y = side === 0 ? 0 : side === 1 ? u * H : side === 2 ? H : u * H;
+      this.parts.push({ x, y, vx: (cx - x) * 0.0016 * (0.5 + Math.random()), vy: (cy - y) * 0.0016 * (0.5 + Math.random()), r: (0.12 + Math.random() * 0.18) * Math.min(W, H), life: 0, max: 120 + Math.random() * 160, ph: Math.random() * 6 });
+    }
+    if (this.parts.length > want) this.parts.length = want;
+    for (const p of this.parts) {
+      if (!calm) { p.x += p.vx * (0.6 + d) + Math.sin(t + p.ph) * 0.15; p.y += p.vy * (0.6 + d) + Math.cos(t * 0.8 + p.ph) * 0.15; }
+      p.life++;
+      const a = Math.sin(Math.min(1, p.life / p.max) * Math.PI) * (0.25 + d * 0.45);
+      const gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+      gr.addColorStop(0, `rgba(2,3,4,${a})`); gr.addColorStop(1, 'rgba(2,3,4,0)');
+      g.fillStyle = gr; g.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+      if (p.life > p.max) Object.assign(p, { life: 0, x: Math.random() < 0.5 ? (Math.random() < 0.5 ? 0 : W) : Math.random() * W, y: Math.random() < 0.5 ? Math.random() * H : (Math.random() < 0.5 ? 0 : H) });
+    }
+    // chiado do pânico catatônico
+    if (this.kinds.includes('static') && !calm) { g.globalAlpha = 0.08; for (let i = 0; i < 260; i++) { g.fillStyle = Math.random() < 0.5 ? '#fff' : '#000'; g.fillRect(Math.random() * W, Math.random() * H, 1, 1); } g.globalAlpha = 1; }
+  },
+  /* ---------- mestre: cards dos jogadores envoltos por trevas ---------- */
+  party() {
+    let bar = $('#gm-party');
+    const show = ROLE === 'gm' && VIEWMODE === 'gm' && Store.mode === 'db' && LS.get('partyOn', true) !== false;
+    const list = show ? Sheets.sorted().filter(([, s]) => s && !isNpc(s) && String(s.nome || '').trim()) : [];
+    if (!list.length) { if (bar) bar.hidden = true; return; }
+    if (!bar) { bar = h('div', { class: 'gm-party', id: 'gm-party', role: 'region', 'aria-label': 'Estado dos jogadores' }); bar.addEventListener('click', e => { const b = e.target.closest('[data-pc]'); if (b) Sheets.show(b.dataset.pc); }); $('#stage')?.append(bar); }
+    bar.hidden = false;
+    const html = list.map(([id, s]) => {
+      const d = darkOf(s), st = stageOf(s.estresse), c = s.crise && s.crise.efeito && !s.crise.ok ? s.crise : null, kinds = fxOf(s);
+      return `<button type="button" class="pc${d > 0 ? ' dark' : ''}${kinds.includes('hands') ? ' hands' : ''}${s.surto ? ' pend' : ''}" data-pc="${esc(id)}" style="--dk:${d.toFixed(3)};--sc:${st.c}" title="${esc(s.nome)} · Estresse ${s.estresse}/${s.estresseMax} · ${esc(st.name)}${c ? ' · ' + esc(c.efeito) : ''}">
+        <span class="pc-smoke"></span>
+        <span class="sh-av" style="--c:${esc(s.cor || '#4fa3a5')}">${s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome))}</span>
+        <span class="pc-tx"><b>${esc(firstName(s))}</b><span>${s.estresse}/${s.estresseMax} · ${esc(st.name.split(' ')[0])}</span>${c ? `<em>${esc(c.efeito)}</em>` : ''}</span>
+        <span class="pc-bar"><i style="width:${Math.round((s.estresse / s.estresseMax) * 100)}%"></i></span>
+        ${kinds.includes('hands') ? '<span class="pc-hands">' + cracksSVG(168, 70, 5, 3) + '</span>' : ''}
+      </button>`;
+    }).join('');
+    if (bar.dataset.h !== html) { bar.dataset.h = html; bar.innerHTML = html; }
+  },
+};
+Fx.updateSoon = rafOnce(() => Fx.update());
 
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
