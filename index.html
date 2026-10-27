@@ -1007,14 +1007,55 @@ textarea.notes:focus { border-color: var(--lamp); }
 @keyframes abx-candle { 0%, 100% { opacity: .7; } 40% { opacity: 1; } 55% { opacity: .8; } 70% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .ab-card[class*="ab-st"] *, .ab-card.ab-st3::after, .ab-card.ab-morto::after { animation: none !important; } }
 .sh-sec .sh-clr { float: right; margin-top: -4px; padding: 0 8px; height: 24px; font-size: 11.5px; text-transform: none; letter-spacing: 0; }
+/* ---------- bandeja de dados ---------- */
+.dz-back { position: fixed; inset: 0; z-index: 62; background: rgba(4, 8, 10, .55); display: grid; place-items: center; padding: 14px; }
+.dz { width: min(560px, 100%); max-height: calc(100vh - 28px); overflow: auto; display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line-2); box-shadow: 0 24px 60px rgba(0, 0, 0, .55); }
+.dz-head { display: flex; align-items: center; gap: 8px; }
+.dz-head h2 { margin: 0; font: 600 26px/1 var(--f-display); color: var(--mist); }
+.dz-pick { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.dz-die { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 6px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); color: var(--mist-2); font: 600 12px var(--f-ui); cursor: pointer; transition: transform .12s, border-color .12s; user-select: none; }
+.dz-die:hover { border-color: var(--line-2); transform: translateY(-2px); }
+.dz-die:active { transform: scale(.94); }
+.dz-die.on { border-color: rgba(233, 180, 90, .6); background: rgba(233, 180, 90, .08); color: var(--mist); }
+.dz-die .dd { width: 38px; height: 38px; }
+.dz-n { position: absolute; top: -7px; right: -5px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 99px; background: var(--lamp); color: var(--lamp-ink); font: 700 12px/20px var(--f-ui); text-align: center; box-shadow: 0 2px 6px rgba(0, 0, 0, .4); }
+.dd polygon:not(.ln), .dd rect, .dd circle:not(.ln) { fill: color-mix(in srgb, var(--dc) 82%, #000); stroke: color-mix(in srgb, var(--dc) 70%, #fff); stroke-width: 3; stroke-linejoin: round; }
+.dd .ln { fill: none; stroke: rgba(255, 255, 255, .28); stroke-width: 2; stroke-linejoin: round; }
+.dd text { fill: #fff; font-family: var(--f-mono); font-weight: 700; text-anchor: middle; paint-order: stroke; stroke: rgba(0, 0, 0, .45); stroke-width: 4px; }
+.dd.crit polygon:not(.ln) { fill: #2f8a4c; stroke: #a8f0b8; filter: drop-shadow(0 0 8px rgba(120, 240, 150, .8)); }
+.dd.fail polygon:not(.ln) { fill: #8a1f22; stroke: #ff9a9a; filter: drop-shadow(0 0 8px rgba(255, 80, 80, .8)); }
+.dz-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dz-expr { flex: 1 1 100%; min-width: 0; font: 600 18px var(--f-mono); color: var(--lamp-2); overflow-wrap: anywhere; }
+@media (min-width: 521px) { .dz-expr { flex: 1 1 auto; } }
+.dz-mod { display: flex; align-items: center; gap: 4px; }
+.dz-mod b { min-width: 30px; text-align: center; font: 600 16px var(--f-mono); color: var(--mist); }
+.dz-mod .iconbtn { width: 30px; height: 30px; }
+.dz-sec { font-size: 13px; color: var(--mist-2); display: flex; gap: 6px; align-items: center; }
+.dz-tray { position: relative; height: 230px; border-radius: 14px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #1f4a3a, #0f2a21 70%, #0a1d17); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), inset 0 10px 40px rgba(0, 0, 0, .55); }
+.dz-tray::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .015) 0 2px, transparent 2px 6px); pointer-events: none; }
+.dz-empty { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(220, 235, 225, .35); font: 500 13px var(--f-ui); letter-spacing: .1em; text-transform: uppercase; }
+.dz-roll { position: absolute; left: 0; top: 0; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .55)); will-change: transform; }
+.dz-roll .dd { width: 100%; height: 100%; display: block; }
+.dz-roll.landed .dd { animation: dz-pop .3s ease-out; }
+@keyframes dz-pop { 0% { transform: scale(1); } 45% { transform: scale(1.14); } 100% { transform: scale(1); } }
+.dz-result { min-height: 46px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.dz-total { font: 700 40px/1 var(--f-mono); color: var(--mist); text-shadow: 0 0 18px rgba(233, 180, 90, .35); animation: dz-pop .35s ease-out; }
+.dz-total.crit { color: #8ff0a8; text-shadow: 0 0 18px rgba(120, 240, 150, .6); }
+.dz-total.fail { color: #ff8a8a; text-shadow: 0 0 18px rgba(255, 80, 80, .6); }
+.dz-result span { font: 500 13px var(--f-mono); color: var(--mist-2); }
+.dz-go { width: 100%; height: 46px; font-size: 16px; justify-content: center; }
+.dz-hist { display: flex; flex-wrap: wrap; gap: 6px; }
+.dz-hist span { padding: 4px 9px; border-radius: 99px; background: var(--panel-2); border: 1px solid var(--line); font: 500 12px var(--f-mono); color: var(--mist-3); }
+.dz-hist b { color: var(--mist); margin-right: 3px; }
+@media (max-width: 520px) { .dz-pick { grid-template-columns: repeat(4, 1fr); } .dz-tray { height: 200px; } }
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610271348"></script>
-<script src="fb-adapter.js?v=202610271348"></script>
+<script src="firebase-config.js?v=202610272039"></script>
+<script src="fb-adapter.js?v=202610272039"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -9576,6 +9617,159 @@ const Abalo = {
 const brkSeed = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return x >>> 0; };
 Abalo.runSoon = rafOnce(() => Abalo.run());
 
+/* ---------- bandeja de dados avulsos (mestre e jogadores) ---------- */
+const DADOS_TIPOS = [4, 6, 8, 10, 12, 20, 100];
+const DADO_COR = { 4: '#4fa3a5', 6: '#e9b45a', 8: '#7fb069', 10: '#8a7fd6', 12: '#5b8fd8', 20: '#de6b58', 100: '#c98a4a' };
+function dadoSVG(sides, label, cls = '') {
+  const shapes = {
+    4: '<polygon points="50,6 95,90 5,90"/>',
+    6: '<rect x="10" y="10" width="80" height="80" rx="14"/>',
+    8: '<polygon points="50,3 96,50 50,97 4,50"/><path d="M4 50 L96 50" class="ln"/>',
+    10: '<polygon points="50,3 95,44 50,97 5,44"/><path d="M5 44 L50 60 L95 44 M50 60 L50 97" class="ln"/>',
+    12: '<polygon points="50,3 96,36 79,94 21,94 4,36"/><polygon points="50,24 72,40 64,68 36,68 28,40" class="ln"/>',
+    20: '<polygon points="50,2 94,26 94,74 50,98 6,74 6,26"/><polygon points="50,20 80,70 20,70" class="ln"/>',
+    100: '<circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="34" class="ln"/>',
+  };
+  const fs = String(label).length >= 3 ? 26 : String(label).length === 2 ? 32 : 38, ty = sides === 4 ? 70 : sides === 20 ? 60 : 62;
+  return `<svg viewBox="0 0 100 100" class="dd ${cls}" style="--dc:${DADO_COR[sides]}" aria-hidden="true">${shapes[sides]}<text x="50" y="${ty}" font-size="${fs}">${esc(String(label))}</text></svg>`;
+}
+const Dados = {
+  pool: {}, mod: 0, secret: false, rolling: false, hist: [], el: null,
+  open() {
+    if (this.el) { this.close(); return; }
+    const back = h('div', { class: 'dz-back', role: 'presentation' });
+    const box = h('div', { class: 'dz', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Rolar dados' });
+    back.addEventListener('pointerdown', e => { if (e.target === back && !this.rolling) this.close(); });
+    this.onKey = e => { if (e.key === 'Escape' && !this.rolling) this.close(); };
+    document.addEventListener('keydown', this.onKey);
+    back.append(box); document.body.append(back); this.el = back; this.box = box;
+    this.render();
+  },
+  close() { this.el?.remove(); this.el = null; document.removeEventListener('keydown', this.onKey); },
+  expr() {
+    const e = DADOS_TIPOS.filter(d => this.pool[d] > 0).map(d => `${this.pool[d]}d${d}`).join('+');
+    return e && this.mod ? e + (this.mod > 0 ? '+' : '-') + Math.abs(this.mod) : e;
+  },
+  count() { return DADOS_TIPOS.reduce((a, d) => a + (this.pool[d] || 0), 0); },
+  render() {
+    if (!this.box) return;
+    const n = this.count(), ex = this.expr();
+    this.box.innerHTML = `
+      <div class="dz-head"><h2>Dados</h2><span class="sp"></span><button type="button" class="iconbtn" data-dz="close" aria-label="Fechar">${icon('x')}</button></div>
+      <div class="dz-pick">${DADOS_TIPOS.map(d => `<button type="button" class="dz-die${this.pool[d] ? ' on' : ''}" data-dz="add" data-d="${d}" title="Adicionar um d${d} (botão direito tira)">${dadoSVG(d, d === 100 ? '%' : d)}<span>d${d}</span>${this.pool[d] ? `<b class="dz-n">${this.pool[d]}</b>` : ''}</button>`).join('')}</div>
+      <div class="dz-row">
+        <div class="dz-expr">${n ? esc(ex) : '<span class="hint">Toque nos dados para montar a rolagem</span>'}</div>
+        <div class="dz-mod"><span class="hint">Bônus</span><button type="button" class="iconbtn" data-dz="mod" data-v="-1" aria-label="Diminuir bônus">${icon('minus')}</button><b>${this.mod > 0 ? '+' + this.mod : this.mod}</b><button type="button" class="iconbtn" data-dz="mod" data-v="1" aria-label="Aumentar bônus">${icon('plus')}</button></div>
+        ${n ? `<button type="button" class="btn sm ghost" data-dz="clear">Limpar</button>` : ''}
+      </div>
+      ${ROLE === 'gm' ? `<label class="chk dz-sec"><input type="checkbox" data-dz="secret" ${this.secret ? 'checked' : ''}> Rolagem secreta (só você vê)</label>` : ''}
+      <div class="dz-tray" id="dz-tray">${this.last ? this.last.html : '<div class="dz-empty">A bandeja está vazia</div>'}</div>
+      <div class="dz-result" id="dz-result">${this.last ? this.last.res : ''}</div>
+      <button type="button" class="btn primary dz-go" data-dz="roll" ${n ? '' : 'disabled'}>${icon('dice')}Rolar${n ? ' ' + esc(ex) : ''}</button>
+      ${this.hist.length ? `<div class="dz-hist">${this.hist.map(r => `<span><b>${esc(String(r.total))}</b> ${esc(r.expr)}</span>`).join('')}</div>` : ''}`;
+    if (!this.box._wired) {
+      this.box._wired = true;
+      this.box.addEventListener('click', e => this.act(e));
+      this.box.addEventListener('contextmenu', e => { const b = e.target.closest('[data-dz="add"]'); if (!b) return; e.preventDefault(); const d = +b.dataset.d; if (this.pool[d]) { this.pool[d]--; this.render(); } });
+      this.box.addEventListener('change', e => { if (e.target.dataset.dz === 'secret') this.secret = e.target.checked; });
+    }
+  },
+  act(e) {
+    const b = e.target.closest('[data-dz]'); if (!b || this.rolling) return;
+    const a = b.dataset.dz;
+    if (a === 'close') { this.close(); return; }
+    if (a === 'add') { const d = +b.dataset.d; if (this.count() >= 20) { UI.toast('No máximo 20 dados de uma vez.'); return; } this.pool[d] = Math.min(20, (this.pool[d] || 0) + 1); this.render(); return; }
+    if (a === 'mod') { this.mod = clampI(this.mod + +b.dataset.v, -20, 20); this.render(); return; }
+    if (a === 'clear') { this.pool = {}; this.mod = 0; this.render(); return; }
+    if (a === 'roll') this.roll();
+  },
+  who() {
+    const s = ME && Sheets.data?.[ME];
+    if (ROLE === 'gm') return 'Mestre';
+    return (s && s.nome ? firstName(s) : (window.APOGEU_FB?.user?.displayName || 'Jogador').split(' ')[0]);
+  },
+  roll() {
+    const expr = this.expr(); if (!expr || this.rolling) return;
+    let res; try { res = rollExpr(expr); } catch (err) { UI.toast(err.message, 'err'); return; }
+    this.rolling = true;
+    const tray = $('#dz-tray'), W = tray.clientWidth, H = tray.clientHeight;
+    const dice = []; for (const p of res.parts) if (p.type !== 'num') p.vals.forEach(v => dice.push({ sides: p.sides, v }));
+    const sz = Math.max(46, Math.min(78, Math.floor(Math.sqrt((W * H) / (dice.length * 2.6)))));
+    const cols = Math.max(1, Math.floor((W - 20) / (sz + 14))), rows = Math.ceil(dice.length / cols);
+    const gx = (W - cols * (sz + 14)) / 2 + 7, gy = Math.max(8, (H - rows * (sz + 14)) / 2 + 7);
+    tray.innerHTML = '';
+    this.sound(dice.length);
+    const done = [];
+    dice.forEach((d, i) => {
+      const el = h('div', { class: 'dz-roll', style: { width: sz + 'px', height: sz + 'px' } });
+      el.innerHTML = dadoSVG(d.sides, '?');
+      tray.append(el);
+      const c = i % cols, r = Math.floor(i / cols);
+      const x = gx + c * (sz + 14) + (Math.random() - 0.5) * 8, y = gy + r * (sz + 14) + (Math.random() - 0.5) * 8;
+      const fromLeft = Math.random() < 0.5, sx = fromLeft ? -sz * 1.5 : W + sz * 0.5, sy = Math.random() * H * 0.6;
+      const r1 = (Math.random() < 0.5 ? -1 : 1) * 360 * (1 + Math.round(Math.random())), rf = (Math.random() - 0.5) * 22; // volta inteira: o número para de pé
+      const mx = x + (fromLeft ? 40 : -40) + (Math.random() - 0.5) * 60, my = Math.max(0, y - 40 - Math.random() * 40);
+      const dur = REDUCED ? 300 : 1050 + Math.random() * 350 + i * 35;
+      const anim = el.animate([
+        { transform: `translate(${sx}px, ${sy}px) rotate(0deg) scale(.7)`, opacity: 0 },
+        { transform: `translate(${mx}px, ${my}px) rotate(${r1 * 0.6}deg) scale(1.08)`, opacity: 1, offset: 0.45 },
+        { transform: `translate(${x + (fromLeft ? -8 : 8)}px, ${y + 4}px) rotate(${r1 * 0.95}deg) scale(.96)`, offset: 0.78 },
+        { transform: `translate(${x}px, ${y}px) rotate(${r1 + rf}deg) scale(1)`, opacity: 1 },
+      ], { duration: dur, easing: 'cubic-bezier(.2,.75,.3,1)', fill: 'forwards' });
+      const txt = () => el.querySelector('text');
+      const flick = setInterval(() => { const t = txt(); if (t) t.textContent = d.sides === 100 ? Math.ceil(Math.random() * 100) : Math.ceil(Math.random() * d.sides); }, 70);
+      done.push(anim.finished.then(() => {
+        clearInterval(flick);
+        el.innerHTML = dadoSVG(d.sides, d.v, d.sides === 20 && d.v === 20 ? 'crit' : d.sides === 20 && d.v === 1 ? 'fail' : '');
+        el.classList.add('landed');
+      }));
+    });
+    Promise.all(done).then(() => {
+      this.rolling = false;
+      const detail = res.parts.map((p, i) => (i ? (p.sign < 0 ? ' − ' : ' + ') : p.sign < 0 ? '−' : '') + (p.type === 'num' ? p.n : `${p.n}d${p.sides} [${p.vals.join(', ')}]`)).join('');
+      const nat20 = dice.some(d => d.sides === 20 && d.v === 20), nat1 = dice.some(d => d.sides === 20 && d.v === 1);
+      const resHtml = `<b class="dz-total${nat20 ? ' crit' : nat1 ? ' fail' : ''}">${res.total}</b><span>${esc(detail)}</span>`;
+      $('#dz-result') && ($('#dz-result').innerHTML = resHtml);
+      this.last = { html: tray.innerHTML, res: resHtml };
+      this.hist = [{ total: res.total, expr: normExpr(expr) }, ...this.hist].slice(0, 6);
+      this.publish(expr, res);
+      const go = this.box?.querySelector('.dz-go'); if (go) go.disabled = false;
+      const hist = this.box?.querySelector('.dz-hist'); if (hist) hist.innerHTML = this.hist.map(r => `<span><b>${esc(String(r.total))}</b> ${esc(r.expr)}</span>`).join('');
+      else if (this.box) this.box.insertAdjacentHTML('beforeend', `<div class="dz-hist">${this.hist.map(r => `<span><b>${esc(String(r.total))}</b> ${esc(r.expr)}</span>`).join('')}</div>`);
+    });
+    const go = this.box.querySelector('.dz-go'); if (go) go.disabled = true;
+  },
+  /* manda a rolagem para a mesa do mesmo jeito que as outras */
+  publish(expr, res) {
+    const why = (this.who() + ' · dados').slice(0, 60);
+    const r = { id: uid('r'), expr: normExpr(expr), why, total: res.total, parts: res.parts, success: res.success, t: Date.now(), secret: false };
+    ROLLS_SEEN.add(r.id);
+    if (ROLE === 'gm' && Store.writable) {
+      if (this.secret) { r.secret = true; SECRET_ROLLS.unshift(r); SECRET_ROLLS = SECRET_ROLLS.slice(0, 30); LS.set('secretRolls', SECRET_ROLLS); }
+      else { const list = [r, ...(Store.data.vtt.rolls?.list || [])].slice(0, 20); Store.put('vtt/rolls', { list }, 0); Live.emit('roll', r); }
+      if (UI.tab === 'dados') UI.renderRightSoon();
+    } else {
+      try { Live.bc?.postMessage({ topic: 'roll', data: r }); } catch {}
+      try { Live.room?.emit('roll', r).catch(() => {}); } catch {}
+      const s = ME && Sheets.data?.[ME];
+      if (s && Sheets.canWrite(ME)) { Sheets.log(s, { l: 'Rolou ' + normExpr(expr), total: res.total, expr: normExpr(expr), parts: res.parts }); Sheets.save(ME, 0); PlSheet.renderSoon(); }
+    }
+  },
+  /* barulhinho de dados na mesa */
+  sound(n) {
+    const ac = Som.ctx(); if (!ac || Som.mudo || REDUCED) return;
+    if (ac.state !== 'running') ac.resume().catch(() => {});
+    const t0 = ac.currentTime + 0.05, buf = ac.createBuffer(1, ac.sampleRate * 0.05, ac.sampleRate), a = buf.getChannelData(0);
+    for (let i = 0; i < a.length; i++) a[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / a.length, 3);
+    const hits = Math.min(14, 4 + n * 2);
+    for (let i = 0; i < hits; i++) {
+      const t = t0 + 0.25 + Math.random() * 0.9 * (i / hits + 0.2), src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+      src.buffer = buf; f.type = 'bandpass'; f.frequency.value = 1800 + Math.random() * 2600; f.Q.value = 3; g.gain.value = (0.25 + Math.random() * 0.3) * Som.vol;
+      src.connect(f); f.connect(g); g.connect(ac.destination); src.start(t);
+    }
+  },
+};
+
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
   const toolbar = h('div', { class: 'toolbar', role: 'toolbar', 'aria-label': 'Ferramentas', 'aria-orientation': 'vertical' },
@@ -9591,6 +9785,7 @@ function buildShell() {
       h('div', { class: 'scene-pill', id: 'scene-pill' }),
       h('span', { class: 'saved', id: 'save-state', 'aria-live': 'polite' }),
       h('button', { class: 'iconbtn hide-xs', type: 'button', html: icon('screen'), title: 'Como mostrar a tela dos jogadores na chamada', 'aria-label': 'Como mostrar a tela dos jogadores na chamada', onclick: openPlayersModal }),
+      h('button', { class: 'iconbtn', id: 'dz-top', type: 'button', html: icon('dice'), title: 'Rolar dados', 'aria-label': 'Rolar dados', onclick: () => Dados.open() }),
       h('button', { class: 'iconbtn', id: 'lock-top', type: 'button', html: icon('lock'), title: 'Travar o mapa e as peças', 'aria-label': 'Travar o mapa e as peças', onclick: () => { if (UI.tab !== 'fichas') UI.setTab('fichas'); UI.openRight(); setTimeout(() => $('#tv-pecas')?.focus(), 50); } }),
       h('button', { class: 'iconbtn', id: 'ab-top', type: 'button', html: icon('film'), title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', onclick: () => (ROLE === 'gm' ? openAberturaModal() : Abertura.local()) }),
       modeSwitch('mode-top'),
@@ -9622,7 +9817,7 @@ function buildShell() {
       h('div', { class: 'pl-lock', id: 'pl-lock', hidden: true, role: 'status' }),
       h('aside', { class: 'pl-sheet', id: 'pl-sheet', hidden: true, 'aria-label': 'Sua ficha' }),
       h('div', { class: 'pl-follow', id: 'pl-follow', hidden: true }, h('button', { class: 'btn primary', type: 'button', html: icon('target') + 'Seguir o mestre', onclick: () => { PL_FOLLOW = true; const sc = Store.data.vtt.scene; if (sc?.cam && sc.map === CUR) applyCamRect(sc.cam); else fitView(); UI.renderPlayerChrome(); } })),
-      h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-me', type: 'button', hidden: true, title: 'Minha ficha ao lado do mapa', 'aria-label': 'Minha ficha ao lado do mapa', html: icon('user') + '<span>Minha ficha</span>', onclick: () => (PlSheet.can() ? PlSheet.toggle() : Sheets.show(ME && Sheets.data[ME] ? ME : null)) }), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-ab', type: 'button', title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', html: icon('film') + '<span>Abertura</span>', onclick: () => Abertura.local() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
+      h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-me', type: 'button', hidden: true, title: 'Minha ficha ao lado do mapa', 'aria-label': 'Minha ficha ao lado do mapa', html: icon('user') + '<span>Minha ficha</span>', onclick: () => (PlSheet.can() ? PlSheet.toggle() : Sheets.show(ME && Sheets.data[ME] ? ME : null)) }), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-dz', type: 'button', title: 'Rolar dados', 'aria-label': 'Rolar dados', html: icon('dice') + '<span>Dados</span>', onclick: () => Dados.open() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-ab', type: 'button', title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', html: icon('film') + '<span>Abertura</span>', onclick: () => Abertura.local() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
       h('div', { class: 'init-float', id: 'init-float', hidden: true, role: 'region', 'aria-label': 'Ordem de iniciativa' }),
       h('button', { class: 'btn primary som-pill', id: 'som-pill', type: 'button', hidden: true, html: icon('sound') + 'Toque para ouvir os sons da mesa', onclick: () => Som.unlock() }),
       h('div', { class: 'loader', id: 'loader', hidden: true, role: 'status' }, h('i'), h('span', null, 'Carregando…')),
