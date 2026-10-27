@@ -886,30 +886,86 @@ textarea.notes:focus { border-color: var(--lamp); }
 @media (max-width: 700px) {
   .pl-sheet { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; height: 54vh; }
 }
-/* ---------- ficha que racha com o estresse ---------- */
-.sh-card[data-brk], .sh-head[data-brk], .sh-pc[data-brk] { position: relative; }
-.brk-ov { position: absolute; inset: 0; pointer-events: none; z-index: 4; border-radius: inherit; overflow: hidden; }
-.brk-ov svg { width: 100%; height: 100%; display: block; }
-.brk-ov path { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: var(--L); stroke-dashoffset: var(--L); animation: ck-grow 2.2s var(--dl) cubic-bezier(.2,.7,.3,1) forwards; vector-effect: non-scaling-stroke; }
-.brk-ov.done path { animation: none; stroke-dashoffset: 0; }
-.brk-ov .ck-dark path { stroke: rgba(0, 0, 0, .42); filter: blur(2px); stroke-width: 4px; }
-.brk-ov .ck-line path { stroke: rgba(3, 5, 6, .95); stroke-width: 1.4px; }
-.brk-ov .ck-glint path { stroke: rgba(205, 220, 225, .35); stroke-width: .7px; }
-[data-brk="3"] .brk-ov .ck-line path { stroke-width: 2px; }
-@keyframes ck-grow { to { stroke-dashoffset: 0; } }
-[data-brk="1"], [data-brk="2"], [data-brk="3"] { -webkit-mask-image: var(--brk-mask); mask-image: var(--brk-mask); -webkit-mask-size: 180px 180px; mask-size: 180px 180px; }
-[data-brk="2"] { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 26px), calc(100% - 9px) calc(100% - 17px), calc(100% - 15px) calc(100% - 8px), calc(100% - 30px) 100%, 0 100%); filter: saturate(.8); }
-[data-brk="3"] { clip-path: polygon(0 14px, 11px 6px, 18px 12px, 30px 0, 100% 0, 100% calc(100% - 38px), calc(100% - 12px) calc(100% - 26px), calc(100% - 20px) calc(100% - 12px), calc(100% - 34px) calc(100% - 6px), calc(100% - 46px) 100%, 0 100%); filter: saturate(.6) brightness(.9); }
-.sh-pc[data-brk="3"], .sh-card[data-brk="3"] { transform: rotate(-.35deg); }
-@media (prefers-reduced-motion: reduce) { .brk-ov path { animation: none; stroke-dashoffset: 0; } }
+/* ---------- a ficha sente o estresse (painel "Minha ficha") ---------- */
+.ab-panel { border-color: color-mix(in srgb, var(--ab) 60%, transparent); box-shadow: var(--shadow), 0 0 22px color-mix(in srgb, var(--ab) 22%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--ab) 12%, transparent); transition: border-color .6s, box-shadow .6s; }
+.ab-panel.st-0 { border-color: rgba(99, 194, 122, .5); } .ab-panel.st-1 { border-color: rgba(233, 194, 74, .6); } .ab-panel.st-2 { border-color: rgba(240, 132, 60, .65); } .ab-panel.st-3 { border-color: rgba(229, 72, 77, .7); }
+.ab-panel .ps-pips i.on { background: var(--ab); box-shadow: 0 0 6px color-mix(in srgb, var(--ab) 60%, transparent); }
+.ab-panel .ps-name { position: relative; display: inline-block; }
+/* 1 · primeira crise: tremor leve, vinheta sutil, pulsação na barra e texto instável */
+.ab-panel.st-1 { animation: ab-glow1 2.6s ease-in-out infinite, ab-tremor 7s infinite; box-shadow: var(--shadow), 0 0 26px color-mix(in srgb, var(--ab) 30%, transparent), inset 0 0 50px rgba(233, 194, 74, .08); }
+.ab-panel.st-1 .ps-pips i.on { animation: ab-pip 1.6s ease-in-out infinite; }
+.ab-panel.st-1 .ps-stage b, .ab-panel.st-1 .ps-name { animation: ab-unstable 3.4s steps(1) infinite; }
+/* 2 · segunda crise: glitches, tremores, texto distorcido e elementos duplicados */
+.ab-panel.st-2 { animation: ab-glow2 1.8s ease-in-out infinite, ab-tremor 4s infinite; box-shadow: var(--shadow), 0 0 30px color-mix(in srgb, var(--ab) 40%, transparent), inset 0 0 60px rgba(240, 100, 50, .13); }
+.ab-panel.st-2 .ps-scroll { animation: ab-glitch 3.8s steps(1) infinite; }
+.ab-panel.st-2 .ps-name::after, .ab-panel.st-3 .ps-name::after { content: attr(data-g); position: absolute; left: 0; top: 0; white-space: nowrap; color: color-mix(in srgb, var(--ab) 80%, transparent); transform: translate(3px, -2px); opacity: .55; pointer-events: none; animation: ab-ghost 2.2s steps(1) infinite; }
+.ab-panel.st-2 .ps-atr b, .ab-panel.st-2 .ps-num { text-shadow: 2px 0 rgba(240, 90, 60, .55), -2px 0 rgba(90, 200, 255, .3); }
+.ab-panel.st-2 .ps-pips i:nth-child(3n+2), .ab-panel.st-3 .ps-pips i:nth-child(2n) { transform: skewX(-24deg) scaleX(.72); }
+.ab-panel.st-2 .ps-pips i.on:nth-child(4n) { animation: ab-flick 1.3s steps(1) infinite; }
+/* 3 · colapso: distorção, ruído, erros, vinheta pesada e elementos desaparecendo */
+.ab-panel.st-3 { animation: ab-glow3 1.1s ease-in-out infinite, ab-tremor 2.6s infinite; background: linear-gradient(rgba(60, 0, 0, .22), rgba(30, 0, 0, .35)), rgba(17, 18, 20, .96); box-shadow: var(--shadow), 0 0 36px rgba(229, 72, 77, .5), inset 0 0 80px rgba(150, 0, 0, .45); }
+.ab-panel.st-3::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; z-index: 5; background: repeating-linear-gradient(0deg, rgba(255, 40, 40, .05) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 55%, rgba(80, 0, 0, .45) 100%); animation: ab-noise .35s steps(2) infinite; mix-blend-mode: screen; }
+.ab-panel.st-3 .ps-scroll { animation: ab-glitch 2.2s steps(1) infinite; }
+.ab-panel.st-3 .ps-name { color: #ff6a6a; text-shadow: 0 0 10px rgba(229, 72, 77, .6); }
+.ab-panel.st-3 .ps-lbl, .ab-panel.st-3 .ps-sech, .ab-panel.st-3 .ps-stage { color: #e98080; }
+.ab-panel.st-3 .ps-num, .ab-panel.st-3 .ps-atr b { color: #ff5d5d; text-shadow: 2px 0 rgba(255, 0, 0, .5), -2px 0 rgba(0, 200, 255, .25); }
+.ab-panel.st-3 .ps-atr { border-color: rgba(229, 72, 77, .35); background: rgba(60, 10, 12, .45); }
+.ab-panel.st-3 .btn.primary, .ab-panel.st-3 .btn.primary:hover { background: #c4373b; border-color: #e5484d; color: #fff; }
+.ab-panel.st-3 .ps-sec:nth-of-type(odd), .ab-panel.st-3 .ps-roll:nth-child(2n) { animation: ab-fade 6s ease-in-out infinite; }
+.ab-panel.st-3 .ps-dice [data-v="1d20"] { border-color: #e5484d; color: #ff6a6a; box-shadow: 0 0 12px rgba(229, 72, 77, .55); }
+/* efeitos de cada crise */
+.ab-panel.fx-crise .ps-dice .btn { animation: ab-shiver 2.4s infinite; }
+.ab-panel.fx-crise .ps-dice .btn:nth-child(2n) { animation-delay: -1.1s; }
+.ps-whisper { margin-top: 6px; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(229, 72, 77, .55); background: rgba(90, 10, 12, .55); color: #ff8080; font: 500 12.5px/1.3 var(--f-ui); text-align: center; text-shadow: 0 0 8px rgba(255, 60, 60, .5); animation: ab-whisper 6s ease-in-out infinite; }
+.ps-wave { width: 100%; height: 22px; display: block; }
+.ps-wave path { fill: none; stroke: var(--ab); stroke-width: 1.6; stroke-dasharray: 340; animation: ab-wave 2.8s linear infinite; filter: drop-shadow(0 0 3px var(--ab)); }
+.ab-panel.fx-breath { animation: ab-breath 3.2s ease-in-out infinite; }
+.ab-panel.fx-panic { animation: ab-panic 3s infinite; }
+.ab-panel.fx-dissoc .ps-meter, .ab-panel.fx-dissoc .ps-sec { animation: ab-dissoc 9s ease-in-out infinite; }
+.ab-panel.fx-dissoc .ps-sec:nth-of-type(2) { animation-delay: -3s; } .ab-panel.fx-dissoc .ps-sec:nth-of-type(3) { animation-delay: -6s; } .ab-panel.fx-dissoc .ps-meter:nth-of-type(2) { animation-delay: -4.5s; }
+.ab-panel.fx-heart { animation: ab-heart 1.1s ease-out infinite; }
+.ab-panel .fake { color: #b58cff !important; text-shadow: 0 0 8px rgba(181, 140, 255, .7) !important; }
+@keyframes ab-glow1 { 0%, 100% { border-color: rgba(233, 194, 74, .45); } 50% { border-color: #e9c24a; } }
+@keyframes ab-glow2 { 0%, 100% { border-color: rgba(240, 132, 60, .45); } 50% { border-color: #f0843c; } }
+@keyframes ab-glow3 { 0%, 100% { border-color: rgba(229, 72, 77, .5); } 50% { border-color: #ff5a5f; } }
+@keyframes ab-tremor { 0%, 92%, 100% { translate: 0 0; } 93% { translate: -1px .5px; } 94% { translate: 1px -.5px; } 95% { translate: -.5px .5px; } 96% { translate: .5px 0; } }
+@keyframes ab-pip { 50% { opacity: .55; filter: brightness(1.35); } }
+@keyframes ab-unstable { 0%, 100% { text-shadow: none; } 40% { text-shadow: 1px 0 rgba(233, 194, 74, .6); } 42% { text-shadow: -1px 0 rgba(233, 194, 74, .6); } 44% { text-shadow: none; } 78% { opacity: .8; } 80% { opacity: 1; } }
+@keyframes ab-glitch { 0%, 100% { transform: none; clip-path: none; } 31% { transform: translateX(3px); clip-path: inset(18% 0 62% 0); } 32% { transform: translateX(-2px); clip-path: inset(48% 0 30% 0); } 33% { transform: none; clip-path: none; } 71% { transform: translateX(-3px) skewX(-1deg); } 72% { transform: none; } }
+@keyframes ab-ghost { 0%, 100% { transform: translate(3px, -2px); opacity: .5; } 25% { transform: translate(-3px, 1px); opacity: .35; } 50% { transform: translate(2px, 2px); opacity: .6; } 75% { opacity: 0; } }
+@keyframes ab-flick { 50% { opacity: .25; } }
+@keyframes ab-noise { 0% { background-position: 0 0, 0 0; } 100% { background-position: 0 3px, 0 0; } }
+@keyframes ab-fade { 0%, 60%, 100% { opacity: 1; } 70%, 80% { opacity: .08; } }
+@keyframes ab-shiver { 0%, 85%, 100% { translate: 0 0; } 87% { translate: 1px 0; } 89% { translate: -1px 1px; } 91% { translate: 1px -1px; } 93% { translate: 0 0; } }
+@keyframes ab-whisper { 0%, 100% { opacity: 0; transform: translateY(4px); } 15%, 55% { opacity: 1; transform: none; } 60% { opacity: .2; } 62% { opacity: .9; } 70% { opacity: 0; } }
+@keyframes ab-wave { to { stroke-dashoffset: -680; } }
+@keyframes ab-breath { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.007); box-shadow: var(--shadow), 0 0 34px color-mix(in srgb, var(--ab) 45%, transparent); } }
+@keyframes ab-panic { 0%, 40% { translate: 0 0; } 45% { translate: -2px 1px; } 50% { translate: 2px -1px; } 60% { translate: -2px 0; } 66% { translate: 2px 1px; } 72% { translate: -1px -1px; } 76% { translate: 2px 0; } 80% { translate: -2px 1px; } 83% { translate: 1px -1px; } 86% { translate: -1px 1px; } 89% { translate: 2px 0; } 91% { translate: -2px -1px; } 93% { translate: 1px 1px; } 95% { translate: -1px 0; } 100% { translate: 0 0; } }
+@keyframes ab-dissoc { 0%, 55%, 100% { opacity: 1; filter: none; } 62%, 74% { opacity: .05; filter: blur(2px); } }
+@keyframes ab-heart { 0% { box-shadow: var(--shadow), 0 0 18px rgba(229, 72, 77, .3); } 10% { box-shadow: var(--shadow), 0 0 46px rgba(229, 72, 77, .85); } 22% { box-shadow: var(--shadow), 0 0 20px rgba(229, 72, 77, .35); } 32% { box-shadow: var(--shadow), 0 0 40px rgba(229, 72, 77, .75); } 60%, 100% { box-shadow: var(--shadow), 0 0 18px rgba(229, 72, 77, .3); } }
+/* card da lista de fichas (mestre e dono) e cabeçalho da ficha cheia */
+.sh-pc.ab-card { border-color: color-mix(in srgb, var(--ab) 55%, transparent); box-shadow: 0 0 16px color-mix(in srgb, var(--ab) 18%, transparent); }
+.sh-pc.ab-card.st-0 { box-shadow: none; }
+.sh-pc.ab-card.st-1 { animation: ab-glow1 2.6s ease-in-out infinite; }
+.sh-pc.ab-card.st-2 { animation: ab-glow2 1.8s ease-in-out infinite, ab-tremor 4s infinite; box-shadow: 0 0 20px color-mix(in srgb, var(--ab) 35%, transparent), inset 0 0 30px rgba(240, 100, 50, .1); }
+.sh-pc.ab-card.st-3 { animation: ab-glow3 1.1s ease-in-out infinite, ab-tremor 2.6s infinite; background: linear-gradient(rgba(70, 0, 0, .3), rgba(30, 0, 0, .4)); box-shadow: 0 0 24px rgba(229, 72, 77, .45), inset 0 0 36px rgba(150, 0, 0, .4); }
+.sh-pc.ab-card .nm { position: relative; }
+.sh-pc.ab-card.st-2 .nm::after, .sh-pc.ab-card.st-3 .nm::after { content: attr(data-g); position: absolute; left: 0; top: 0; white-space: nowrap; color: color-mix(in srgb, var(--ab) 80%, transparent); opacity: .5; transform: translate(3px, -2px); animation: ab-ghost 2.2s steps(1) infinite; pointer-events: none; }
+.sh-pc.ab-card.st-3 .nm { color: #ff6a6a; }
+.sh-pc.ab-card .sh-mbar b { background: var(--ab) !important; }
+.ab-main .sh-head { border-radius: 14px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--ab) 40%, transparent), 0 0 24px color-mix(in srgb, var(--ab) 16%, transparent); }
+.ab-main.st-0 .sh-head { box-shadow: none; }
+.ab-main.st-3 .sh-name { color: #ff6a6a; text-shadow: 2px 0 rgba(255, 0, 0, .45), -2px 0 rgba(0, 200, 255, .2); }
+.ab-main.st-2 .sh-name { text-shadow: 2px -1px rgba(240, 132, 60, .5); }
+@media (prefers-reduced-motion: reduce) { .ab-panel, .ab-panel *, .ab-panel::after, .sh-pc.ab-card, .sh-pc.ab-card .nm::after { animation: none !important; } }
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610270013"></script>
-<script src="fb-adapter.js?v=202610270013"></script>
+<script src="firebase-config.js?v=202610271025"></script>
+<script src="fb-adapter.js?v=202610271025"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -6734,7 +6790,7 @@ const Sheets = {
           if (PLAYER_CAN && ME && !this.data[ME]) setTimeout(() => UI.toast(Pedidos.can() ? 'Bem-vindo à mesa! Toque em Fichas, no canto de cima, para criar a sua.' : 'Bem-vindo à mesa! Toque em Fichas, no canto de cima, para pedir ao mestre a sua ficha.'), 900);
         }
         this.refresh();
-        if (this.ready) { Crise.check(); Crise.gmCheck(); Crise.scanSoon(); PlSheet.renderSoon(); Brk.runSoon(); }
+        if (this.ready) { Crise.check(); Crise.gmCheck(); Crise.scanSoon(); PlSheet.renderSoon(); Abalo.runSoon(); }
       };
       const watchCol = (col, bag, flag) => {
         const listen = () => db.collection(col).onSnapshot(snap => {
@@ -6767,7 +6823,7 @@ const Sheets = {
   },
   save(id, delay = 450) {
     if (!this.canWrite(id)) return;
-    if (typeof Crise !== 'undefined') { Crise.scanSoon(); if (id === ME) PlSheet.renderSoon(); Brk.runSoon(); }
+    if (typeof Crise !== 'undefined') { Crise.scanSoon(); if (id === ME) PlSheet.renderSoon(); Abalo.runSoon(); }
     const s = this.data[id]; if (s) s.upd = Date.now();
     if (!this.db) { clearTimeout(this.timers._local); this.timers._local = setTimeout(() => { delete this.timers._local; if (!LS.set('fichas.v1', this.data)) UI.toast('O navegador não tem espaço para guardar as fichas (retratos grandes ocupam muito).', 'err'); }, 300); return; }
     clearTimeout(this.timers[id]);
@@ -9220,32 +9276,36 @@ const PlSheet = {
     box.hidden = false;
     const s = Sheets.data[ME], vm = vidaMax(s), va = vidaAt(s), st = stageOf(s.estresse), o = Sheets.opt;
     const keepScroll = box.querySelector('.ps-scroll')?.scrollTop || 0, ex = $('#ps-expr'), exv = ex?.value || '', exf = ex && document.activeElement === ex;
-    const rolls = (s.rolls || []).slice(-4).reverse();
+    const rolls = (s.rolls || []).slice(-4).reverse(), L = Abalo.lvl(s), ak = Abalo.kinds(s), pc = ABALO_COR[L];
+    box.className = 'pl-sheet ab-panel st-' + L + ak.map(k => ' fx-' + k).join('');
+    box.style.setProperty('--ab', pc);
     box.innerHTML = `
       <div class="ps-head">
         <span class="sh-av" style="--c:${esc(s.cor || '#4fa3a5')}">${s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome || '?'))}</span>
-        <div class="ps-nm"><b>${esc(s.nome || 'Sua persona')}</b><span>${esc([s.idade ? s.idade + ' anos' : '', s.conceito].filter(Boolean).join(' · '))}</span></div>
+        <div class="ps-nm"><b class="ps-name" data-g="${esc(s.nome || 'Sua persona')}">${esc(s.nome || 'Sua persona')}</b><span>${esc([s.idade ? s.idade + ' anos' : '', s.conceito].filter(Boolean).join(' · '))}</span></div>
         <button type="button" class="iconbtn" data-ps="full" title="Abrir a ficha completa" aria-label="Abrir a ficha completa">${icon('fullscreen')}</button>
         <button type="button" class="iconbtn" data-ps="close" title="Esconder a ficha" aria-label="Esconder a ficha">${icon('x')}</button>
       </div>
       <div class="ps-scroll">
         <div class="ps-meter">
-          <div class="ps-row"><span class="ps-lbl">Vida</span><b class="ps-num">${va}<small> / ${vm}</small></b>
+          <div class="ps-row"><span class="ps-lbl">Vida</span><b class="ps-num">${L >= 3 ? `<span title="Vida real: ${va}">--</span>` : va}<small> / ${vm}</small></b>
             <button type="button" class="iconbtn" data-ps="vida" data-d="-1" aria-label="Perder 1 de Vida">${icon('minus')}</button><button type="button" class="iconbtn" data-ps="vida" data-d="1" aria-label="Recuperar 1 de Vida">${icon('plus')}</button></div>
           <div class="ps-bar"><i style="width:${Math.round((va / vm) * 100)}%;background:${va <= Math.ceil(vm / 4) ? 'var(--danger)' : 'var(--sea)'}"></i></div>
           ${s.sangrando ? '<span class="ps-warn">Sangrando: perde 1 de Vida por rodada até estancar.</span>' : ''}
         </div>
         <div class="ps-meter">
-          <div class="ps-row"><span class="ps-lbl">Estresse</span><b class="ps-num">${s.estresse}<small> / ${s.estresseMax}</small></b>
+          <div class="ps-row"><span class="ps-lbl">Estresse</span><b class="ps-num ps-est">${L >= 3 ? '<span title="Estresse real: 0">Ø</span>' : s.estresse}<small> / ${s.estresseMax}</small></b>
             <button type="button" class="iconbtn" data-ps="est" data-d="-1" aria-label="Perder 1 de Estresse">${icon('minus')}</button><button type="button" class="iconbtn" data-ps="est" data-d="1" aria-label="Recuperar 1 de Estresse">${icon('plus')}</button></div>
-          <div class="ps-pips" style="--n:${s.estresseMax}">${Array.from({ length: s.estresseMax }, (_, i) => `<i class="${i < s.estresse ? 'on' : ''}" style="--c:${st.c}"></i>`).join('')}</div>
-          <span class="ps-stage" style="--c:${st.c}"><b>${esc(st.name)}.</b> ${esc(st.txt)}</span>
+          <div class="ps-pips" style="--n:${s.estresseMax}">${Array.from({ length: s.estresseMax }, (_, i) => `<i class="${i < s.estresse ? 'on' : ''}" style="--c:${pc};--i:${i}"></i>`).join('')}</div>
+          ${ak.includes('breath') ? '<svg class="ps-wave" viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 L20 12 L28 4 L36 20 L44 6 L52 18 L60 12 L90 12 L98 3 L106 21 L114 5 L122 19 L130 12 L160 12 L168 4 L176 20 L184 6 L192 18 L200 12 L230 12 L238 3 L246 21 L254 5 L262 19 L270 12 L300 12"/></svg>' : ''}
+          <span class="ps-stage" style="--c:${pc}"><b>${esc(st.name)}.</b> ${esc(st.txt)}</span>
+          ${ak.includes('paranoia') ? '<div class="ps-whisper" role="status"><span>Alguém está olhando para você.</span></div>' : ''}
           ${s.surto && SURTOS[s.surto] ? `<span class="ps-warn">${esc(SURTOS[s.surto].name)}: ${s.surto === 'ansiedade' ? 'role antes de qualquer ação.' : 'o mestre vai rolar o que acontece.'}</span>` : ''}
           ${s.crise && s.crise.efeito ? `<div class="sh-crise" style="--c:${esc(s.crise.cor || '#de6b58')}"><span>${esc(s.crise.crise)}: <b>${esc(s.crise.efeito)}</b></span><span>${esc(s.crise.txt)}</span><div class="row"><button type="button" class="btn sm ghost" data-ps="crisefim">Efeito acabou</button></div></div>` : ''}
         </div>
         <div class="ps-sec">
           <div class="ps-sech"><span>Testes</span><div class="seg ps-mode">${[['dis', 'Desv.'], ['norm', 'Normal'], ['adv', 'Vant.']].map(([v, l]) => `<button type="button" data-ps="mode" data-v="${v}" class="${o.mode === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>
-          <div class="ps-atrs">${ATRS.map(([k, n]) => `<button type="button" class="ps-atr${s.destaque === k ? ' star' : ''}" data-ps="test" data-k="${k}"><span>${n}</span><b>${s.atr[k] || 0}</b></button>`).join('')}</div>
+          <div class="ps-atrs">${ATRS.map(([k, n]) => `<button type="button" class="ps-atr${s.destaque === k ? ' star' : ''}" data-ps="test" data-k="${k}"><span>${n}</span>${Abalo.atrShow(s, k, L)}</button>`).join('')}</div>
         </div>
         ${(s.armas || []).length ? `<div class="ps-sec"><div class="ps-sech"><span>Armas</span></div>${s.armas.map(a => `<div class="ps-arma"><span>${esc(a.nome)}<small>${esc(a.dano)}${a.bonus ? ' + ' + esc(ATRN[a.bonus] || '') : ''}</small></span><button type="button" class="btn sm" data-ps="atk" data-id="${esc(a.id)}">Atacar</button><button type="button" class="btn sm primary" data-ps="dmg" data-id="${esc(a.id)}">Dano</button></div>`).join('')}</div>` : ''}
         <div class="ps-sec">
@@ -9362,127 +9422,79 @@ const Pedidos = {
   },
 };
 
-/* rachaduras: linhas finas que nascem num ponto de impacto e se ramificam, com brilho de vidro trincado */
-function cracksSVG(W, H, seed, n = 4) {
-  let r = (seed * 2654435761) % 2147483647 || 7; const rnd = () => ((r = (r * 16807) % 2147483647) / 2147483647);
-  const lines = [], rings = [];
-  const origins = [[0.07, 0.9], [0.93, 0.88], [0.1, 0.12], [0.9, 0.14], [0.52, 0.97], [0.03, 0.5], [0.97, 0.47]].slice(0, n);
-  for (const [ox, oy] of origins) {
-    const x0 = ox * W, y0 = oy * H, toward = Math.atan2(H / 2 - y0, W / 2 - x0), arms = 4 + Math.floor(rnd() * 3);
-    for (let a = 0; a < arms; a++) {
-      let ang = toward + (rnd() - 0.5) * 3.4, x = x0 + (rnd() - 0.5) * 14, y = y0 + (rnd() - 0.5) * 14, len = (0.22 + rnd() * 0.4) * Math.min(W, H);
-      const pts = [[x, y]];
-      const branch = (bx, by, bang, blen, depth) => {
-        const bp = [[bx, by]]; let cx = bx, cy = by, ca = bang;
-        const steps = 4 + Math.floor(rnd() * 4);
-        for (let i = 0; i < steps; i++) { ca += (rnd() - 0.5) * 1.1; const st = blen / steps * (0.4 + rnd() * 1.2); cx += Math.cos(ca) * st; cy += Math.sin(ca) * st; bp.push([cx, cy]); if (depth < 2 && rnd() < 0.25) branch(cx, cy, ca + (rnd() < 0.5 ? -1 : 1) * (0.6 + rnd() * 0.6), blen * 0.45, depth + 1); }
-        lines.push({ p: bp, w: Math.max(0.5, 2 - depth * 0.6), d: depth });
-      };
-      const steps = 12 + Math.floor(rnd() * 8);
-      for (let i = 0; i < steps; i++) {
-        ang += (rnd() - 0.5) * 0.95; const st = len / steps * (0.3 + rnd() * 1.4);
-        x += Math.cos(ang) * st; y += Math.sin(ang) * st; pts.push([x, y]);
-        if (rnd() < 0.3) branch(x, y, ang + (rnd() < 0.5 ? -1 : 1) * (0.5 + rnd() * 0.7), len * (0.2 + rnd() * 0.3), 1);
-      }
-      lines.push({ p: pts, w: 2.6 + rnd() * 1.2, d: 0 });
-    }
-    // anéis de estilhaço perto do impacto
-    for (let k = 1; k <= 2; k++) {
-      const rr = (0.04 + k * 0.035) * Math.min(W, H), seg = [];
-      for (let t = 0; t <= 14; t++) { const a = toward - 1.6 + (t / 14) * 3.2 + (rnd() - 0.5) * 0.12; seg.push([x0 + Math.cos(a) * rr * (0.9 + rnd() * 0.2), y0 + Math.sin(a) * rr * (0.9 + rnd() * 0.2)]); }
-      rings.push({ p: seg, w: 1.1, d: 1 });
-    }
-  }
-  const all = lines.concat(rings);
-  const pathOf = l => 'M' + l.p.map(([x, y]) => x.toFixed(1) + ' ' + y.toFixed(1)).join(' L');
-  const lenOf = l => l.p.reduce((a, q, i) => (i ? a + Math.hypot(q[0] - l.p[i - 1][0], q[1] - l.p[i - 1][1]) : 0), 0);
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
-    <g class="ck-dark">${all.map(l => `<path d="${pathOf(l)}" stroke-width="${(l.w * 5).toFixed(1)}" style="--L:${lenOf(l).toFixed(0)};--dl:${(l.d * 0.9).toFixed(1)}s"/>`).join('')}</g>
-    <g class="ck-line">${all.map(l => `<path d="${pathOf(l)}" stroke-width="${l.w.toFixed(1)}" style="--L:${lenOf(l).toFixed(0)};--dl:${(l.d * 0.9).toFixed(1)}s"/>`).join('')}</g>
-    <g class="ck-glint">${lines.filter(l => !l.d).map(l => `<path d="${pathOf(l)}" stroke-width="0.8" transform="translate(1.4 -1)" style="--L:${lenOf(l).toFixed(0)};--dl:0s"/>`).join('')}</g>
-  </svg>`;
-}
-/* ---------- ficha que racha com o estresse ----------
-   Só o dono da ficha e o mestre veem: rachaduras, cantos lascados, papel gasto e letras faltando,
-   cada vez mais conforme o Estresse cai (e mais um pouco com um efeito de crise ativo). */
-const brkHash = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0) % 999983 + 1; };
-const Brk = {
-  orig: new WeakMap(), shown: new Set(), masks: {}, runSoon: null, mo: null,
-  lvl(s) {
-    if (!s || isNpc(s)) return 0;
-    let l = s.estresse >= 8 ? 0 : s.estresse >= 4 ? 1 : s.estresse >= 1 ? 2 : 3;
-    if (s.crise && s.crise.efeito && !s.crise.ok) l = Math.min(3, l + 1);
-    return l;
+/* ---------- a ficha sente o estresse ----------
+   Fases: 0 estável (8+), 1 primeira crise (7 a 4), 2 segunda crise (3 a 1), 3 colapso (0).
+   Só o dono da ficha e o mestre veem. Os números mostrados podem "mentir", mas as rolagens usam sempre os valores reais. */
+const ABALO_COR = ['#63c27a', '#e9c24a', '#f0843c', '#e5484d'];
+const ABALO_CRISE = {
+  'Paranoia do Trauma': ['paranoia'], 'Hiperventilação': ['breath'], 'Visão de túnel': ['dissoc'], 'Negação rígida': ['halluc'],
+  'Fuga desesperada': ['panic'], 'Pânico catatônico': ['panic', 'dissoc'], 'Histeria persecutória': ['panic', 'paranoia'], 'Fuga cega': ['panic'],
+  'Parada cardíaca por pânico': ['heart'], 'Ferimento desesperado': ['panic', 'heart'], 'Entrega à Entidade': ['dissoc', 'halluc'],
+};
+const ABALO_SUSSURROS = ['Alguém está olhando para você.', 'Eles sabem o que você fez.', 'Não confie neles.', 'Você ouviu isso?', 'Tem alguém atrás de você.', 'Eles estão rindo de você.'];
+const Abalo = {
+  timer: 0, runSoon: null, mo: null, whisper: 0,
+  lvl(s) { return !s || isNpc(s) ? 0 : s.estresse >= 8 ? 0 : s.estresse >= 4 ? 1 : s.estresse >= 1 ? 2 : 3; },
+  crise(s) { return s?.crise?.efeito && !s.crise.ok ? s.crise : null; },
+  kinds(s) {
+    const L = this.lvl(s), c = this.crise(s), k = new Set(c ? ABALO_CRISE[c.efeito] || [] : []);
+    if (c) k.add('crise');
+    if (s && (s.destaque === 'sorte' || /apostador/i.test((s.origem || '') + ' ' + (s.conceito || ''))) && (L >= 1 || c)) k.add('luck');
+    return [...k];
   },
   can(id) { return !!id && (ROLE === 'gm' || (!!ME && id === ME)); },
-  mask(L) {
-    if (this.masks[L]) return this.masks[L];
-    const N = 180, c = cv(N, N), g = c.getContext('2d');
-    g.fillStyle = '#fff'; g.fillRect(0, 0, N, N);
-    g.globalCompositeOperation = 'destination-out';
-    let r = 97 + L; const rnd = () => ((r = (r * 16807) % 2147483647) / 2147483647);
-    const n = [0, 40, 90, 160][L];
-    for (let i = 0; i < n; i++) {
-      const x = rnd() * N, y = rnd() * N, big = rnd() < 0.04 * L;
-      g.globalAlpha = 0.25 + rnd() * 0.45; g.beginPath();
-      if (big) { for (let k = 0; k < 7; k++) { const a = (k / 7) * 6.283, rr = (3 + rnd() * 6) * (0.6 + rnd() * 0.6); g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } }
-      else g.arc(x, y, 0.5 + rnd() * 1.4, 0, 6.283);
-      g.fill();
+  /* o que aparece no lugar dos números (o valor real fica no título) */
+  atrShow(s, k, L) {
+    const v = s.atr[k] || 0;
+    if (L >= 3 && k === s.destaque) return `<b title="Valor real: ${v}">???</b>`;
+    if (L >= 3 && k === this.lost(s)) return `<b title="Valor real: ${v}">–</b>`;
+    if (L === 2 && k === s.destaque) return `<b title="Valor real: ${v}">?</b>`;
+    return `<b>${v}</b>`;
+  },
+  lost(s) { const ks = ATRS.map(a => a[0]).filter(k => k !== s.destaque); return ks[brkSeed(s.nome || 'x') % ks.length]; },
+  /* efeitos que mexem nos números de tempos em tempos */
+  tick() {
+    const box = $('#pl-sheet'), s = ME && Sheets.data[ME];
+    if (!box || box.hidden || !s) return;
+    const L = this.lvl(s), k = this.kinds(s);
+    if (k.includes('luck')) {
+      const b = box.querySelector('.ps-atr[data-k="sorte"] b');
+      if (b) b.textContent = L >= 3 && Math.random() < 0.35 ? '???' : Math.random() < 0.15 ? '?' : String(1 + Math.floor(Math.random() * 20));
     }
-    return (this.masks[L] = `url(${c.toDataURL('image/png')})`);
-  },
-  corrupt(txt, rate, seed) {
-    let r = seed; const rnd = () => ((r = (r * 16807) % 2147483647) / 2147483647);
-    let out = '';
-    for (const ch of txt) out += /\p{L}/u.test(ch) && rnd() < rate ? (rnd() < 0.75 ? ' ' : rnd() < 0.5 ? '·' : '_') : ch;
-    return out;
-  },
-  texts(el, L, salt) {
-    const rate = [0, 0.04, 0.1, 0.17][L];
-    const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: n => {
-      const p = n.parentElement; if (!p || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-      return p.closest('.brk-ov, svg, textarea, select, script, style, .sh-roll, .ps-roll b') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
-    } });
-    const nodes = []; while (walk.nextNode()) nodes.push(walk.currentNode);
-    for (const n of nodes) {
-      let o = this.orig.get(n);
-      if (o == null || (n.nodeValue !== o && n.nodeValue !== n._brk)) { o = n.nodeValue; this.orig.set(n, o); }
-      const want = L ? this.corrupt(o, rate, brkHash(o + salt)) : o;
-      if (n.nodeValue !== want) { n.nodeValue = want; n._brk = want; }
+    if (k.includes('halluc') && Math.random() < 0.55) {
+      const cands = [...box.querySelectorAll('.ps-atr b, .ps-roll b')]; const b = cands[Math.floor(Math.random() * cands.length)];
+      if (b && !b.dataset.fake) { const o = b.textContent; b.dataset.fake = '1'; b.textContent = String(Math.floor(Math.random() * 21)); b.classList.add('fake'); setTimeout(() => { if (b.isConnected) { b.textContent = o; b.classList.remove('fake'); delete b.dataset.fake; } }, 700); }
     }
+    if (k.includes('paranoia') && ++this.whisper % 9 === 0) { const w = box.querySelector('.ps-whisper span'); if (w) w.textContent = ABALO_SUSSURROS[Math.floor(Math.random() * ABALO_SUSSURROS.length)]; }
   },
-  apply(el, id, L, salt) {
-    if (!el) return;
-    const prev = +(el.dataset.brk || 0);
-    if (!L && !prev) return;
-    el.dataset.brk = String(L);
-    let ov = el.querySelector(':scope > .brk-ov');
-    if (!L) { ov?.remove(); this.texts(el, 0, salt); el.style.removeProperty('--brk-mask'); return; }
-    el.style.setProperty('--brk-mask', this.mask(L));
-    const w = el.offsetWidth || 300, hh = el.offsetHeight || 200, H = Math.max(120, Math.round(1000 * hh / w));
-    const key = `${id}|${salt}|${L}|${Math.round(H / 60)}`;
-    if (!ov || ov.dataset.k !== key) {
-      if (!ov) { ov = document.createElement('div'); ov.className = 'brk-ov'; ov.setAttribute('aria-hidden', 'true'); el.append(ov); }
-      ov.dataset.k = key;
-      ov.innerHTML = cracksSVG(1000, H, brkHash(id + salt), [0, 1, 3, 5][L]);
-      ov.classList.toggle('done', this.shown.has(key)); this.shown.add(key);
-    }
-    this.texts(el, L, salt);
-  },
+  start() { if (!this.timer) this.timer = setInterval(() => this.tick(), 650); },
+  /* card da lista de fichas e cabeçalho da ficha cheia (mestre e dono) */
   run() {
-    if (!Sheets.ready) return;
-    for (const b of document.querySelectorAll('.sh-pc[data-open]')) { const id = b.dataset.open; this.apply(b, id, this.can(id) ? this.lvl(Sheets.data[id]) : 0, 'c'); }
-    const main = $('#sh-main'), cur = Sheets.cur, L = Sheets.open && this.can(cur) ? this.lvl(Sheets.data[cur]) : 0;
-    if (main) main.querySelectorAll('.sh-head, .sh-card').forEach((e, i) => this.apply(e, cur, L, 's' + i));
-    const ps = $('#pl-sheet'); if (ps && !ps.hidden && ME) this.apply(ps, ME, this.lvl(Sheets.data[ME]), 'p');
+    for (const b of document.querySelectorAll('.sh-pc[data-open]')) {
+      const id = b.dataset.open, s = Sheets.data[id], L = this.can(id) && s && !isNpc(s) ? this.lvl(s) : -1;
+      const want = L >= 0 ? `ab-card st-${L}${this.crise(s) ? ' crise' : ''}` : '';
+      if ((b.dataset.ab || '') !== want) {
+        b.classList.remove('ab-card', 'st-0', 'st-1', 'st-2', 'st-3', 'crise'); if (want) b.classList.add(...want.split(' '));
+        b.dataset.ab = want; if (want) b.style.setProperty('--ab', ABALO_COR[L]);
+        const nm = b.querySelector('.nm'); if (nm) nm.dataset.g = nm.textContent;
+      }
+    }
+    const main = $('#sh-main'), cur = Sheets.cur, s = cur && Sheets.data[cur];
+    if (main) {
+      const L = Sheets.open && s && !isNpc(s) && this.can(cur) ? this.lvl(s) : -1;
+      main.classList.remove('ab-main', 'st-0', 'st-1', 'st-2', 'st-3');
+      if (L >= 0) { main.classList.add('ab-main', 'st-' + L); main.style.setProperty('--ab', ABALO_COR[L]); }
+    }
   },
   watch() {
     if (this.mo) return;
     this.mo = new MutationObserver(() => this.runSoon());
-    for (const sel of ['#sheets', '#pl-sheet']) { const el = $(sel); if (el) this.mo.observe(el, { childList: true, subtree: true }); }
+    const el = $('#sheets'); if (el) this.mo.observe(el, { childList: true, subtree: true });
+    this.start();
   },
 };
-Brk.runSoon = rafOnce(() => Brk.run());
+const brkSeed = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return x >>> 0; };
+Abalo.runSoon = rafOnce(() => Abalo.run());
 
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
@@ -9634,7 +9646,7 @@ async function boot(hot) {
   for (const r of Store.data.vtt.rolls?.list || []) if (r?.id) ROLLS_SEEN.add(r.id);
   Live.init(room);
   PlSheet.wire();
-  Brk.watch();
+  Abalo.watch();
   setTimeout(() => { ensureOwners(); onTravas(); }, 3500); setInterval(ensureOwners, 30000);
   Sheets.init(db);
   Pedidos.init(db);
