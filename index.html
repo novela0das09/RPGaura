@@ -1006,14 +1006,15 @@ textarea.notes:focus { border-color: var(--lamp); }
 @keyframes abx-memory { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: none; } }
 @keyframes abx-candle { 0%, 100% { opacity: .7; } 40% { opacity: 1; } 55% { opacity: .8; } 70% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .ab-card[class*="ab-st"] *, .ab-card.ab-st3::after, .ab-card.ab-morto::after { animation: none !important; } }
+.sh-sec .sh-clr { float: right; margin-top: -4px; padding: 0 8px; height: 24px; font-size: 11.5px; text-transform: none; letter-spacing: 0; }
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610271101"></script>
-<script src="fb-adapter.js?v=202610271101"></script>
+<script src="firebase-config.js?v=202610271348"></script>
+<script src="fb-adapter.js?v=202610271348"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -6373,6 +6374,15 @@ function tokEditor(t) {
     h('p', { class: 'hint' }, 'Arraste a ficha no mapa para mover. Tecla Delete exclui a ficha selecionada.'));
 }
 
+/* mestre: apaga todo o histórico de rolagens (aba Dados, fichas e painel dos jogadores) */
+function clearAllRolls() {
+  if (ROLE !== 'gm' || !Store.writable) return;
+  SECRET_ROLLS = []; LS.set('secretRolls', []);
+  Store.put('vtt/rolls', { list: [] }, 0);
+  for (const [id, sh] of Object.entries(Sheets.data)) if (sh && sh.rolls && sh.rolls.length) { sh.rolls = []; Sheets.save(id, 0); }
+  UI.renderRight(); if (Sheets.open) Sheets.refresh();
+  UI.toast('Histórico de rolagens apagado para toda a mesa.');
+}
 /* ---------- aba Dados ---------- */
 function normExpr(e) { return String(e).toLowerCase().replace(/\s+/g, ''); }
 function rollDetail(r) {
@@ -6418,7 +6428,7 @@ function paneDice() {
   out.push(h('p', { class: 'hint' }, 'Funciona com qualquer sistema: ', h('b', null, '1d20+5'), ', ', h('b', null, '3d6'), ', ', h('b', null, '4d6kh3'), ' (fica com os 3 maiores), ', h('b', null, '2d20kl1'), ' (o menor), ', h('b', null, '5d10>=7'), ' (conta sucessos).'));
   const pub = (Store.data.vtt.rolls?.list || []).filter(r => r && r.id);
   const all = [...pub, ...SECRET_ROLLS].sort((a, b) => (b.t || 0) - (a.t || 0)).slice(0, 25);
-  out.push(h('h4', null, 'Histórico', h('span', { class: 'sp' }), all.length ? h('button', { class: 'btn sm ghost', type: 'button', onclick: () => { SECRET_ROLLS = []; LS.set('secretRolls', []); Store.put('vtt/rolls', { list: [] }, 0); UI.renderRight(); } }, 'Limpar') : null));
+  out.push(h('h4', null, 'Histórico', h('span', { class: 'sp' }), confirmButton('Limpar histórico', () => clearAllRolls(), 'btn sm ghost')));
   if (!all.length) out.push(h('div', { class: 'empty' }, 'As rolagens aparecem aqui. As que não forem secretas também surgem na tela dos jogadores.'));
   else out.push(h('div', { class: 'rolls' }, all.map(r => h('div', { class: 'rollrow' + (r.secret ? ' secret' : '') },
     h('span', { class: 'why' }, r.why || (r.success ? 'Sucessos' : 'Rolagem')),
@@ -6989,7 +6999,7 @@ const Sheets = {
       ${!cw && !PLAYER_CAN && Store.mode === 'db' ? '<p class="hint" style="margin:0">Para criar e editar a sua ficha, entre no site com a sua conta do Google.</p>' : ''}
       <button type="button" class="btn sm" data-act="map">${icon('back')}Voltar ao mapa</button>
       ${!this.ready ? '<div class="sh-empty">Carregando as fichas…</div>' : list.length ? cards : `<div class="sh-empty">${cw ? 'Nenhuma ficha ainda. Use os botões de <b>Nova ficha</b> para criar uma persona, um NPC ou um inimigo, ou espere os jogadores criarem as deles.' : canMine ? `Ninguém criou ficha ainda. Toque em <b>${esc(Pedidos.label())}</b>.` : 'Ninguém criou ficha ainda.'}</div>`}
-      ${rolls.length ? `<p class="sh-sec">Últimas rolagens</p><div class="sh-feed">${rolls.slice(0, 8).map(r => `<div><b>${esc(r.who)}</b> · ${esc(r.l || 'Rolagem')}${r.total != null ? ` · <b>${esc(r.total)}</b>` : ''}<span class="t">${[r.o || r.txt || r.expr || '', fmtTime(r.t)].filter(Boolean).map(esc).join(' · ')}</span></div>`).join('')}</div>` : ''}
+      ${rolls.length ? `<p class="sh-sec">Últimas rolagens${cw ? `<button type="button" class="btn sm ghost sh-clr" data-act="clearrolls">Limpar</button>` : ''}</p><div class="sh-feed">${rolls.slice(0, 8).map(r => `<div><b>${esc(r.who)}</b> · ${esc(r.l || 'Rolagem')}${r.total != null ? ` · <b>${esc(r.total)}</b>` : ''}<span class="t">${[r.o || r.txt || r.expr || '', fmtTime(r.t)].filter(Boolean).map(esc).join(' · ')}</span></div>`).join('')}</div>` : ''}
       ${places.length ? `<p class="sh-sec">Lugares criados pelos jogadores</p><div class="sh-feed">${places.map(([, s]) => `<div class="sh-place"><b>${esc(s.localNome || 'Lugar sem nome')}</b><span class="t">de ${esc(firstName(s))}${s.localMapa && mapExists(s.localMapa) ? ' · perto de ' + esc(mapName(s.localMapa)) : ''}</span>${String(s.localMisterio || '').trim() ? `<p>${esc(String(s.localMisterio).trim().slice(0, 200))}${String(s.localMisterio).trim().length > 200 ? '…' : ''}</p>` : ''}</div>`).join('')}</div>` : ''}`;
   },
 
@@ -7479,6 +7489,11 @@ function wireSheets() {
     if (b.dataset.rp != null) { Sheets.opt.rp = +b.dataset.rp; Sheets.derived(); return; }
     const act = b.dataset.act;
     if (act === 'map') { Sheets.hide(); return; }
+    if (act === 'clearrolls') {
+      if (ROLE !== 'gm') return;
+      if (b.dataset.armed !== '1') { b.dataset.armed = '1'; b.textContent = 'Toque de novo para limpar'; setTimeout(() => { if (b.isConnected) { b.dataset.armed = ''; b.textContent = 'Limpar'; } }, 4000); return; }
+      clearAllRolls(); return;
+    }
     if (act === 'back') { Sheets.cur = null; Sheets.refresh(); return; }
     if (act === 'new') {
       const gmNew = ROLE === 'gm' && Store.writable;
