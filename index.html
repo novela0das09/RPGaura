@@ -841,7 +841,7 @@ textarea.notes:focus { border-color: var(--lamp); }
 
 /* ---------- ficha ao lado do mapa (jogador) ---------- */
 .pl-sheet { position: absolute; top: 62px; right: 12px; bottom: 62px; width: 304px; z-index: 13; display: flex; flex-direction: column; background: rgba(17, 27, 31, 0.95); border: 1px solid var(--line-2); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; backdrop-filter: blur(6px); }
-.app:not(.players) .pl-sheet { display: none !important; }
+.app:not(.players) .pl-sheet, .app.sheets-open .pl-sheet { display: none !important; }
 .pl-sheet[hidden] { display: none; }
 #pl-me.on { background: rgba(233, 180, 90, 0.18); border-color: rgba(233, 180, 90, 0.5); color: var(--lamp-2); }
 .ps-head { display: grid; grid-template-columns: auto 1fr auto auto; gap: 8px; align-items: center; padding: 10px 10px 10px 12px; border-bottom: 1px solid var(--line); }
@@ -886,14 +886,30 @@ textarea.notes:focus { border-color: var(--lamp); }
 @media (max-width: 700px) {
   .pl-sheet { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; height: 54vh; }
 }
+/* ---------- ficha que racha com o estresse ---------- */
+.sh-card[data-brk], .sh-head[data-brk], .sh-pc[data-brk] { position: relative; }
+.brk-ov { position: absolute; inset: 0; pointer-events: none; z-index: 4; border-radius: inherit; overflow: hidden; }
+.brk-ov svg { width: 100%; height: 100%; display: block; }
+.brk-ov path { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: var(--L); stroke-dashoffset: var(--L); animation: ck-grow 2.2s var(--dl) cubic-bezier(.2,.7,.3,1) forwards; vector-effect: non-scaling-stroke; }
+.brk-ov.done path { animation: none; stroke-dashoffset: 0; }
+.brk-ov .ck-dark path { stroke: rgba(0, 0, 0, .42); filter: blur(2px); stroke-width: 4px; }
+.brk-ov .ck-line path { stroke: rgba(3, 5, 6, .95); stroke-width: 1.4px; }
+.brk-ov .ck-glint path { stroke: rgba(205, 220, 225, .35); stroke-width: .7px; }
+[data-brk="3"] .brk-ov .ck-line path { stroke-width: 2px; }
+@keyframes ck-grow { to { stroke-dashoffset: 0; } }
+[data-brk="1"], [data-brk="2"], [data-brk="3"] { -webkit-mask-image: var(--brk-mask); mask-image: var(--brk-mask); -webkit-mask-size: 180px 180px; mask-size: 180px 180px; }
+[data-brk="2"] { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 26px), calc(100% - 9px) calc(100% - 17px), calc(100% - 15px) calc(100% - 8px), calc(100% - 30px) 100%, 0 100%); filter: saturate(.8); }
+[data-brk="3"] { clip-path: polygon(0 14px, 11px 6px, 18px 12px, 30px 0, 100% 0, 100% calc(100% - 38px), calc(100% - 12px) calc(100% - 26px), calc(100% - 20px) calc(100% - 12px), calc(100% - 34px) calc(100% - 6px), calc(100% - 46px) 100%, 0 100%); filter: saturate(.6) brightness(.9); }
+.sh-pc[data-brk="3"], .sh-card[data-brk="3"] { transform: rotate(-.35deg); }
+@media (prefers-reduced-motion: reduce) { .brk-ov path { animation: none; stroke-dashoffset: 0; } }
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610270002"></script>
-<script src="fb-adapter.js?v=202610270002"></script>
+<script src="firebase-config.js?v=202610270013"></script>
+<script src="fb-adapter.js?v=202610270013"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -6718,7 +6734,7 @@ const Sheets = {
           if (PLAYER_CAN && ME && !this.data[ME]) setTimeout(() => UI.toast(Pedidos.can() ? 'Bem-vindo à mesa! Toque em Fichas, no canto de cima, para criar a sua.' : 'Bem-vindo à mesa! Toque em Fichas, no canto de cima, para pedir ao mestre a sua ficha.'), 900);
         }
         this.refresh();
-        if (this.ready) { Crise.check(); Crise.gmCheck(); Crise.scanSoon(); PlSheet.renderSoon(); }
+        if (this.ready) { Crise.check(); Crise.gmCheck(); Crise.scanSoon(); PlSheet.renderSoon(); Brk.runSoon(); }
       };
       const watchCol = (col, bag, flag) => {
         const listen = () => db.collection(col).onSnapshot(snap => {
@@ -6751,7 +6767,7 @@ const Sheets = {
   },
   save(id, delay = 450) {
     if (!this.canWrite(id)) return;
-    if (typeof Crise !== 'undefined') { Crise.scanSoon(); if (id === ME) PlSheet.renderSoon(); }
+    if (typeof Crise !== 'undefined') { Crise.scanSoon(); if (id === ME) PlSheet.renderSoon(); Brk.runSoon(); }
     const s = this.data[id]; if (s) s.upd = Date.now();
     if (!this.db) { clearTimeout(this.timers._local); this.timers._local = setTimeout(() => { delete this.timers._local; if (!LS.set('fichas.v1', this.data)) UI.toast('O navegador não tem espaço para guardar as fichas (retratos grandes ocupam muito).', 'err'); }, 300); return; }
     clearTimeout(this.timers[id]);
@@ -9346,6 +9362,128 @@ const Pedidos = {
   },
 };
 
+/* rachaduras: linhas finas que nascem num ponto de impacto e se ramificam, com brilho de vidro trincado */
+function cracksSVG(W, H, seed, n = 4) {
+  let r = (seed * 2654435761) % 2147483647 || 7; const rnd = () => ((r = (r * 16807) % 2147483647) / 2147483647);
+  const lines = [], rings = [];
+  const origins = [[0.07, 0.9], [0.93, 0.88], [0.1, 0.12], [0.9, 0.14], [0.52, 0.97], [0.03, 0.5], [0.97, 0.47]].slice(0, n);
+  for (const [ox, oy] of origins) {
+    const x0 = ox * W, y0 = oy * H, toward = Math.atan2(H / 2 - y0, W / 2 - x0), arms = 4 + Math.floor(rnd() * 3);
+    for (let a = 0; a < arms; a++) {
+      let ang = toward + (rnd() - 0.5) * 3.4, x = x0 + (rnd() - 0.5) * 14, y = y0 + (rnd() - 0.5) * 14, len = (0.22 + rnd() * 0.4) * Math.min(W, H);
+      const pts = [[x, y]];
+      const branch = (bx, by, bang, blen, depth) => {
+        const bp = [[bx, by]]; let cx = bx, cy = by, ca = bang;
+        const steps = 4 + Math.floor(rnd() * 4);
+        for (let i = 0; i < steps; i++) { ca += (rnd() - 0.5) * 1.1; const st = blen / steps * (0.4 + rnd() * 1.2); cx += Math.cos(ca) * st; cy += Math.sin(ca) * st; bp.push([cx, cy]); if (depth < 2 && rnd() < 0.25) branch(cx, cy, ca + (rnd() < 0.5 ? -1 : 1) * (0.6 + rnd() * 0.6), blen * 0.45, depth + 1); }
+        lines.push({ p: bp, w: Math.max(0.5, 2 - depth * 0.6), d: depth });
+      };
+      const steps = 12 + Math.floor(rnd() * 8);
+      for (let i = 0; i < steps; i++) {
+        ang += (rnd() - 0.5) * 0.95; const st = len / steps * (0.3 + rnd() * 1.4);
+        x += Math.cos(ang) * st; y += Math.sin(ang) * st; pts.push([x, y]);
+        if (rnd() < 0.3) branch(x, y, ang + (rnd() < 0.5 ? -1 : 1) * (0.5 + rnd() * 0.7), len * (0.2 + rnd() * 0.3), 1);
+      }
+      lines.push({ p: pts, w: 2.6 + rnd() * 1.2, d: 0 });
+    }
+    // anéis de estilhaço perto do impacto
+    for (let k = 1; k <= 2; k++) {
+      const rr = (0.04 + k * 0.035) * Math.min(W, H), seg = [];
+      for (let t = 0; t <= 14; t++) { const a = toward - 1.6 + (t / 14) * 3.2 + (rnd() - 0.5) * 0.12; seg.push([x0 + Math.cos(a) * rr * (0.9 + rnd() * 0.2), y0 + Math.sin(a) * rr * (0.9 + rnd() * 0.2)]); }
+      rings.push({ p: seg, w: 1.1, d: 1 });
+    }
+  }
+  const all = lines.concat(rings);
+  const pathOf = l => 'M' + l.p.map(([x, y]) => x.toFixed(1) + ' ' + y.toFixed(1)).join(' L');
+  const lenOf = l => l.p.reduce((a, q, i) => (i ? a + Math.hypot(q[0] - l.p[i - 1][0], q[1] - l.p[i - 1][1]) : 0), 0);
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+    <g class="ck-dark">${all.map(l => `<path d="${pathOf(l)}" stroke-width="${(l.w * 5).toFixed(1)}" style="--L:${lenOf(l).toFixed(0)};--dl:${(l.d * 0.9).toFixed(1)}s"/>`).join('')}</g>
+    <g class="ck-line">${all.map(l => `<path d="${pathOf(l)}" stroke-width="${l.w.toFixed(1)}" style="--L:${lenOf(l).toFixed(0)};--dl:${(l.d * 0.9).toFixed(1)}s"/>`).join('')}</g>
+    <g class="ck-glint">${lines.filter(l => !l.d).map(l => `<path d="${pathOf(l)}" stroke-width="0.8" transform="translate(1.4 -1)" style="--L:${lenOf(l).toFixed(0)};--dl:0s"/>`).join('')}</g>
+  </svg>`;
+}
+/* ---------- ficha que racha com o estresse ----------
+   Só o dono da ficha e o mestre veem: rachaduras, cantos lascados, papel gasto e letras faltando,
+   cada vez mais conforme o Estresse cai (e mais um pouco com um efeito de crise ativo). */
+const brkHash = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0) % 999983 + 1; };
+const Brk = {
+  orig: new WeakMap(), shown: new Set(), masks: {}, runSoon: null, mo: null,
+  lvl(s) {
+    if (!s || isNpc(s)) return 0;
+    let l = s.estresse >= 8 ? 0 : s.estresse >= 4 ? 1 : s.estresse >= 1 ? 2 : 3;
+    if (s.crise && s.crise.efeito && !s.crise.ok) l = Math.min(3, l + 1);
+    return l;
+  },
+  can(id) { return !!id && (ROLE === 'gm' || (!!ME && id === ME)); },
+  mask(L) {
+    if (this.masks[L]) return this.masks[L];
+    const N = 180, c = cv(N, N), g = c.getContext('2d');
+    g.fillStyle = '#fff'; g.fillRect(0, 0, N, N);
+    g.globalCompositeOperation = 'destination-out';
+    let r = 97 + L; const rnd = () => ((r = (r * 16807) % 2147483647) / 2147483647);
+    const n = [0, 40, 90, 160][L];
+    for (let i = 0; i < n; i++) {
+      const x = rnd() * N, y = rnd() * N, big = rnd() < 0.04 * L;
+      g.globalAlpha = 0.25 + rnd() * 0.45; g.beginPath();
+      if (big) { for (let k = 0; k < 7; k++) { const a = (k / 7) * 6.283, rr = (3 + rnd() * 6) * (0.6 + rnd() * 0.6); g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } }
+      else g.arc(x, y, 0.5 + rnd() * 1.4, 0, 6.283);
+      g.fill();
+    }
+    return (this.masks[L] = `url(${c.toDataURL('image/png')})`);
+  },
+  corrupt(txt, rate, seed) {
+    let r = seed; const rnd = () => ((r = (r * 16807) % 2147483647) / 2147483647);
+    let out = '';
+    for (const ch of txt) out += /\p{L}/u.test(ch) && rnd() < rate ? (rnd() < 0.75 ? ' ' : rnd() < 0.5 ? '·' : '_') : ch;
+    return out;
+  },
+  texts(el, L, salt) {
+    const rate = [0, 0.04, 0.1, 0.17][L];
+    const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: n => {
+      const p = n.parentElement; if (!p || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      return p.closest('.brk-ov, svg, textarea, select, script, style, .sh-roll, .ps-roll b') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+    } });
+    const nodes = []; while (walk.nextNode()) nodes.push(walk.currentNode);
+    for (const n of nodes) {
+      let o = this.orig.get(n);
+      if (o == null || (n.nodeValue !== o && n.nodeValue !== n._brk)) { o = n.nodeValue; this.orig.set(n, o); }
+      const want = L ? this.corrupt(o, rate, brkHash(o + salt)) : o;
+      if (n.nodeValue !== want) { n.nodeValue = want; n._brk = want; }
+    }
+  },
+  apply(el, id, L, salt) {
+    if (!el) return;
+    const prev = +(el.dataset.brk || 0);
+    if (!L && !prev) return;
+    el.dataset.brk = String(L);
+    let ov = el.querySelector(':scope > .brk-ov');
+    if (!L) { ov?.remove(); this.texts(el, 0, salt); el.style.removeProperty('--brk-mask'); return; }
+    el.style.setProperty('--brk-mask', this.mask(L));
+    const w = el.offsetWidth || 300, hh = el.offsetHeight || 200, H = Math.max(120, Math.round(1000 * hh / w));
+    const key = `${id}|${salt}|${L}|${Math.round(H / 60)}`;
+    if (!ov || ov.dataset.k !== key) {
+      if (!ov) { ov = document.createElement('div'); ov.className = 'brk-ov'; ov.setAttribute('aria-hidden', 'true'); el.append(ov); }
+      ov.dataset.k = key;
+      ov.innerHTML = cracksSVG(1000, H, brkHash(id + salt), [0, 1, 3, 5][L]);
+      ov.classList.toggle('done', this.shown.has(key)); this.shown.add(key);
+    }
+    this.texts(el, L, salt);
+  },
+  run() {
+    if (!Sheets.ready) return;
+    for (const b of document.querySelectorAll('.sh-pc[data-open]')) { const id = b.dataset.open; this.apply(b, id, this.can(id) ? this.lvl(Sheets.data[id]) : 0, 'c'); }
+    const main = $('#sh-main'), cur = Sheets.cur, L = Sheets.open && this.can(cur) ? this.lvl(Sheets.data[cur]) : 0;
+    if (main) main.querySelectorAll('.sh-head, .sh-card').forEach((e, i) => this.apply(e, cur, L, 's' + i));
+    const ps = $('#pl-sheet'); if (ps && !ps.hidden && ME) this.apply(ps, ME, this.lvl(Sheets.data[ME]), 'p');
+  },
+  watch() {
+    if (this.mo) return;
+    this.mo = new MutationObserver(() => this.runSoon());
+    for (const sel of ['#sheets', '#pl-sheet']) { const el = $(sel); if (el) this.mo.observe(el, { childList: true, subtree: true }); }
+  },
+};
+Brk.runSoon = rafOnce(() => Brk.run());
+
 function buildShell() {
   const tools = [['move', 'move', 'Mover e abrir áreas', 'V'], ['fog-reveal', 'reveal', 'Revelar névoa', 'R'], ['fog-hide', 'hide', 'Cobrir com névoa', 'C'], ['measure', 'ruler', 'Régua', 'M'], ['ping', 'ping', 'Sinalizar um ponto', 'P'], ['areas', 'areas', 'Editar áreas clicáveis', 'A'], ['light', 'bulb', 'Luz, dia e noite', 'L']];
   const toolbar = h('div', { class: 'toolbar', role: 'toolbar', 'aria-label': 'Ferramentas', 'aria-orientation': 'vertical' },
@@ -9496,6 +9634,7 @@ async function boot(hot) {
   for (const r of Store.data.vtt.rolls?.list || []) if (r?.id) ROLLS_SEEN.add(r.id);
   Live.init(room);
   PlSheet.wire();
+  Brk.watch();
   setTimeout(() => { ensureOwners(); onTravas(); }, 3500); setInterval(ensureOwners, 30000);
   Sheets.init(db);
   Pedidos.init(db);
