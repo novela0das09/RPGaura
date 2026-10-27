@@ -968,14 +968,52 @@ textarea.notes:focus { border-color: var(--lamp); }
 .sx-main.st-3 .sh-name { color: #ff6a6a; text-shadow: 2px 0 rgba(255, 0, 0, .45), -2px 0 rgba(0, 200, 255, .2); }
 .sx-main.st-2 .sh-name { text-shadow: 2px -1px rgba(240, 132, 60, .5); }
 @media (prefers-reduced-motion: reduce) { .sx-panel, .sx-panel *, .sx-panel::after, .sh-pc.sx-card, .sh-pc.sx-card .nm::after, .sx-main .sh-card, .sx-main .sh-pips i { animation: none !important; } }
+
+/* abertura: personagem abalado pelo estresse ou em memória */
+.ab-card.ab-st1 .ab-por, .ab-card.ab-st1 .ab-txt { animation: abx-tremor 2.6s infinite; }
+.ab-card.ab-st1 .ab-nm { animation: abx-flicker 3.2s steps(1) infinite; }
+.ab-card.ab-st2 .ab-por { animation: abx-tremor 1.8s infinite, abx-slice 2.4s steps(1) infinite; }
+.ab-card.ab-st2 .ab-txt { animation: abx-tremor 2s infinite, abx-shift 2.9s steps(1) infinite; }
+.ab-card.ab-st2 .ab-nm span { text-shadow: 3px 0 rgba(255, 70, 50, .55), -3px 0 rgba(60, 200, 255, .4), 0.05em 0.05em 0 var(--acc); }
+.ab-card.ab-st2 .ab-nm, .ab-card.ab-st3 .ab-nm { position: relative; }
+.ab-card.ab-st2 .ab-nm::after, .ab-card.ab-st3 .ab-nm::after { content: attr(data-g); position: absolute; left: 0; top: 0; font: 400 clamp(26px, 3vw, 44px)/1 "Anton", sans-serif; text-transform: uppercase; color: var(--acc); opacity: 0; animation: abx-ghost 2.2s steps(1) infinite; pointer-events: none; white-space: nowrap; }
+.ab-card.ab-st3 .ab-por { animation: abx-shake .5s infinite, abx-slice 1.3s steps(1) infinite; }
+.ab-card.ab-st3 .ab-txt { animation: abx-shake .6s infinite, abx-shift 1.6s steps(1) infinite; }
+.ab-card.ab-st3 .ab-nm span { color: #ff6b6b; text-shadow: 4px 0 rgba(255, 0, 0, .6), -4px 0 rgba(0, 220, 255, .35); }
+.ab-card.ab-st3 .ab-por-in img, .ab-card.ab-st3 .ab-ini { filter: saturate(.6) contrast(1.25) sepia(.35) hue-rotate(-25deg) !important; }
+.ab-card.ab-st3::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255, 30, 30, .06) 0 2px, transparent 2px 4px), radial-gradient(ellipse at center, transparent 45%, rgba(90, 0, 0, .55) 100%); animation: abx-noise .3s steps(2) infinite, abx-redflash 2.4s steps(1) infinite; }
+.ab-card.ab-morto { filter: grayscale(1); }
+.ab-card.ab-morto .ab-por-in { background: radial-gradient(ellipse at 50% 38%, rgba(210, 210, 215, .55), rgba(40, 40, 44, .9) 55%, #0b0b0c 80%); }
+.ab-card.ab-morto .ab-por-in img { filter: grayscale(1) contrast(2.6) brightness(.34) !important; mix-blend-mode: luminosity; }
+.ab-card.ab-morto .ab-ini { filter: grayscale(1) brightness(.3) !important; }
+.ab-card.ab-morto .ab-por-in::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(0, 0, 0, .75) 100%); pointer-events: none; }
+.ab-card.ab-morto .ab-por-sh { background: rgba(170, 170, 175, .35); }
+.ab-card.ab-morto .ab-nm span { color: #d9d9dc; text-shadow: none; }
+.ab-card.ab-morto .ab-nm { animation: abx-memory 2.2s ease-out both; }
+.ab-card.ab-morto .ab-num { color: rgba(200, 200, 205, .5); }
+.ab-tag.ab-mem { letter-spacing: .5em; color: rgba(225, 225, 230, .85); }
+.ab-card.ab-morto::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, .05), transparent 60%); animation: abx-candle 3s ease-in-out infinite; }
+.ab-memtag { margin-left: 8px; font: 500 11px var(--f-ui); color: var(--mist-3); text-transform: uppercase; letter-spacing: .1em; }
+.ab-mchk { font-size: 12.5px; color: var(--mist-2); display: flex; gap: 6px; align-items: center; }
+@keyframes abx-tremor { 0%, 82%, 100% { translate: 0 0; } 84% { translate: -2px 1px; } 86% { translate: 2px -1px; } 88% { translate: -1px 0; } 90% { translate: 1px 1px; } }
+@keyframes abx-shake { 0% { translate: 0 0; } 25% { translate: -3px 2px; } 50% { translate: 3px -2px; } 75% { translate: -2px -1px; } 100% { translate: 0 0; } }
+@keyframes abx-flicker { 0%, 100% { opacity: 1; } 47% { opacity: .55; } 49% { opacity: 1; } 81% { opacity: .7; } 82% { opacity: 1; } }
+@keyframes abx-slice { 0%, 100% { clip-path: none; } 30% { clip-path: inset(12% 0 64% 0); translate: 6px 0; } 31% { clip-path: inset(52% 0 22% 0); translate: -5px 0; } 32% { clip-path: none; translate: 0 0; } 74% { clip-path: inset(70% 0 8% 0); translate: 8px 0; } 75% { clip-path: none; translate: 0 0; } }
+@keyframes abx-shift { 0%, 100% { filter: none; } 40% { filter: hue-rotate(40deg); translate: 4px 0; } 41% { filter: none; translate: 0 0; } 77% { translate: -5px 0; } 78% { translate: 0 0; } }
+@keyframes abx-ghost { 0%, 100% { opacity: 0; } 20% { opacity: .5; transform: translate(6px, -4px); } 24% { opacity: 0; } 60% { opacity: .4; transform: translate(-5px, 3px); } 63% { opacity: 0; } }
+@keyframes abx-noise { 0% { background-position: 0 0, 0 0; } 100% { background-position: 0 4px, 0 0; } }
+@keyframes abx-redflash { 0%, 100% { opacity: 1; } 58% { opacity: .55; } 60% { opacity: 1; } }
+@keyframes abx-memory { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: none; } }
+@keyframes abx-candle { 0%, 100% { opacity: .7; } 40% { opacity: 1; } 55% { opacity: .8; } 70% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ab-card[class*="ab-st"] *, .ab-card.ab-st3::after, .ab-card.ab-morto::after { animation: none !important; } }
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610271040"></script>
-<script src="fb-adapter.js?v=202610271040"></script>
+<script src="firebase-config.js?v=202610271049"></script>
+<script src="fb-adapter.js?v=202610271049"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -8889,7 +8927,8 @@ const Abertura = {
   cfg() {
     const c = Store.data.vtt?.abertura || {};
     return { ativa: c.ativa !== false, titulo: String(c.titulo ?? 'Névoa Sobre Apogeu').slice(0, 60), intro: String(c.intro ?? 'Em Apogeu, a névoa nunca vai embora.').slice(0, 90), sub: String(c.sub ?? 'uma mesa de RPG').slice(0, 60),
-      trilha: String(c.trilha || 'synth'), fora: c.fora && typeof c.fora === 'object' ? c.fora : {}, frases: c.frases && typeof c.frases === 'object' ? c.frases : {}, ordem: Array.isArray(c.ordem) ? c.ordem.map(String) : [] };
+      trilha: String(c.trilha || 'synth'), fora: c.fora && typeof c.fora === 'object' ? c.fora : {}, frases: c.frases && typeof c.frases === 'object' ? c.frases : {}, ordem: Array.isArray(c.ordem) ? c.ordem.map(String) : [],
+      mortos: c.mortos && typeof c.mortos === 'object' ? c.mortos : {}, estado: c.estado && typeof c.estado === 'object' ? c.estado : {} };
   },
   put(fn) { const c = this.cfg(); fn(c); Store.put('vtt/abertura', c, 300); this.renderBtn(); },
   pjs() { return Object.entries(Sheets.data || {}).filter(([, s]) => s && !isNpc(s) && String(s.nome || '').trim()).map(([id, s]) => ({ id, s })); },
@@ -8902,13 +8941,16 @@ const Abertura = {
     const b = $('#pl-ab'); if (b) b.hidden = !this.cfg().ativa;
     const t = $('#ab-top'); if (t) t.classList.toggle('off', !this.cfg().ativa);
   },
+  /* fase de estresse de cada personagem (0 a 3); só o mestre enxerga o estresse de todos */
+  estados(ids) { const o = {}; for (const id of ids) { const L = typeof Abalo !== 'undefined' ? Abalo.lvl(Sheets.data[id]) : 0; if (L) o[id] = L; } return o; },
   /* mestre: toca para a mesa inteira */
   broadcast() {
     const c = this.cfg(), ids = this.elenco(c).map(x => x.id);
     if (!ids.length) { UI.toast('Ainda não há personagens com nome para apresentar.', 'err'); return; }
-    if (!c.ativa) this.put(x => { x.ativa = true; });
-    const frases = {}; for (const id of ids) if (c.frases[id]) frases[id] = String(c.frases[id]).slice(0, 110);
-    const msg = { n: uid(), ids, cfg: { titulo: c.titulo, intro: c.intro, sub: c.sub, trilha: c.trilha, frases } };
+    const estado = this.estados(ids);
+    this.put(x => { x.ativa = true; x.estado = estado; });
+    const frases = {}, mortos = {}; for (const id of ids) { if (c.frases[id]) frases[id] = String(c.frases[id]).slice(0, 110); if (c.mortos[id]) mortos[id] = true; }
+    const msg = { n: uid(), ids, cfg: { titulo: c.titulo, intro: c.intro, sub: c.sub, trilha: c.trilha, frases, mortos, estado } };
     Live.emit('intro', msg); this.play(msg, true);
   },
   stopAll() { Live.emit('intro', { stop: true, n: uid() }); this.close(); },
@@ -8924,7 +8966,9 @@ const Abertura = {
     if (!c.ativa && ROLE !== 'gm') { UI.toast('O mestre desligou a abertura.'); return; }
     const ids = this.elenco(c).map(x => x.id);
     if (!ids.length) { UI.toast('Ainda não há personagens com nome para apresentar.'); return; }
-    this.play({ n: uid(), ids, cfg: c }, false);
+    const estado = ROLE === 'gm' ? this.estados(ids) : Object.assign({}, c.estado);
+    if (ROLE !== 'gm' && ME && ids.includes(ME) && typeof Abalo !== 'undefined') { const L = Abalo.lvl(Sheets.data[ME]); if (L) estado[ME] = L; else delete estado[ME]; }
+    this.play({ n: uid(), ids, cfg: Object.assign({}, c, { estado }) }, false);
   },
   async play(msg, mine) {
     this.close(true);
@@ -8939,7 +8983,14 @@ const Abertura = {
     this.build();
     const pals = await Promise.all(cast.map(x => abPalette(x.s)));
     if (!this.on || this.n !== myN) return;
-    cast.forEach((x, i) => { x.pal = pals[i]; });
+    const mix = (a, b, k) => a.map((v, j) => v + (b[j] - v) * k);
+    cast.forEach((x, i) => {
+      let p = pals[i]; const L = +(c.estado?.[x.id] || 0);
+      if (c.mortos?.[x.id]) p = { bg0: [8, 8, 9], bg1: [28, 28, 30], bg2: [84, 84, 88], acc: [168, 168, 172], txt: [226, 226, 229] };
+      else if (L >= 3) p = { bg0: mix(p.bg0, [20, 0, 0], .7), bg1: mix(p.bg1, [70, 4, 6], .7), bg2: mix(p.bg2, [150, 20, 24], .65), acc: [229, 72, 77], txt: mix(p.txt, [255, 200, 200], .4) };
+      else if (L === 2) p = Object.assign({}, p, { acc: mix(p.acc, [240, 132, 60], .6), bg2: mix(p.bg2, [140, 60, 20], .35) });
+      x.pal = p;
+    });
     this.pal = JSON.parse(JSON.stringify(AB_HOUSE)); this.palT = AB_HOUSE;
     this.seg = -1; this.start = performance.now();
     this.audioStart(0);
@@ -9030,18 +9081,20 @@ const Abertura = {
       return;
     }
     const { s, id, pal } = sg.x; this.palT = pal || AB_HOUSE; this.flash();
+    const morto = !!c.mortos?.[id], L = morto ? 0 : +(c.estado?.[id] || 0);
     const nm = String(s.nome).trim().replace(/\s+/g, ' '), parts = nm.split(' '), first = parts[0], rest = parts.slice(1).join(' ');
     const meta = [s.idade ? String(s.idade).replace(/\D+$/, '') + ' anos' : '', String(s.conceito || '').trim()].filter(Boolean).join(' · ');
     const frase = String(c.frases?.[id] || '').trim();
     const side = sg.i % 2 ? 'ab-R' : 'ab-L', css = { '--acc': abRgb(pal.acc), '--bg2': abRgb(pal.bg2), '--txt': abRgb(pal.txt), '--bg0': abRgb(pal.bg0), '--len': Math.max(first.length, 4) };
     const marq = (txt, cls) => h('div', { class: 'ab-mq ' + cls }, h('span', null, Array(6).fill(txt.toUpperCase()).join('  ·  ')));
-    fill(st, h('div', { class: 'ab-card ' + side, style: css },
-      marq(nm, 'm1'), marq(String(s.conceito || nm), 'm2'),
+    fill(st, h('div', { class: 'ab-card ' + side + (morto ? ' ab-morto' : L ? ' ab-st' + L : ''), style: css },
+      marq(morto ? 'Em memória' : nm, 'm1'), marq(morto ? nm : String(s.conceito || nm), 'm2'),
       h('div', { class: 'ab-num' }, String(sg.i + 1).padStart(2, '0')),
       h('div', { class: 'ab-por' }, h('div', { class: 'ab-por-sh' }), h('div', { class: 'ab-por-in' }, s.retrato ? h('img', { src: imgSrc(s.retrato), alt: '' }) : h('div', { class: 'ab-ini', style: { background: s.cor || '#4fa3a5' } }, initials(nm)))),
       h('div', { class: 'ab-txt' },
-        meta ? h('div', { class: 'ab-tag' }, meta) : null,
-        h('h2', { class: 'ab-nm' }, this.letters(first, 'ab-f', 0.32, 0.04), rest ? this.letters(rest, 'ab-l', 0.55, 0.03) : null),
+        morto ? h('div', { class: 'ab-tag ab-mem' }, 'Em memória de') : meta ? h('div', { class: 'ab-tag' }, meta) : null,
+        h('h2', { class: 'ab-nm', 'data-g': nm }, this.letters(first, 'ab-f', 0.32, 0.04), rest ? this.letters(rest, 'ab-l', 0.55, 0.03) : null),
+        morto && meta ? h('div', { class: 'ab-by' }, meta) : null,
         frase ? h('p', { class: 'ab-fr' }, '“' + frase + '”') : null,
         s.jogador ? h('div', { class: 'ab-by' }, 'jogado por ', h('b', null, String(s.jogador).slice(0, 40))) : null)));
   },
@@ -9069,7 +9122,8 @@ function openAberturaModal() {
       list.length ? h('div', { class: 'ab-list' }, list.map(({ id, s }, i) => h('div', { class: 'ab-row' + (c.fora[id] ? ' off' : '') },
         h('input', { type: 'checkbox', checked: !c.fora[id] || null, 'aria-label': 'Mostrar ' + s.nome, onchange: e => Abertura.put(x => { if (e.target.checked) delete x.fora[id]; else x.fora[id] = true; }) }),
         h('span', { class: 'sh-av', style: { '--c': s.cor || '#4fa3a5' }, html: s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome)) }),
-        h('div', { class: 'ab-rw' }, h('b', null, s.nome), h('input', { class: 'inp', value: c.frases[id] || '', placeholder: 'Frase do personagem (opcional)', maxlength: 110, onchange: e => Abertura.put(x => { const v = e.target.value.trim(); if (v) x.frases[id] = v; else delete x.frases[id]; }) })),
+        h('div', { class: 'ab-rw' }, h('b', null, s.nome, c.mortos[id] ? h('span', { class: 'ab-memtag' }, 'em memória') : null), h('input', { class: 'inp', value: c.frases[id] || '', placeholder: 'Frase do personagem (opcional)', maxlength: 110, onchange: e => Abertura.put(x => { const v = e.target.value.trim(); if (v) x.frases[id] = v; else delete x.frases[id]; }) }),
+          h('label', { class: 'chk ab-mchk' }, h('input', { type: 'checkbox', checked: c.mortos[id] || null, onchange: e => Abertura.put(x => { if (e.target.checked) x.mortos[id] = true; else delete x.mortos[id]; }) }), 'Personagem morto (aparece só a silhueta, em memória)')),
         h('div', { class: 'ab-mv' }, h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Subir', disabled: i === 0 || null, onclick: () => move(id, -1) }, '↑'), h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Descer', disabled: i === list.length - 1 || null, onclick: () => move(id, 1) }, '↓')))))
         : h('p', { class: 'hint' }, 'Quando os jogadores criarem as fichas (com nome), eles aparecem aqui.'),
       h('p', { class: 'hint' }, 'O fundo de cada personagem usa as cores do retrato dele. Só aparece o que todos já veem na ficha: nome, idade, conceito, retrato e quem joga.'));
