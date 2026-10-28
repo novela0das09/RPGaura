@@ -85,6 +85,27 @@
         ".read": "auth != null && root.child('mesa/banidos/' + auth.uid).val() !== true && (auth.uid === $uid || root.child('mesa/mestres/' + auth.uid).val() === true)",
         ".write": "auth != null && root.child('mesa/banidos/' + auth.uid).val() !== true && (auth.uid === $uid || root.child('mesa/mestres/' + auth.uid).val() === true)"
       }
+    },
+    "call": {
+      "cfg": {
+        ".read": "auth != null && root.child('mesa/banidos/' + auth.uid).val() !== true",
+        ".write": "auth != null && root.child('mesa/banidos/' + auth.uid).val() !== true && root.child('mesa/mestres/' + auth.uid).val() === true"
+      },
+      "peers": {
+        ".read": "auth != null && root.child('mesa/banidos/' + auth.uid).val() !== true",
+        "$uid": {
+          ".write": "auth != null && ((auth.uid === $uid && (root.child('mesa/banidos/' + auth.uid).val() !== true || !newData.exists())) || root.child('mesa/mestres/' + auth.uid).val() === true)"
+        }
+      },
+      "sig": {
+        "$to": {
+          ".read": "auth != null && auth.uid === $to",
+          ".write": "auth != null && auth.uid === $to && !newData.exists()",
+          "$from": {
+            ".write": "auth != null && root.child('mesa/banidos/' + auth.uid).val() !== true && (auth.uid === $from || (auth.uid === $to && !newData.exists()))"
+          }
+        }
+      }
     }
   }
 }

@@ -1048,14 +1048,58 @@ textarea.notes:focus { border-color: var(--lamp); }
 .dz-hist span { padding: 4px 9px; border-radius: 99px; background: var(--panel-2); border: 1px solid var(--line); font: 500 12px var(--f-mono); color: var(--mist-3); }
 .dz-hist b { color: var(--mist); margin-right: 3px; }
 @media (max-width: 520px) { .dz-pick { grid-template-columns: repeat(4, 1fr); } .dz-tray { height: 200px; } }
+/* ---------- call de voz ---------- */
+.vc { position: fixed; left: 14px; bottom: 14px; z-index: 58; width: min(360px, calc(100vw - 28px)); max-height: min(78vh, 640px); overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 16px; background: color-mix(in srgb, var(--panel) 94%, transparent); backdrop-filter: blur(10px); border: 1px solid var(--line-2); box-shadow: 0 20px 50px rgba(0, 0, 0, .5); color: var(--mist); }
+.vc-head { display: flex; align-items: center; gap: 10px; }
+.vc-tt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.vc-tt b { font: 600 20px/1 var(--f-display); }
+.vc-tt small { font-size: 12px; color: var(--mist-3); }
+.vc-led { width: 10px; height: 10px; border-radius: 50%; background: var(--mist-3); flex: none; }
+.vc-led.on { background: #63c27a; box-shadow: 0 0 0 4px rgba(99, 194, 122, .18); animation: vc-led 2s ease-in-out infinite; }
+@keyframes vc-led { 50% { box-shadow: 0 0 0 7px rgba(99, 194, 122, .05); } }
+.vc-gm { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); }
+.vc-gm .chk { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--mist); cursor: pointer; }
+.vc-raio { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; font-size: 12.5px; color: var(--mist-2); }
+.vc-raio input { grid-column: 1 / -1; width: 100%; accent-color: var(--lamp); }
+.vc-raio b { font: 600 12px var(--f-mono); color: var(--lamp-2); grid-row: 1; grid-column: 2; }
+.vc-ouve > span { font-size: 12.5px; color: var(--mist-2); }
+.vc-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.vc-chip { padding: 4px 10px; border-radius: 99px; border: 1px solid var(--line-2); background: transparent; color: var(--mist-2); font: 600 12px var(--f-ui); cursor: pointer; }
+.vc-chip.on { background: rgba(233, 180, 90, .14); border-color: rgba(233, 180, 90, .6); color: var(--lamp-2); }
+.vc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.vc-p { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 10px; padding: 7px 8px; border-radius: 10px; background: var(--ink-2); border: 1px solid var(--line); transition: opacity .2s; }
+.vc-p.mudo { opacity: .5; }
+.vc-av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; overflow: hidden; background: var(--c); color: #fff; font: 700 12px var(--f-ui); box-shadow: 0 0 0 2px var(--panel); transition: box-shadow .12s; }
+.vc-av img { width: 100%; height: 100%; object-fit: cover; }
+.vc-p.fala .vc-av { box-shadow: 0 0 0 2px #7fe0a0, 0 0 12px 2px rgba(120, 230, 160, .55); }
+.vc-tx { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.vc-tx b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vc-tx small { font-size: 11.5px; color: var(--mist-3); }
+.vc-tx .vc-ouvem { color: var(--mist-2); }
+.vc-dist { display: block; height: 3px; margin-top: 3px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.vc-dist i { display: block; height: 100%; background: #63c27a; transition: width .3s; }
+.vc-sel { height: 30px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--panel); color: var(--mist); font: 500 12.5px var(--f-ui); padding: 0 6px; }
+.vc-vol { grid-column: 2 / -1; width: 100%; height: 16px; accent-color: #63c27a; }
+.vc-vazio, .vc-dica { margin: 0; font-size: 12.5px; color: var(--mist-2); line-height: 1.45; }
+.vc-dica { padding: 8px 10px; border-radius: 10px; background: rgba(79, 163, 165, .08); border: 1px solid rgba(79, 163, 165, .2); }
+.vc-acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.vc-acts .btn { flex: 1; justify-content: center; }
+.vc-btn { position: relative; }
+.vc-btn.on { color: #8fe3a5; border-color: rgba(99, 194, 122, .5); }
+.vc-btn.on svg { filter: drop-shadow(0 0 4px rgba(99, 194, 122, .7)); }
+.vc-count { position: absolute; top: -5px; right: -5px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 99px; background: #63c27a; color: #082010; font: 700 10.5px/17px var(--f-ui); text-align: center; }
+.tok.vc-fala .disc { box-shadow: 0 0 0 3px #7fe0a0, 0 0 22px 6px rgba(120, 230, 160, .55); animation: vc-tok .9s ease-in-out infinite alternate; }
+@keyframes vc-tok { to { box-shadow: 0 0 0 4px #a8f0c0, 0 0 30px 9px rgba(120, 230, 160, .4); } }
+@media (max-width: 520px) { .vc { left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 70vh; } }
+@media (prefers-reduced-motion: reduce) { .vc-led.on, .tok.vc-fala .disc { animation: none; } }
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610272039"></script>
-<script src="fb-adapter.js?v=202610272039"></script>
+<script src="firebase-config.js?v=202610281840"></script>
+<script src="fb-adapter.js?v=202610281840"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -5052,6 +5096,8 @@ const initials = name => (String(name || '?').trim().split(/\s+/).map(w => w[0])
 /* ---------- ícones ---------- */
 const ICONS = {
   chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/><path d="M9 12h.01M12 12h.01M15 12h.01"/>',
+  mic: '<path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3M8.5 21h7"/>',
+  micoff: '<path d="M9 9v3a3 3 0 0 0 5.1 2.1M15 9.3V6a3 3 0 0 0-5.7-1.3"/><path d="M19 11a7 7 0 0 1-1.2 3.9M5 11a7 7 0 0 0 10.6 6M12 18v3M8.5 21h7M3 3l18 18"/>',
   film: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 8h4M3 12h4M3 16h4M17 8h4M17 12h4M17 16h4"/>',
   play: '<path d="M7 5l12 7-12 7z"/>',
   compass: '<circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><path d="M12 7l2 5-2 5-2-5z" fill="currentColor" stroke="none"/>',
@@ -9618,6 +9664,385 @@ const brkSeed = str => { let x = 2166136261; for (let i = 0; i < str.length; i++
 Abalo.runSoon = rafOnce(() => Abalo.run());
 
 /* ---------- bandeja de dados avulsos (mestre e jogadores) ---------- */
+/* ---------- call de voz da mesa ----------
+   A voz vai direto de um navegador para o outro (WebRTC); o Firebase só apresenta um ao outro.
+   O mestre libera ou fecha a call, liga a proximidade (pela peça da ficha de cada jogador no mapa)
+   e separa os jogadores em grupos sem tirar ninguém da call. */
+const VC_GRUPOS = ['', 'A', 'B', 'C', 'D'];
+const vcGrupoNome = g => (g ? 'Grupo ' + g : 'Geral');
+const VC_ICE = [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }, { urls: 'stun:stun.cloudflare.com:3478' }];
+const Voice = {
+  ok: false, rt: null, me: null, sid: null, cfg: {}, peers: {}, conns: new Map(), joined: false, joining: false,
+  stream: null, track: null, muted: false, ac: null, lan: null, vol: {}, fala: new Set(), el: null, seen: new Set(),
+  chain: Promise.resolve(), n: 0, tick: 0, meterT: 0, inboxCb: null, dragging: false,
+  init() {
+    const FB = window.APOGEU_FB;
+    if (!FB?.ready || !FB.rtdb || !FB.user || !window.RTCPeerConnection || !navigator.mediaDevices?.getUserMedia) return;
+    this.ok = true; this.rt = FB.rtdb; this.me = FB.user.uid;
+    this.vol = LS.get('vcVol', {}) || {};
+    this.rt.ref('call/cfg').on('value', s => { const prev = this.C(); this.cfg = s.val() || {}; this.onCfg(prev); }, () => {});
+    this.rt.ref('call/peers').on('value', s => { this.peers = s.val() || {}; if (this.joined && !this.peers[this.me]?.s) this.relink(); this.sync(); this.badge(); this.renderSoon(); }, () => {});
+    Store.on(path => { if (this.joined && /^(secret\/gm\/)?tokens\//.test(path)) this.mixSoon(); });
+    addEventListener('pagehide', () => { if (this.joined) this.rt.ref('call/peers/' + this.me).remove().catch(() => {}); });
+    this.badge();
+  },
+  /* ---------- regras de quem ouve quem ---------- */
+  C() { const c = this.cfg || {}; return { aberta: c.aberta !== false, prox: !!c.prox, raio: clampN(+c.raio || 8, 2, 40), grupos: c.grupos || {}, ouve: typeof c.ouve === 'string' ? c.ouve : '*' }; },
+  isGM(uid) { return window.APOGEU_FB?.mestres?.[uid] === true || (uid === this.me && ROLE === 'gm'); },
+  grupo(uid) { const g = this.C().grupos[uid]; return VC_GRUPOS.includes(g) ? g : ''; },
+  gmOuve(g) { const o = this.C().ouve; return o === '*' || o.includes(g || '0'); },
+  /* a peça que vale para a proximidade é a da ficha do jogador */
+  peca(uid) {
+    const s = Sheets.data?.[uid]; let t = s?.token ? getToken(s.token) : null;
+    if (!t) t = allTokens().find(x => x.owner === uid);
+    return t && !t.hidden ? t : null;
+  },
+  /* quanto "a" ouve "b": g de 0 a 1, pan de -1 (esquerda) a 1 (direita) */
+  link(a, b) {
+    const c = this.C(), ga = this.isGM(a), gb = this.isGM(b);
+    if (ga && gb) return { g: 1, pan: 0 };
+    if (ga || gb) return this.gmOuve(this.grupo(ga ? b : a)) ? { g: 1, pan: 0 } : { g: 0, why: ga ? 'você não está ouvindo o grupo' : 'o mestre está em outro grupo' };
+    if (this.grupo(a) !== this.grupo(b)) return { g: 0, why: 'outro grupo' };
+    if (!c.prox) return { g: 1, pan: 0 };
+    const ta = this.peca(a), tb = this.peca(b);
+    if (!ta || !tb) return { g: 0, why: 'sem peça no mapa' };
+    if (ta.map !== tb.map) return { g: 0, why: 'em outro mapa' };
+    let cell = 30; try { cell = mapInfo(ta.map)?.grid?.size || 30; } catch {}
+    const d = Math.hypot(ta.x - tb.x, ta.y - tb.y) / cell, r = c.raio, perto = r * 0.35;
+    const g = d <= perto ? 1 : d >= r ? 0 : Math.pow(1 - (d - perto) / (r - perto), 1.6);
+    return { g, d, pan: clampN((tb.x - ta.x) / cell / r, -1, 1) * 0.75, why: g > 0 ? '' : 'longe demais' };
+  },
+  /* ---------- entrar e sair ---------- */
+  nome() { const s = Sheets.data?.[this.me]; return ROLE === 'gm' ? 'Mestre' : s?.nome ? firstName(s) : (window.APOGEU_FB?.user?.displayName || 'Jogador').split(' ')[0]; },
+  async join() {
+    if (!this.ok || this.joined || this.joining) return;
+    if (!this.C().aberta && !this.isGM(this.me)) { UI.toast('O mestre fechou a call por enquanto.'); return; }
+    this.joining = true; this.render();
+    try { this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false }); }
+    catch (e) {
+      this.joining = false; this.render();
+      UI.toast(/NotAllowed|Security/.test(e?.name || '') ? 'O navegador bloqueou o microfone. Libere o microfone para este site (no cadeado da barra de endereço) e tente de novo.' : 'Não encontrei um microfone neste aparelho.', 'err');
+      return;
+    }
+    this.track = this.stream.getAudioTracks()[0]; this.track.enabled = !this.muted;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext; this.ac = new AC(); await this.ac.resume();
+      this.lan = this.ac.createAnalyser(); this.lan.fftSize = 512; this.ac.createMediaStreamSource(this.stream).connect(this.lan);
+    } catch { this.ac = null; this.lan = null; }
+    this.sid = Math.random().toString(36).slice(2, 10); this.seen.clear();
+    try {
+      await this.rt.ref('call/sig/' + this.me).remove().catch(() => {});
+      const box = this.rt.ref('call/sig/' + this.me);
+      this.inboxCb = box.on('value', s => { const v = s.val(); this.chain = this.chain.then(() => this.inbox(v)).catch(e => console.warn(e)); }, () => {});
+      const meRef = this.rt.ref('call/peers/' + this.me);
+      try { meRef.onDisconnect().remove(); } catch {}
+      const u = window.APOGEU_FB?.user || {};
+      await meRef.set({ n: this.nome(), f: u.photoURL || '', s: this.sid, mu: this.muted, t: Date.now() });
+    } catch (e) { console.warn(e); this.joining = false; this.stopLocal(); UI.toast('Não foi possível entrar na call agora. Tente de novo.', 'err'); this.render(); return; }
+    this.joined = true; this.joining = false;
+    clearInterval(this.meterT); this.meterT = setInterval(() => this.meter(), 120);
+    this.sync(); this.badge(); this.render();
+    UI.toast(this.C().prox ? 'Você entrou na call. A proximidade está ligada: quem está perto da sua peça soa mais alto.' : 'Você entrou na call.');
+  },
+  /* a conexão com o banco caiu e voltou (o banco tirou a pessoa da lista): entra de novo sozinho */
+  relink() {
+    if (this.relinking || (!this.C().aberta && !this.isGM(this.me))) return;
+    this.relinking = true;
+    for (const uid of [...this.conns.keys()]) this.drop(uid);
+    this.sid = Math.random().toString(36).slice(2, 10);
+    const meRef = this.rt.ref('call/peers/' + this.me), u = window.APOGEU_FB?.user || {};
+    try { meRef.onDisconnect().remove(); } catch {}
+    meRef.set({ n: this.nome(), f: u.photoURL || '', s: this.sid, mu: this.muted, t: Date.now() }).catch(() => {}).finally(() => { this.relinking = false; });
+  },
+  leave(msg) {
+    if (!this.joined && !this.joining) return;
+    this.joined = false; this.joining = false;
+    try { const r = this.rt.ref('call/peers/' + this.me); r.onDisconnect().cancel?.(); r.remove().catch(() => {}); } catch {}
+    try { if (this.inboxCb) this.rt.ref('call/sig/' + this.me).off('value', this.inboxCb); } catch {}
+    this.inboxCb = null;
+    for (const uid of [...this.conns.keys()]) this.drop(uid);
+    clearInterval(this.meterT); this.stopLocal();
+    this.setFala(new Set());
+    this.badge(); this.render();
+    if (msg) UI.toast(msg);
+  },
+  stopLocal() {
+    try { this.stream?.getTracks().forEach(t => t.stop()); } catch {}
+    try { this.ac?.close(); } catch {}
+    this.stream = this.track = this.ac = this.lan = null;
+  },
+  toggleMute() {
+    this.muted = !this.muted;
+    if (this.track) this.track.enabled = !this.muted;
+    if (this.joined) this.rt.ref('call/peers/' + this.me + '/mu').set(this.muted).catch(() => {});
+    this.render();
+  },
+  onCfg(prev) {
+    const c = this.C();
+    if (this.joined && !c.aberta && !this.isGM(this.me)) { this.leave('O mestre fechou a call.'); return; }
+    if (this.joined && !this.isGM(this.me)) {
+      if (prev.prox !== c.prox) UI.toast(c.prox ? 'O mestre ligou a proximidade: agora você ouve quem está perto da sua peça.' : 'O mestre desligou a proximidade: todos do seu grupo se ouvem.');
+      else if ((prev.grupos[this.me] || '') !== (c.grupos[this.me] || '')) UI.toast('O mestre te colocou no ' + vcGrupoNome(this.grupo(this.me)) + ' da call.');
+    }
+    this.mix(); this.badge(); this.renderSoon();
+  },
+  setCfg(patch) {
+    if (ROLE !== 'gm') return;
+    const c = Object.assign(this.C(), patch);
+    this.cfg = c; this.onCfg(this.C());
+    this.rt.ref('call/cfg').set(c).catch(() => UI.toast('Não foi possível mudar a call agora.', 'err'));
+    if (patch.aberta === false) for (const uid of Object.keys(this.peers)) if (!this.isGM(uid)) this.rt.ref('call/peers/' + uid).remove().catch(() => {}); // fecha para todos, mesmo quem ficou preso
+  },
+  /* ---------- conexões (cada par de pessoas tem a sua) ---------- */
+  sync() {
+    if (!this.joined) return;
+    const live = new Set();
+    for (const [uid, p] of Object.entries(this.peers)) {
+      if (uid === this.me || !p?.s) continue;
+      live.add(uid);
+      const c = this.conns.get(uid);
+      if (c && c.rs !== p.s) this.drop(uid);
+      if (!this.conns.get(uid) && this.me < uid) this.call(uid, p.s); // quem tem o id "menor" chama; o outro atende
+    }
+    for (const uid of [...this.conns.keys()]) if (!live.has(uid)) this.drop(uid);
+    this.mix();
+  },
+  conn(uid, rs) {
+    const pc = new RTCPeerConnection({ iceServers: VC_ICE });
+    const c = { uid, rs, pc, q: [], sender: null, gain: null, pan: null, an: null, audio: null, g: 0, st: 'new', tries: 0, t0: Date.now() };
+    c.sender = pc.addTrack(this.track, this.stream);
+    pc.onicecandidate = e => { if (e.candidate) this.send(uid, rs, { ty: 'ice', c: JSON.stringify(e.candidate.toJSON ? e.candidate.toJSON() : e.candidate) }); };
+    pc.ontrack = e => this.attach(c, e.streams?.[0] || new MediaStream([e.track]));
+    pc.onconnectionstatechange = () => {
+      c.st = pc.connectionState; this.renderSoon();
+      if (c.st === 'failed' && this.me < uid && this.conns.get(uid) === c) setTimeout(() => { if (this.conns.get(uid) === c && this.peers[uid]?.s === rs) { const t = c.tries + 1; this.drop(uid); if (t <= 3) this.call(uid, rs, t); } }, 1500);
+    };
+    this.conns.set(uid, c);
+    return c;
+  },
+  async call(uid, rs, tries = 0) {
+    const c = this.conn(uid, rs); c.tries = tries;
+    try { const o = await c.pc.createOffer(); await c.pc.setLocalDescription(o); this.send(uid, rs, { ty: 'offer', sdp: o.sdp }); }
+    catch (e) { console.warn('call', e); }
+  },
+  drop(uid) {
+    const c = this.conns.get(uid); if (!c) return;
+    this.conns.delete(uid);
+    try { c.pc.close(); } catch {}
+    try { c.gain?.disconnect(); c.pan?.disconnect(); c.src?.disconnect(); } catch {}
+    if (c.audio) { c.audio.srcObject = null; c.audio.remove(); }
+  },
+  send(to, rs, m) {
+    const k = Date.now().toString(36) + (this.n++ % 1679616).toString(36).padStart(4, '0');
+    this.rt.ref(`call/sig/${to}/${this.me}/${k}`).set(Object.assign(m, { s: this.sid, r: rs })).catch(() => {});
+  },
+  async inbox(all) {
+    if (!this.joined && !this.joining) return;
+    for (const [from, box] of Object.entries(all || {})) {
+      for (const k of Object.keys(box || {}).sort()) {
+        const key = from + '/' + k; if (this.seen.has(key)) continue;
+        this.seen.add(key);
+        this.rt.ref(`call/sig/${this.me}/${from}/${k}`).remove().catch(() => {});
+        const m = box[k];
+        if (!m || m.r !== this.sid) continue; // recado de uma entrada antiga
+        try { await this.handle(from, m); } catch (e) { console.warn('sinal', e); }
+      }
+    }
+  },
+  async handle(from, m) {
+    let c = this.conns.get(from);
+    if (m.ty === 'offer') {
+      if (c) this.drop(from);
+      c = this.conn(from, m.s);
+      await c.pc.setRemoteDescription({ type: 'offer', sdp: m.sdp });
+      const a = await c.pc.createAnswer(); await c.pc.setLocalDescription(a);
+      this.send(from, m.s, { ty: 'answer', sdp: a.sdp });
+      this.flushIce(c); this.mix();
+    } else if (m.ty === 'answer') {
+      if (!c || c.rs !== m.s || c.pc.signalingState !== 'have-local-offer') return;
+      await c.pc.setRemoteDescription({ type: 'answer', sdp: m.sdp });
+      this.flushIce(c);
+    } else if (m.ty === 'ice') {
+      if (!c || c.rs !== m.s) return;
+      let cand; try { cand = JSON.parse(m.c); } catch { return; }
+      if (c.pc.remoteDescription) await c.pc.addIceCandidate(cand).catch(() => {}); else c.q.push(cand);
+    }
+  },
+  flushIce(c) { const q = c.q; c.q = []; for (const x of q) c.pc.addIceCandidate(x).catch(() => {}); },
+  attach(c, st) {
+    if (c.audio) return;
+    // o Chrome só entrega o áudio remoto ao mixer se ele também estiver num elemento de áudio
+    c.audio = h('audio', { autoplay: true, playsinline: true, hidden: true }); c.audio.srcObject = st; document.body.append(c.audio);
+    if (this.ac) {
+      c.audio.muted = true;
+      c.src = this.ac.createMediaStreamSource(st);
+      c.an = this.ac.createAnalyser(); c.an.fftSize = 512;
+      c.gain = this.ac.createGain(); c.gain.gain.value = 0;
+      c.pan = this.ac.createStereoPanner ? this.ac.createStereoPanner() : null;
+      c.src.connect(c.an); c.src.connect(c.gain);
+      if (c.pan) { c.gain.connect(c.pan); c.pan.connect(this.ac.destination); } else c.gain.connect(this.ac.destination);
+    } else c.audio.volume = 0;
+    c.audio.play?.().catch(() => {});
+    this.mix();
+  },
+  /* volume de cada pessoa e para quem a minha voz vai (quem não deve me ouvir nem recebe o áudio) */
+  mix() {
+    if (!this.joined) return;
+    for (const [uid, c] of this.conns) {
+      const ouvir = this.link(this.me, uid), falar = this.link(uid, this.me);
+      const tr = falar.g > 0 ? this.track : null;
+      if (c.sender && c.sender.track !== tr) c.sender.replaceTrack(tr).catch(() => {});
+      c.g = ouvir.g; c.why = ouvir.why;
+      const v = ouvir.g * clampN(this.vol[uid] ?? 1, 0, 2);
+      if (c.gain && this.ac) { c.gain.gain.setTargetAtTime(v, this.ac.currentTime, 0.12); if (c.pan) c.pan.pan.setTargetAtTime(ouvir.pan || 0, this.ac.currentTime, 0.15); }
+      else if (c.audio) c.audio.volume = clampN(v, 0, 1);
+    }
+    this.renderSoon();
+  },
+  mixSoon: null,
+  /* quem está falando agora: anel na lista e na peça do mapa */
+  meter() {
+    if (!this.joined) return;
+    if (++this.tick % 25 === 0) this.watch();
+    const buf = new Float32Array(512), rms = an => { an.getFloatTimeDomainData(buf); let s = 0; for (let i = 0; i < buf.length; i++) s += buf[i] * buf[i]; return Math.sqrt(s / buf.length); };
+    const on = new Set();
+    if (this.lan && !this.muted && rms(this.lan) > 0.02) on.add(this.me);
+    for (const [uid, c] of this.conns) if (c.an && c.g > 0.05 && !this.peers[uid]?.mu && rms(c.an) > 0.015) on.add(uid);
+    this.setFala(on);
+  },
+  /* se a outra pessoa não atendeu (recado perdido, página recarregando), chama de novo */
+  watch() {
+    for (const [uid, c] of [...this.conns]) {
+      if (this.me > uid || c.st === 'connected' || Date.now() - c.t0 < 8000) continue;
+      const p = this.peers[uid]; if (!p?.s) continue;
+      this.drop(uid); this.call(uid, p.s, c.tries);
+    }
+  },
+  setFala(on) {
+    const a = [...on].sort().join(), b = [...this.fala].sort().join(); if (a === b) return;
+    const tokOf = uid => { const t = this.peca(uid); return t ? TOKEL.get(t.id) : null; };
+    for (const uid of this.fala) if (!on.has(uid)) { tokOf(uid)?.classList.remove('vc-fala'); this.el?.querySelector(`[data-vcu="${CSS.escape(uid)}"]`)?.classList.remove('fala'); }
+    for (const uid of on) { tokOf(uid)?.classList.add('vc-fala'); this.el?.querySelector(`[data-vcu="${CSS.escape(uid)}"]`)?.classList.add('fala'); }
+    this.fala = on;
+  },
+  /* ---------- painel ---------- */
+  badge() {
+    const n = Object.values(this.peers).filter(p => p?.s).length, c = this.C();
+    for (const b of document.querySelectorAll('.vc-btn')) {
+      b.hidden = !this.ok;
+      b.classList.toggle('on', this.joined);
+      b.classList.toggle('fechada', !c.aberta);
+      const k = b.querySelector('.vc-count'); if (k) { k.textContent = n ? String(n) : ''; k.hidden = !n; }
+    }
+  },
+  toggle() { if (this.el) this.close(); else this.open(); },
+  open() {
+    if (!this.ok) { UI.toast('A call só funciona no site da mesa, com login.'); return; }
+    if (!this.el) {
+      this.el = h('section', { class: 'vc', id: 'vc', role: 'region', 'aria-label': 'Call da mesa' });
+      document.body.append(this.el);
+      this.el.addEventListener('click', e => this.act(e));
+      this.el.addEventListener('change', e => this.act(e));
+      this.el.addEventListener('input', e => { const t = e.target; if (t.dataset.vc === 'vol') { this.vol[t.dataset.u] = +t.value / 100; LS.set('vcVol', this.vol); this.mix(); } if (t.dataset.vc === 'raio') { const b = this.el.querySelector('.vc-raio b'); if (b) b.textContent = t.value + ' quadrados'; } });
+      this.el.addEventListener('pointerdown', e => { if (e.target.type === 'range') this.dragging = true; });
+      addEventListener('pointerup', () => { if (this.dragging) { this.dragging = false; this.renderSoon(); } });
+    }
+    this.render();
+  },
+  close() { this.el?.remove(); this.el = null; },
+  act(e) {
+    const t = e.target.closest('[data-vc]'); if (!t || !this.el?.contains(t)) return;
+    const a = t.dataset.vc;
+    if (e.type === 'click') {
+      if (a === 'close') this.close();
+      else if (a === 'join') this.join();
+      else if (a === 'leave') this.leave();
+      else if (a === 'mute') this.toggleMute();
+      else if (a === 'ouve') {
+        const g = t.dataset.g, c = this.C();
+        if (g === '*') this.setCfg({ ouve: '*' });
+        else {
+          let cur = c.ouve === '*' ? VC_GRUPOS.map(x => x || '0').join('') : c.ouve.replace(/-/g, '');
+          cur = cur.includes(g) ? cur.replace(g, '') : cur + g;
+          this.setCfg({ ouve: cur.length >= VC_GRUPOS.length ? '*' : cur || '-' });
+        }
+      }
+      return;
+    }
+    if (a === 'aberta') this.setCfg({ aberta: t.checked });
+    else if (a === 'prox') this.setCfg({ prox: t.checked });
+    else if (a === 'raio') this.setCfg({ raio: clampI(t.value, 2, 40) });
+    else if (a === 'grupo') { const gs = Object.assign({}, this.C().grupos); if (t.value) gs[t.dataset.u] = t.value; else delete gs[t.dataset.u]; this.setCfg({ grupos: gs }); }
+  },
+  renderSoon: null,
+  quem(uid) {
+    const s = Sheets.data?.[uid], p = this.peers[uid] || {};
+    if (this.isGM(uid)) return { nome: uid === this.me ? 'Você (mestre)' : 'Mestre', ini: 'M', cor: '#e9b45a', img: p.f || '' };
+    const base = s?.nome ? firstName(s) : p.n || 'Jogador';
+    return { nome: base + (uid === this.me ? ' (você)' : ''), ini: initials(s?.nome || base), cor: s?.cor || '#4fa3a5', img: s?.retrato ? imgSrc(s.retrato) : p.f || '' };
+  },
+  render() {
+    if (!this.el || this.dragging) return;
+    const c = this.C(), gm = ROLE === 'gm', ids = Object.keys(this.peers).filter(u => this.peers[u]?.s);
+    if (this.joined && !ids.includes(this.me)) ids.push(this.me);
+    ids.sort((a, b) => (this.isGM(b) - this.isGM(a)) || (this.grupo(a) > this.grupo(b) ? 1 : this.grupo(a) < this.grupo(b) ? -1 : 0) || String(this.quem(a).nome).localeCompare(this.quem(b).nome));
+    const status = uid => {
+      const p = this.peers[uid] || {};
+      if (uid === this.me) return this.muted ? 'microfone desligado' : 'você';
+      if (!this.joined) return p.mu ? 'microfone desligado' : 'na call';
+      const k = this.conns.get(uid);
+      if (!k || k.st === 'new' || k.st === 'connecting') return 'conectando…';
+      if (k.st === 'failed' || k.st === 'disconnected') return 'sem conexão com essa pessoa';
+      if (p.mu) return 'microfone desligado';
+      if (k.g <= 0) return k.why || 'você não ouve';
+      if (c.prox && !this.isGM(uid) && !this.isGM(this.me)) return k.g >= 0.99 ? 'pertinho' : k.g > 0.45 ? 'perto' : 'longe, baixinho';
+      return 'ouvindo';
+    };
+    const ouvem = uid => ids.filter(o => o !== uid && !this.isGM(o) && this.link(uid, o).g > 0).map(o => this.quem(o).nome.replace(' (você)', ''));
+    const row = uid => {
+      const q = this.quem(uid), k = this.conns.get(uid), g = uid === this.me ? 1 : k ? k.g : 0, gmU = this.isGM(uid);
+      const vol = Math.round(clampN(this.vol[uid] ?? 1, 0, 2) * 100);
+      return `<li class="vc-p${this.fala.has(uid) ? ' fala' : ''}${this.joined && uid !== this.me && g <= 0 ? ' mudo' : ''}" data-vcu="${esc(uid)}">
+        <span class="vc-av" style="--c:${esc(q.cor)}">${q.img ? `<img src="${esc(q.img)}" alt="">` : esc(q.ini)}</span>
+        <span class="vc-tx"><b>${esc(q.nome)}</b><small>${esc(status(uid))}${!gmU && (gm || this.grupo(uid)) ? ' · ' + esc(vcGrupoNome(this.grupo(uid))) : ''}</small>
+          ${gm && !gmU ? `<small class="vc-ouvem">Ouve: ${esc(ouvem(uid).join(', ') || 'ninguém dos jogadores')}</small>` : ''}
+          ${this.joined && uid !== this.me && g > 0 && c.prox && !gmU && !this.isGM(this.me) ? `<span class="vc-dist"><i style="width:${Math.round(g * 100)}%"></i></span>` : ''}</span>
+        ${gm && !gmU ? `<select class="vc-sel" data-vc="grupo" data-u="${esc(uid)}" aria-label="Grupo de ${esc(q.nome)}">${VC_GRUPOS.map(x => `<option value="${x}"${this.grupo(uid) === x ? ' selected' : ''}>${esc(vcGrupoNome(x))}</option>`).join('')}</select>` : ''}
+        ${this.joined && uid !== this.me ? `<input type="range" class="vc-vol" min="0" max="200" step="5" value="${vol}" data-vc="vol" data-u="${esc(uid)}" aria-label="Volume de ${esc(q.nome)}" title="Volume de ${esc(q.nome)}: ${vol}%">` : ''}
+      </li>`;
+    };
+    const ouveSet = c.ouve === '*' ? null : c.ouve;
+    const gmBox = gm ? `<div class="vc-gm">
+        <label class="chk"><input type="checkbox" data-vc="aberta" ${c.aberta ? 'checked' : ''}> Call liberada para os jogadores</label>
+        <label class="chk"><input type="checkbox" data-vc="prox" ${c.prox ? 'checked' : ''}> Proximidade pelas peças das fichas</label>
+        ${c.prox ? `<div class="vc-raio"><span>Alcance da voz</span><input type="range" min="2" max="40" step="1" value="${c.raio}" data-vc="raio" aria-label="Alcance da voz em quadrados"><b>${c.raio} quadrados</b></div>` : ''}
+        <div class="vc-ouve"><span>Você ouve e fala com</span><div class="vc-chips">
+          <button type="button" class="vc-chip${!ouveSet ? ' on' : ''}" data-vc="ouve" data-g="*">Todos</button>
+          ${VC_GRUPOS.map(x => `<button type="button" class="vc-chip${ouveSet && ouveSet.includes(x || '0') ? ' on' : ''}" data-vc="ouve" data-g="${x || '0'}">${esc(vcGrupoNome(x))}</button>`).join('')}
+        </div></div>
+      </div>` : '';
+    let dica = '';
+    if (!gm) {
+      if (!c.aberta && !this.joined) dica = 'O mestre fechou a call por enquanto.';
+      else if (c.prox) dica = this.peca(this.me) ? `Proximidade ligada: você ouve quem está a até ${c.raio} quadrados da sua peça. Quanto mais perto, mais alto.` : 'Proximidade ligada, mas a sua peça não está no mapa: por enquanto você só ouve o mestre.';
+      if (this.grupo(this.me)) dica += (dica ? ' ' : '') + `Você está no ${vcGrupoNome(this.grupo(this.me))}.`;
+    } else if (c.prox) dica = 'O mestre ouve sem distância. Entre jogadores vale a distância entre as peças das fichas no mapa.';
+    const n = ids.length;
+    this.el.className = 'vc' + (this.joined ? ' in' : '');
+    this.el.innerHTML = `
+      <div class="vc-head"><span class="vc-led${this.joined ? ' on' : ''}"></span><div class="vc-tt"><b>Call da mesa</b><small>${n ? n + (n === 1 ? ' pessoa' : ' pessoas') : 'Ninguém'} na call${c.prox ? ' · proximidade' : ''}${!c.aberta ? ' · fechada' : ''}</small></div>
+        <button type="button" class="iconbtn" data-vc="close" aria-label="Fechar painel da call" title="Fechar (você continua na call)">${icon('x')}</button></div>
+      ${gmBox}
+      ${n ? `<ul class="vc-list">${ids.map(row).join('')}</ul>` : '<p class="vc-vazio">Ninguém entrou ainda.</p>'}
+      ${dica ? `<p class="vc-dica">${esc(dica)}</p>` : ''}
+      <div class="vc-acts">${this.joined
+        ? `<button type="button" class="btn${this.muted ? ' danger' : ''}" data-vc="mute" aria-pressed="${this.muted}">${icon(this.muted ? 'micoff' : 'mic')}${this.muted ? 'Ligar microfone' : 'Desligar microfone'}</button><button type="button" class="btn ghost" data-vc="leave">Sair da call</button>`
+        : `<button type="button" class="btn primary" data-vc="join" ${this.joining || (!c.aberta && !gm) ? 'disabled' : ''}>${icon('mic')}${this.joining ? 'Entrando…' : 'Entrar na call'}</button>`}</div>`;
+  },
+};
+Voice.mixSoon = (() => { let t = 0; return () => { if (t) return; t = setTimeout(() => { t = 0; Voice.mix(); }, 150); }; })();
+Voice.renderSoon = (() => { let t = 0; return () => { if (t) return; t = setTimeout(() => { t = 0; Voice.render(); Voice.badge(); }, 120); }; })();
+
 const DADOS_TIPOS = [4, 6, 8, 10, 12, 20, 100];
 const DADO_COR = { 4: '#4fa3a5', 6: '#e9b45a', 8: '#7fb069', 10: '#8a7fd6', 12: '#5b8fd8', 20: '#de6b58', 100: '#c98a4a' };
 function dadoSVG(sides, label, cls = '') {
@@ -9785,6 +10210,7 @@ function buildShell() {
       h('div', { class: 'scene-pill', id: 'scene-pill' }),
       h('span', { class: 'saved', id: 'save-state', 'aria-live': 'polite' }),
       h('button', { class: 'iconbtn hide-xs', type: 'button', html: icon('screen'), title: 'Como mostrar a tela dos jogadores na chamada', 'aria-label': 'Como mostrar a tela dos jogadores na chamada', onclick: openPlayersModal }),
+      h('button', { class: 'iconbtn vc-btn', id: 'vc-top', type: 'button', hidden: true, html: icon('mic') + '<span class="vc-count" hidden></span>', title: 'Call de voz da mesa', 'aria-label': 'Call de voz da mesa', onclick: () => Voice.toggle() }),
       h('button', { class: 'iconbtn', id: 'dz-top', type: 'button', html: icon('dice'), title: 'Rolar dados', 'aria-label': 'Rolar dados', onclick: () => Dados.open() }),
       h('button', { class: 'iconbtn', id: 'lock-top', type: 'button', html: icon('lock'), title: 'Travar o mapa e as peças', 'aria-label': 'Travar o mapa e as peças', onclick: () => { if (UI.tab !== 'fichas') UI.setTab('fichas'); UI.openRight(); setTimeout(() => $('#tv-pecas')?.focus(), 50); } }),
       h('button', { class: 'iconbtn', id: 'ab-top', type: 'button', html: icon('film'), title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', onclick: () => (ROLE === 'gm' ? openAberturaModal() : Abertura.local()) }),
@@ -9817,7 +10243,7 @@ function buildShell() {
       h('div', { class: 'pl-lock', id: 'pl-lock', hidden: true, role: 'status' }),
       h('aside', { class: 'pl-sheet', id: 'pl-sheet', hidden: true, 'aria-label': 'Sua ficha' }),
       h('div', { class: 'pl-follow', id: 'pl-follow', hidden: true }, h('button', { class: 'btn primary', type: 'button', html: icon('target') + 'Seguir o mestre', onclick: () => { PL_FOLLOW = true; const sc = Store.data.vtt.scene; if (sc?.cam && sc.map === CUR) applyCamRect(sc.cam); else fitView(); UI.renderPlayerChrome(); } })),
-      h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-me', type: 'button', hidden: true, title: 'Minha ficha ao lado do mapa', 'aria-label': 'Minha ficha ao lado do mapa', html: icon('user') + '<span>Minha ficha</span>', onclick: () => (PlSheet.can() ? PlSheet.toggle() : Sheets.show(ME && Sheets.data[ME] ? ME : null)) }), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-dz', type: 'button', title: 'Rolar dados', 'aria-label': 'Rolar dados', html: icon('dice') + '<span>Dados</span>', onclick: () => Dados.open() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-ab', type: 'button', title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', html: icon('film') + '<span>Abertura</span>', onclick: () => Abertura.local() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
+      h('div', { class: 'pl-mode', id: 'pl-mode', hidden: true }, modeSwitch('mode-stage'), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-me', type: 'button', hidden: true, title: 'Minha ficha ao lado do mapa', 'aria-label': 'Minha ficha ao lado do mapa', html: icon('user') + '<span>Minha ficha</span>', onclick: () => (PlSheet.can() ? PlSheet.toggle() : Sheets.show(ME && Sheets.data[ME] ? ME : null)) }), h('button', { class: 'btn sm pl-sheets', type: 'button', html: icon('users') + 'Fichas', onclick: () => Sheets.show(null) }), h('button', { class: 'btn sm pl-sheets pl-ic vc-btn', id: 'pl-vc', type: 'button', hidden: true, title: 'Call de voz da mesa', 'aria-label': 'Call de voz da mesa', html: icon('mic') + '<span>Call</span><span class="vc-count" hidden></span>', onclick: () => Voice.toggle() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-dz', type: 'button', title: 'Rolar dados', 'aria-label': 'Rolar dados', html: icon('dice') + '<span>Dados</span>', onclick: () => Dados.open() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-ab', type: 'button', title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', html: icon('film') + '<span>Abertura</span>', onclick: () => Abertura.local() }), h('button', { class: 'btn sm pl-sheets pl-ic', id: 'pl-som', type: 'button', title: 'Volume do som', 'aria-label': 'Volume do som', html: icon('sound') + '<span>Som</span>', onclick: () => openSomModal() }), window.APOGEU_FB?.discord ? h('a', { class: 'btn sm pl-sheets pl-ic', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Discord da mesa', style: { textDecoration: 'none' }, html: icon('chat') + '<span>Discord</span>' }) : null, window.APOGEU_FB?.ready ? h('button', { class: 'btn sm pl-sheets pl-ic', type: 'button', title: 'Sua conta', 'aria-label': 'Sua conta', html: icon('user') + '<span>Conta</span>', onclick: () => window.APOGEU_FB.account() }) : null),
       h('div', { class: 'init-float', id: 'init-float', hidden: true, role: 'region', 'aria-label': 'Ordem de iniciativa' }),
       h('button', { class: 'btn primary som-pill', id: 'som-pill', type: 'button', hidden: true, html: icon('sound') + 'Toque para ouvir os sons da mesa', onclick: () => Som.unlock() }),
       h('div', { class: 'loader', id: 'loader', hidden: true, role: 'status' }, h('i'), h('span', null, 'Carregando…')),
@@ -9920,6 +10346,7 @@ async function boot(hot) {
   $('#app').classList.remove('booting');
   for (const r of Store.data.vtt.rolls?.list || []) if (r?.id) ROLLS_SEEN.add(r.id);
   Live.init(room);
+  try { Voice.init(); } catch (e) { console.warn('call', e); }
   PlSheet.wire();
   Abalo.watch();
   setTimeout(() => { ensureOwners(); onTravas(); }, 3500); setInterval(ensureOwners, 30000);

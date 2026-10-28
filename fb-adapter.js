@@ -136,6 +136,7 @@
       } catch (e) { showLogin(start, e); }
     });
   };
+  FB.rtdb = rtdb; // a call de voz usa direto (sinais entre os navegadores)
   FB.setTravas = tv => rtdb.ref('mesa/travas').set({ pecas: !!tv.pecas, mapa: !!tv.mapa }).catch(() => {});
   function go(start) {
     window.claude = { use: async name => (name === 'db' ? db : name === 'user' ? user : name === 'room' ? room : null) };
