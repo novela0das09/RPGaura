@@ -1100,8 +1100,8 @@ textarea.notes:focus { border-color: var(--lamp); }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610302032"></script>
-<script src="fb-adapter.js?v=202610302032"></script>
+<script src="firebase-config.js?v=202610302041"></script>
+<script src="fb-adapter.js?v=202610302041"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -3663,13 +3663,14 @@ MAPS['parte-alta'] = {
     m.o('flowerbed', 13.2, 18, { w: 1.6, h: 0.6 }); m.o('flowerbed', 18.8, 18, { w: 1.6, h: 0.6 });
     // Lote F — pracinha
     m.fill('lawn', 20.5, 15, 15, 8.6);
-    m.path('cobble', [[20.5, 19.5], [35.5, 19.5]], 1.4, { smooth: false, cap: 'butt' });
+    m.path('cobble', [[21, 19.5], [35.5, 19.5]], 1.4, { smooth: false, cap: 'butt' });
     m.path('cobble', [[28, 15], [28, 23.6]], 1.4, { smooth: false, cap: 'butt' });
     m.ellipse('cobble', 28, 19.5, 2.8, 2.8, { layer: 'ground2', edge: '#8f8b83', edgeW: 0.12 });
     for (const [x, y, r] of [[25.6, 19.5, 90], [30.4, 19.5, -90], [28, 17.1, 180], [28, 21.9, 0]]) m.o('bench', x, y, { w: 1.3, rot: r, color: '#7a5232' });
     m.tree(28, 19.5, 1.7, 'ipey');
     m.o('flowerbed', 24, 16.6, { w: 2.6, h: 0.8 }); m.o('flowerbed', 32.5, 22.4, { w: 2.6, h: 0.8 });
-    m.walls([[20.5, 15], [35.5, 15], [35.5, 23.6], [20.5, 23.6], [20.5, 15]], { kind: 'hedge', t: 0.5 });
+    m.walls([[27.2, 15], [20.5, 15], [20.5, 23.6], [27.2, 23.6]], { kind: 'hedge', t: 0.5 });
+    m.walls([[28.8, 23.6], [35.5, 23.6], [35.5, 20.3]], { kind: 'hedge', t: 0.5 }); m.walls([[35.5, 18.7], [35.5, 15], [28.8, 15]], { kind: 'hedge', t: 0.5 });
     m.tree(22, 22.2, 1.2, 'broad'); m.tree(34, 16.4, 1.1, 'light'); m.tree(34.2, 21.6, 0.9, 'palm');
     m.o('lamppost', 26, 17.6, { arm: false }); m.o('lamppost', 30, 21.4, { arm: false });
     m.label('Rua das Palmeiras', 6, 14.7, { kind: 'street' });
@@ -4558,11 +4559,11 @@ MAPS.farol = {
     m.waves([[-1, 21.8], [4.6, 22.6], [10.8, 23.4], [15.4, 21.4], [22.4, 22.6], [28, 21], [30.4, 16.6], [31, 12]], { count: 3, gap: 0.5, side: 1 });
     [[3, 20.6, 1.1], [9, 21.8, 1.3], [14.6, 20, 1], [20, 21, 1.4], [25.6, 20.4, 1.2], [28.8, 17.2, 1.1], [29, 10.6, 1.3], [29.8, 5.4, 1]].forEach(([x, y, r], i) => m.o('rock', x, y, { r, seed: 900 + i, moss: i % 2 === 0 }));
     // trilha e quintal
-    m.path('trail', [[-1, 17.4], [3, 17], [6.4, 16.6], [8, 15.6]], 1.4, { organic: 0.3, edge: 'rgba(50,40,25,0.35)' });
+    m.path('trail', [[-1, 17.6], [3, 17.6], [6.6, 17.3], [8, 16.4]], 1.4, { organic: 0.3, edge: 'rgba(50,40,25,0.35)' });
     m.path('trail', [[14, 12.5], [16, 11.4], [17, 10.6]], 1.2, { organic: 0.2 });
     m.ellipse('flagstone', 19.6, 10.5, 3.6, 3.6, { layer: 'ground2', edge: 'rgba(40,35,28,0.55)', edgeW: 0.18 });
     m.walls(circlePts(19.6, 10.5, 3.45, 40, Math.PI * 0.75, Math.PI * 2.55), { kind: 'rail', color: '#e8e2d6' });
-    m.walls([[3, 4], [16, 4], [16, 16], [8.6, 16]], { kind: 'fence', color: '#e8e2d6' }); m.walls([[7.4, 16], [3, 16], [3, 4]], { kind: 'fence', color: '#e8e2d6' });
+    m.walls([[3, 4], [16, 4], [16, 10.7]], { kind: 'fence', color: '#e8e2d6' }); m.walls([[16, 12.1], [16, 16], [8.6, 16]], { kind: 'fence', color: '#e8e2d6' }); m.door(16, 11.4, 'v', { w: 1.3, kind: 'gate' }); m.walls([[7.4, 16], [3, 16], [3, 4]], { kind: 'fence', color: '#e8e2d6' });
     m.door(8, 16, 'h', { w: 1.2, kind: 'gate' });
     // farol
     m.floor('flagstone', 17.1, 8, 5, 5, { ao: false });
@@ -4587,7 +4588,7 @@ MAPS.farol = {
     m.o('counter', 12, 9.88, { w: 3.6, h: 0.55, stove: -0.9, sink: 0.9 }); m.tableSet(12, 12.2, { w: 1.2, h: 0.8, chairs: 2, items: 'food' }); m.o('barrel', 13.4, 13.4, { color: '#4a6a7a' });
     m.label('Cozinha', 12, 13.5, { size: 0.22 });
     // galpão, poço, jardim
-    m.o('shed', 4, 17.2, { w: 2.2, h: 1.8 });
+    m.o('shed', 1.6, 12.9, { w: 1.8, h: 2.2 });
     for (const [x, y] of [[1.4, 15.2], [2, 15.9], [1.3, 16.6]]) m.o('barrel', x, y, { color: '#8a3a22' });
     m.o('well', 14.2, 5.4, { r: 0.55 }); m.o('flowerbed', 10, 15, { w: 2.6, h: 0.6 }); m.o('bench', 24.6, 15.6, { w: 1.4, rot: 160 });
     m.o('hammock', 4.4, 2.2, { w: 2.2 });
@@ -4960,7 +4961,7 @@ MAPS['mina-entrada'] = {
     m.ground('forest');
     m.ellipse('dirt', 14.4, 13.6, 9.6, 5.6, { organic: 0.45 });
     m.ellipse('gravel', 22.4, 15.4, 4.2, 2.6, { organic: 0.5 });
-    m.path('trail', [[-1, 18.6], [3.4, 18], [6.4, 16.6], [8.4, 15.6]], 1.6, { organic: 0.3, edge: 'rgba(40,30,20,0.35)' });
+    m.path('trail', [[-1, 18.6], [3.4, 18.2], [6.8, 17.2], [9.6, 16.1]], 1.6, { organic: 0.3, edge: 'rgba(40,30,20,0.35)' });
     // encosta de pedra com a boca da mina
     const hill = [[-1, -1], [31, -1], [31, 7.8], [25.6, 8.8], [20.6, 7.6], [17.2, 8.6], [11.6, 8.5], [8, 7], [3.4, 8.2], [-1, 7.4]];
     m.poly('cliff', hill, { organic: 0.55, shadow: 0.3 });
@@ -4991,7 +4992,7 @@ MAPS['mina-entrada'] = {
     m.path('trail', [[26.8, 13.1], [28.6, 12.8], [31, 12.5]], 1.1, { organic: 0.25, edge: 'rgba(40,30,20,0.3)' });
     m.label('trilha', 29.4, 13.7, { size: 0.18 });
     // mata em volta
-    const avoid = [{ poly: hill }, { c: [14.4, 13.6], r: 10 }, [1.8, 10, 7.4, 6], { line: [[-1, 18.6], [3.4, 18], [6.4, 16.6], [8.4, 15.6]], w: 2.6 }, { line: [[26.8, 13.1], [31, 12.5]], w: 2.2 }];
+    const avoid = [{ poly: hill }, { c: [14.4, 13.6], r: 10 }, [1.8, 10, 7.4, 6], { line: [[-1, 18.6], [3.4, 18.2], [6.8, 17.2], [9.6, 16.1]], w: 2.6 }, { line: [[26.8, 13.1], [31, 12.5]], w: 2.2 }];
     m.trees([0, 6, 30, 16], 26, { kinds: ['dark', 'broad', 'dark', 'mango', 'palm'], rmin: 1, rmax: 1.8, avoid, margin: 0.2, minDist: 2 });
     m.trees([0, -1, 30, 6], 10, { kinds: ['dark', 'broad', 'dead'], rmin: 0.9, rmax: 1.5, minDist: 2.4 });
     m.scatter([0, 6, 30, 16], 24, { avoid, minDist: 1 }, (x, y, R) => m.tree(x, y, 0.35 + R() * 0.35, R() < 0.5 ? 'fern' : 'bush'));
@@ -5411,10 +5412,10 @@ function mansaoFora(m, o = {}) {
   for (const x of [19.1, 20.9, 36.8, 40.2]) m.o('pillar', x, 33.6, { s: 0.42, color: '#d8d0bf' });
   // entrada de carros, rotatória com chafariz e caminho até a varanda
   m.path('cobble', [[38.5, 35.4], [38.5, 27.2]], 3.4, { smooth: false, cap: 'butt' });
-  m.path('gravel', circlePts(20, 31.2, 2.5, 30), 1.4, { closed: true });
-  m.path('gravel', [[22.4, 31.6], [27, 31.6], [36.8, 31.4]], 1.4, { smooth: false });
-  m.path('flagstone', [[20, 33.6], [20, 32.5]], 1.4, { smooth: false });
-  m.ellipse('lawn', 20, 31.2, 1.8, 1.8, { layer: 'ground2' });
+  m.path('gravel', circlePts(20, 31.35, 1.6, 30), 1.0, { closed: true });
+  m.path('gravel', [[21.5, 31.35], [27, 31.35], [36.8, 31.35]], 1.0, { smooth: false });
+  m.path('flagstone', [[20, 33.4], [20, 32.9]], 1.0, { smooth: false, cap: 'butt' });
+  m.ellipse('lawn', 20, 31.35, 1.1, 1.1, { layer: 'ground2' });
   // fundos: terraço, piscina, deque e gazebo
   m.fill('flagstone', 8, 9, 24, 3, { edge: 'rgba(40,35,28,0.4)', edgeW: 0.06 });
   m.fill('tile', 8, 1.6, 16, 6.4, { edge: 'rgba(40,35,28,0.4)', edgeW: 0.06 });
@@ -5425,7 +5426,7 @@ function mansaoFora(m, o = {}) {
   m.walls([[1, 1], [1, 32.8]], { kind: 'hedge' }); m.walls([[1.1, 1], [42.9, 1]], { kind: 'hedge' }); m.walls([[42.9, 1], [42.9, 11]], { kind: 'hedge' });
   m.walls([[1.4, 32.8], [17.6, 32.8]], { kind: 'hedge' }); m.walls([[22.4, 32.8], [35.6, 32.8]], { kind: 'hedge' });
   if (o.objetos !== false) {
-    m.o('fountain', 20, 31.2, { r: 1.3 });
+    m.o('fountain', 20, 31.35, { r: 0.95 });
     m.o('flowerbed', 11.4, 27.8, { w: 8, h: 0.7, colors: ['#e84a5f', '#f6d743'] }); m.o('flowerbed', 28.6, 27.8, { w: 8, h: 0.7, colors: ['#c86bd0', '#f4f1e8'] });
     m.o('flowerbed', 26.4, 30.2, { w: 2.2, h: 0.9 }); m.o('flowerbed', 13.6, 30.2, { w: 2.2, h: 0.9 });
     for (const y of [3.4, 5.4]) m.o('beachchair', 22.6, y, { rot: 90, color: '#f4efe2' });
@@ -5441,7 +5442,7 @@ function mansaoFora(m, o = {}) {
   }
   // árvores (sempre nos mesmos lugares, em qualquer andar)
   const casa = [5.4, 11.4, 37.2, 16.4];
-  const avoid = [casa, [7.6, 1.2, 17, 11.6], [27.6, 2.4, 6.2, 6], [34.4, 26.4, 8, 10.4], { c: [20, 31.2], r: 4.4 }, [17, 26.8, 6, 3], { line: [[22.4, 31.6], [36.8, 31.4]], w: 2.2 }, [33.6, 2, 7.6, 7.8], { line: [[8, 10.5], [4.5, 10.5], [3.4, 14], [3.4, 26]], w: 2.4 }];
+  const avoid = [casa, [7.6, 1.2, 17, 11.6], [27.6, 2.4, 6.2, 6], [34.4, 26.4, 8, 10.4], { c: [20, 31.35], r: 3 }, [17, 26.8, 6, 3], { line: [[21.5, 31.35], [36.8, 31.35]], w: 1.8 }, [33.6, 2, 7.6, 7.8], { line: [[8, 10.5], [4.5, 10.5], [3.4, 14], [3.4, 26]], w: 2.4 }];
   m.trees([1.6, 1.6, 41, 31], 22, { kinds: ['broad', 'mango', 'palm', 'ipey', 'broad', 'light', 'palm'], rmin: 1, rmax: 1.9, avoid, margin: 0.4, minDist: 2.8, seed: 70707 });
   m.scatter([1.6, 1.6, 41, 31], 18, { avoid, margin: 0.2, minDist: 1.3, seed: 70717 }, (x, y, R) => m.tree(x, y, 0.35 + R() * 0.3, R() < 0.3 ? 'banana' : 'bush'));
 }
