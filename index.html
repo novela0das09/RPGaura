@@ -1100,8 +1100,8 @@ textarea.notes:focus { border-color: var(--lamp); }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610302005"></script>
-<script src="fb-adapter.js?v=202610302005"></script>
+<script src="firebase-config.js?v=202610302032"></script>
+<script src="fb-adapter.js?v=202610302032"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -2495,6 +2495,7 @@ const PROPS = {
     const r0 = o.r ?? 0.5, seed = o.seed ?? 1, pts = blobPts(r0, seed, 9, 0.45);
     ctx.beginPath(); smoothClosed(ctx, pts);
     sh(ctx, 0.1 + r0 * 0.1, 0.5); ctx.fillStyle = o.color ?? '#7d796f'; ctx.fill(); nosh(ctx);
+    ctx.save(); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.95; ctx.fillStyle = pat(ctx, 'rock'); ctx.fill(); ctx.restore(); // textura de pedra
     const g = ctx.createRadialGradient(-r0 * 0.35, -r0 * 0.4, r0 * 0.05, 0, 0, r0 * 1.1);
     g.addColorStop(0, 'rgba(255,250,235,0.35)'); g.addColorStop(0.5, 'rgba(255,255,255,0.03)'); g.addColorStop(1, 'rgba(0,0,0,0.38)');
     ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 0.02; ctx.strokeStyle = OUT; ctx.stroke();
@@ -3014,6 +3015,9 @@ function drawMasonry(ctx, list) {
   for (const w of list) { ctx.strokeStyle = '#16120d'; ctx.lineWidth = w.t + 0.08; ctx.stroke(w.path); }
   nosh(ctx);
   for (const w of list) { ctx.strokeStyle = w.tex ? pat(ctx, w.tex) : w.color; ctx.lineWidth = w.t; ctx.stroke(w.path); }
+  ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.5; // grão do reboco
+  for (const w of list) if (!w.tex) { ctx.strokeStyle = pat(ctx, 'wallgrain'); ctx.lineWidth = w.t; ctx.stroke(w.path); }
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
   for (const w of list) if (!w.tex) { ctx.strokeStyle = 'rgba(255,255,255,0.16)'; ctx.lineWidth = w.t * 0.3; ctx.stroke(w.path); }
   ctx.restore();
 }
@@ -4719,7 +4723,7 @@ PROPS.lens = function (ctx, o) { // lente de Fresnel do farol
 MAPS['monumento-subsolo'] = {
   id: 'monumento-subsolo', w: 26, h: 20,
   draw(m) {
-    m.ground('rock');
+    m.ground('caverock');
     const S = { kind: 'ruin', t: 0.42 }, cx = 16, cy = 7.8;
     // salão da escada
     m.floor('ashlar', 3, 2, 6, 5);
@@ -5003,7 +5007,7 @@ MATS.minedark = function () {
 MAPS['mina-subterranea'] = {
   id: 'mina-subterranea', w: 32, h: 24,
   draw(m) {
-    m.ground('rock');
+    m.ground('caverock');
     const T = [
       [[[3.6, -1], [4, 3.4], [6, 6.2], [9.6, 7.4], [16, 7.4], [21.4, 7.6]], 2.6],
       [[[12.4, 7.6], [12.6, 11.6], [12.4, 14.6]], 2.2],
@@ -5016,8 +5020,8 @@ MAPS['mina-subterranea'] = {
     // primeiro as bordas escuras de tudo, depois o chão: os cruzamentos ficam limpos
     for (const [pts, w] of T) m.path('minedark', pts, w + 0.9, { layer: 'floor', cap: 'round' });
     for (const [cx, cy, rx, ry, org] of C) m.ellipse('minedark', cx, cy, rx + 0.45, ry + 0.45, { organic: org, layer: 'floor' });
-    for (const [pts, w] of T) m.path('dirt', pts, w, { layer: 'floor', organic: 0.15, cap: 'round' });
-    for (const [cx, cy, rx, ry, org] of C) m.ellipse('dirt', cx, cy, rx, ry, { organic: org, layer: 'floor' });
+    for (const [pts, w] of T) m.path('cavefloor', pts, w, { layer: 'floor', organic: 0.15, cap: 'round' });
+    for (const [cx, cy, rx, ry, org] of C) m.ellipse('cavefloor', cx, cy, rx, ry, { organic: org, layer: 'floor' });
     // câmara de extração
     for (const [x, y, r] of [[28.6, 6.4, 1], [27.8, 9.8, 0.8], [21.8, 5, 0.7], [25.4, 4.8, 0.9]]) m.o('coal', x, y, { r });
     m.o('minecart', 22.6, 9.2, { rot: 100 }); m.o('wheelbarrow', 26.4, 10.6, { rot: -20 });
@@ -5042,6 +5046,220 @@ MAPS['mina-subterranea'] = {
     m.o('mushrooms', 4.2, 9.6); m.o('mushrooms', 26.8, 18.6);
   },
 };
+
+/* ==========================================================
+   Texturas com relevo: pedra fraturada, pedrinhas com sombra,
+   ondulação da areia e luz do noroeste em todos os chãos naturais
+   ========================================================== */
+/* luz do noroeste sobre um mapa de altura periódico (H em 0..1) */
+function shadeHeight(c, S, H, k = 1, lift = 0) {
+  const x = c.getContext('2d'), img = x.getImageData(0, 0, S, S), d = img.data;
+  for (let y = 0; y < S; y++) {
+    const ym = ((y - 1 + S) % S) * S, yp = ((y + 1) % S) * S, row = y * S;
+    for (let X = 0; X < S; X++) {
+      const xm = (X - 1 + S) % S, xp = (X + 1) % S;
+      const gx = H[row + xp] - H[row + xm], gy = H[yp + X] - H[ym + X];
+      const s = clamp(1 + lift + (0.6 * gx + 0.8 * gy) * k, 0.35, 1.7), o = (row + X) * 4;
+      d[o] = clamp(d[o] * s, 0, 255); d[o + 1] = clamp(d[o + 1] * s, 0, 255); d[o + 2] = clamp(d[o + 2] * s, 0, 255);
+    }
+  }
+  x.putImageData(img, 0, 0);
+}
+function bumpFbm(c, P, oct, seed, k) { const S = c.width; shadeHeight(c, S, fbm(S, P, P, oct, seed), k); return c; }
+/* pedrinhas com sombra e brilho (não são só pontos chapados) */
+function pebbles(c, n, seed, pal, rmin, rmax, a = 1) {
+  const S = c.width, x = c.getContext('2d'), r = rng(seed);
+  for (let i = 0; i < n; i++) {
+    const px = r() * S, py = r() * S, rx = rmin + r() * (rmax - rmin), ry = rx * (0.55 + r() * 0.4), ang = r() * Math.PI, col = pal[(r() * pal.length) | 0];
+    wrapDraw(S, px, py, rx * 2 + 2, (X, Y) => {
+      x.globalAlpha = 0.38 * a; x.fillStyle = '#000'; x.beginPath(); x.ellipse(X + rx * 0.35, Y + rx * 0.45, rx, ry, ang, 0, TAU); x.fill();
+      x.globalAlpha = a; x.fillStyle = col; x.beginPath(); x.ellipse(X, Y, rx, ry, ang, 0, TAU); x.fill();
+      x.globalAlpha = 0.26 * a; x.fillStyle = '#fff'; x.beginPath(); x.ellipse(X - rx * 0.28, Y - ry * 0.32, rx * 0.45, ry * 0.4, ang, 0, TAU); x.fill();
+    });
+  }
+  x.globalAlpha = 1;
+  return c;
+}
+/* manchas suaves (umidade, sujeira, musgo) */
+function blotches(c, P, seed, color, level, maxA) {
+  const S = c.width, x = c.getContext('2d'), img = x.getImageData(0, 0, S, S), d = img.data, n = fbm(S, P, P, 4, seed), col = hx(color);
+  for (let i = 0; i < S * S; i++) {
+    const a = clamp((n[i] - level) / (1 - level) * 2.2, 0, 1) * maxA;
+    if (a <= 0) continue;
+    const o = i * 4; d[o] = lerp(d[o], col[0], a); d[o + 1] = lerp(d[o + 1], col[1], a); d[o + 2] = lerp(d[o + 2], col[2], a);
+  }
+  x.putImageData(img, 0, 0);
+  return c;
+}
+/* rachaduras finas que se ramificam, com borda clara do lado da luz */
+function cracks(c, n, seed, dark, len = 7, step = 8) {
+  const S = c.width, x = c.getContext('2d'), r = rng(seed);
+  for (let i = 0; i < n; i++) {
+    const pts = []; let px = r() * S, py = r() * S, a = r() * TAU; pts.push([px, py]);
+    const L = len + ((r() * len) | 0);
+    for (let k = 0; k < L; k++) { a += (r() - 0.5) * 1.1; px += Math.cos(a) * step; py += Math.sin(a) * step; pts.push([px, py]); }
+    const w = 0.8 + r() * 1.2;
+    for (const [dx, dy] of [[0, 0], [S, 0], [-S, 0], [0, S], [0, -S]]) {
+      x.beginPath(); pts.forEach(([X, Y], j) => j ? x.lineTo(X + dx, Y + dy) : x.moveTo(X + dx, Y + dy));
+      x.strokeStyle = 'rgba(255,250,235,0.10)'; x.lineWidth = w + 1.2; x.save(); x.translate(-0.8, -0.8); x.stroke(); x.restore();
+      x.strokeStyle = dark; x.lineWidth = w; x.stroke();
+    }
+  }
+  return c;
+}
+/* pedra fraturada: faces de Voronoi inclinadas, fendas fundas, textura fina e luz do noroeste */
+function rockFaces(S, o) {
+  const r = rng(o.seed), n = o.cells ?? 60, pts = [];
+  for (let i = 0; i < n; i++) pts.push([r() * S, r() * S, r(), (r() - 0.5) * (o.tilt ?? 1), (r() - 0.5) * (o.tilt ?? 1), r()]);
+  const det = fbm(S, o.P ?? 10, o.P ?? 10, 5, o.seed + 7), big = fbm(S, 3, 3, 3, o.seed + 9);
+  const H = new Float32Array(S * S), cell = new Float32Array(S * S), edge = new Float32Array(S * S);
+  const crack = o.crack ?? 2.4, wa = o.warp ?? 0, wx = fbm(S, 4, 4, 4, o.seed + 11), wy = fbm(S, 4, 4, 4, o.seed + 13), vis = fbm(S, 5, 5, 3, o.seed + 17);
+  for (let y = 0; y < S; y++) for (let X = 0; X < S; X++) {
+    let d1 = 1e9, d2 = 1e9, k = 0, kx = 0, ky = 0;
+    const j = y * S + X, qx = X + (wx[j] - 0.5) * wa, qy = y + (wy[j] - 0.5) * wa;
+    for (let i = 0; i < n; i++) {
+      let dx = qx - pts[i][0], dy = qy - pts[i][1];
+      if (dx > S / 2) dx -= S; else if (dx < -S / 2) dx += S;
+      if (dy > S / 2) dy -= S; else if (dy < -S / 2) dy += S;
+      const dd = dx * dx + dy * dy;
+      if (dd < d1) { d2 = d1; d1 = dd; k = i; kx = dx; ky = dy; } else if (dd < d2) d2 = dd;
+    }
+    const e = Math.sqrt(d2) - Math.sqrt(d1), p = pts[k], i = y * S + X;
+    const plane = p[2] * (o.relief ?? 0.5) + (p[3] * kx + p[4] * ky) / S * 2.2;
+    let fenda = clamp(e / crack, 0, 1);
+    if (o.patchy) fenda = 1 - (1 - fenda) * clamp((vis[i] - 0.32) * 3.2, 0.12, 1); // fendas que somem e voltam
+    H[i] = plane + det[i] * (o.rough ?? 0.35) - (1 - fenda * fenda) * (o.depth ?? 0.5);
+    cell[i] = p[5]; edge[i] = fenda;
+  }
+  const c = cv(S, S), x = c.getContext('2d'), img = x.createImageData(S, S), d = img.data;
+  const cols = o.colors.map(hx), last = cols.length - 1, gap = hx(o.gap ?? '#0e0d0b');
+  for (let i = 0; i < S * S; i++) {
+    const t = clamp(big[i] * 0.45 + cell[i] * 0.35 + det[i] * 0.3, 0, 0.9999), f = t * last, k = Math.floor(f);
+    let col = mixc(cols[k], cols[k + 1], f - k);
+    col = mixc(gap, col, 0.25 + 0.75 * edge[i]);
+    const oo = i * 4; d[oo] = col[0]; d[oo + 1] = col[1]; d[oo + 2] = col[2]; d[oo + 3] = 255;
+  }
+  x.putImageData(img, 0, 0);
+  shadeHeight(c, S, H, o.light ?? 38);
+  return c;
+}
+
+const MATS0 = Object.assign({}, MATS);
+Object.assign(MATS, {
+  rock() { // pedra do costão e das margens
+    const c = rockFaces(512, { seed: 5101, cells: 30, colors: ['#3b3833', '#514d46', '#68635a', '#7f796e'], gap: '#151310', tilt: 2, crack: 2.8, rough: 0.6, P: 7, light: 40, warp: 60, patchy: true });
+    blotches(c, 5, 5102, '#4e5a36', 0.6, 0.32);
+    speckle(c, 512, 260, 5103, ['#b9b48a', '#a8a59a', '#c9a86a'], 0.8, 2.2, 0.35);
+    return c;
+  },
+  cliff() { // paredão: blocos maiores, mais escuro, musgo nas fendas
+    const c = rockFaces(512, { seed: 5201, cells: 22, colors: ['#25231f', '#33302b', '#433f38', '#555048'], gap: '#0b0a08', tilt: 2.4, crack: 3.2, depth: 0.6, rough: 0.7, P: 6, light: 44, warp: 80, patchy: true });
+    blotches(c, 4, 5202, '#2f4320', 0.62, 0.4);
+    cracks(c, 40, 5203, 'rgba(8,7,6,0.65)', 5, 9);
+    speckle(c, 512, 180, 5204, ['#6f7d4a', '#8a8a6a'], 1, 2.6, 0.3);
+    return c;
+  },
+  caverock() { // rocha de caverna: escura, úmida, com veios e brilhos
+    const c = rockFaces(512, { seed: 5301, cells: 34, colors: ['#121110', '#1b1917', '#26231f', '#34302a'], gap: '#050404', tilt: 2.2, crack: 2.6, depth: 0.5, rough: 0.7, P: 7, light: 50, warp: 70, patchy: true });
+    cracks(c, 30, 5305, 'rgba(4,4,3,0.7)', 5, 8);
+    contours(c, 512, 5, 3, 5302, 0.006, '#5a5248', 0.5, 0.35);
+    blotches(c, 6, 5303, '#0a0908', 0.55, 0.5);
+    speckle(c, 512, 220, 5304, ['#c9c2b0', '#8fa0a8', '#d9c48a'], 0.4, 1.1, 0.55);
+    return c;
+  },
+  minedark() { // sombra junto às paredes das galerias
+    const S = 256, c = natural(S, ['#060505', '#0b0a09', '#121010'], 6, 4, 5401, 1.2, 6);
+    return bumpFbm(c, 8, 4, 5402, 30);
+  },
+  cavefloor() { // chão de terra batida e cascalho dentro da mina
+    const S = 512, c = natural(S, ['#3a2f24', '#4a3c2e', '#5a4a39', '#6a5844'], 7, 5, 5451, 1.1, 10);
+    bumpFbm(c, 9, 5, 5452, 12);
+    blotches(c, 5, 5453, '#241c15', 0.58, 0.45);
+    return pebbles(c, 300, 5454, ['#4d463e', '#6a6157', '#3a332c', '#7a7064'], 1.2, 3.4, 0.9);
+  },
+  dirt() {
+    const c = bumpFbm(MATS0.dirt(), 9, 5, 5501, 12);
+    blotches(c, 5, 5502, '#3f2c1b', 0.6, 0.35);
+    return pebbles(c, 240, 5503, ['#7a6a58', '#5e5246', '#94877a', '#6a5a48'], 1.4, 3.6);
+  },
+  trail() {
+    const c = bumpFbm(MATS0.trail(), 9, 5, 5601, 10);
+    blotches(c, 4, 5602, '#5a4026', 0.62, 0.25);
+    return pebbles(c, 160, 5603, ['#8d806c', '#a99c86', '#6f6250'], 1.2, 3);
+  },
+  soil() {
+    const c = bumpFbm(MATS0.soil(), 9, 5, 5701, 12);
+    return pebbles(c, 200, 5702, ['#4e4032', '#6a5a48', '#3a2e22'], 1.2, 3);
+  },
+  mud() {
+    const c = bumpFbm(MATS0.mud(), 7, 5, 5801, 12);
+    speckle(c, 512, 260, 5802, ['#cfc6b0'], 0.5, 1.4, 0.35);
+    return c;
+  },
+  gravel() {
+    const S = 512, c = natural(S, ['#4f4c46', '#5d5a53', '#6b675e'], 8, 3, 5901, 1, 8);
+    pebbles(c, 2600, 5902, ['#6a665e', '#8a857a', '#9d978b', '#55524b', '#7b766b', '#b0aa9c'], 1.6, 4.2);
+    return c;
+  },
+  sand() { // areia lisa, com ondulação bem leve
+    const S = 512, c = natural(S, ['#d6b984', '#dec393', '#e6cea2', '#eed9b0'], 4, 4, 6000, 0.9, 5);
+    const n = fbm(S, 4, 4, 4, 6001), H = new Float32Array(S * S);
+    for (let y = 0; y < S; y++) for (let X = 0; X < S; X++) { const i = y * S + X; H[i] = 0.5 + 0.25 * Math.sin(TAU * (6 * y / S + 0.18 * Math.sin(TAU * 2 * X / S)) + n[i] * 4) + n[i] * 0.4; }
+    shadeHeight(c, S, H, 1.3);
+    speckle(c, S, 260, 6003, ['#c4a676', '#f6ead0'], 0.5, 1, 0.35);
+    return c;
+  },
+  wetsand() {
+    const S = 512, c = natural(S, ['#a68d61', '#b09870', '#baa27b', '#c4ad86'], 4, 4, 6100, 0.9, 5);
+    const n = fbm(S, 4, 4, 4, 6101), H = new Float32Array(S * S);
+    for (let y = 0; y < S; y++) for (let X = 0; X < S; X++) { const i = y * S + X; H[i] = 0.5 + 0.3 * Math.sin(TAU * (8 * y / S + 0.22 * Math.sin(TAU * 3 * X / S)) + n[i] * 5) + n[i] * 0.3; }
+    shadeHeight(c, S, H, 1.8);
+    speckle(c, S, 120, 6102, ['#fff8ea'], 0.4, 0.9, 0.35);
+    return c;
+  },
+  grass() {
+    const c = bumpFbm(MATS0.grass(), 10, 5, 6201, 6);
+    blotches(c, 6, 6202, '#2a4416', 0.62, 0.2); blotches(c, 5, 6203, '#7d8a3c', 0.72, 0.18);
+    return c;
+  },
+  grassdk() { const c = bumpFbm(MATS0.grassdk(), 10, 5, 6301, 10); return blotches(c, 6, 6302, '#182d10', 0.6, 0.3); },
+  forest() { // chão da mata: folhas, musgo, terra e pedrinhas
+    const c = bumpFbm(MATS0.forest(), 9, 5, 6401, 12);
+    blotches(c, 6, 6402, '#2c3f1a', 0.62, 0.35); blotches(c, 5, 6403, '#2a1d12', 0.66, 0.3);
+    return pebbles(c, 70, 6404, ['#6a665c', '#7d786c', '#55524a'], 1.2, 3, 0.85);
+  },
+  leaves() { return bumpFbm(MATS0.leaves(), 10, 5, 6501, 9); },
+  moss() { return bumpFbm(MATS0.moss(), 10, 5, 6601, 10); },
+  asphalt() { // asfalto escuro e liso, com poucos remendos
+    const S = 512, c = natural(S, ['#232427', '#28292c', '#2d2e31', '#323336'], 8, 4, 6700, 1, 6);
+    speckle(c, S, 900, 6705, ['#3e3f42', '#1b1c1e'], 0.4, 0.9, 0.5);
+    blotches(c, 5, 6702, '#18191b', 0.7, 0.25);
+    cracks(c, 10, 6703, 'rgba(10,10,11,0.45)', 3, 9);
+    return c;
+  },
+  sidewalk() { // calçada clara de placas, bem diferente do asfalto
+    const S = T4, c = natural(S, ['#c9c2b4', '#d2cbbd', '#dad4c7'], 8, 4, 6850, 1, 6);
+    blotches(c, 4, 6851, '#b5ad9e', 0.66, 0.15);
+    const x = c.getContext('2d');
+    for (let i = 0; i <= S; i += 48) { x.fillStyle = 'rgba(70,64,55,0.45)'; x.fillRect(i - 1, 0, 2, S); x.fillRect(0, i - 1, S, 2); x.fillStyle = 'rgba(255,255,250,0.35)'; x.fillRect(i + 1, 0, 1, S); x.fillRect(0, i + 1, S, 1); }
+    return c;
+  },
+  concrete() { const c = blotches(MATS0.concrete(), 5, 6801, '#8a887f', 0.66, 0.16); cracks(c, 8, 6802, 'rgba(70,66,60,0.3)', 4, 9); return bumpFbm(c, 12, 4, 6803, 2.2); },
+  flagstone() { return bumpFbm(blotches(MATS0.flagstone(), 5, 6901, '#5a5446', 0.66, 0.2), 10, 4, 6902, 7); },
+  ruin() { return bumpFbm(MATS0.ruin(), 10, 4, 7001, 8); },
+  ashlar() { return bumpFbm(blotches(MATS0.ashlar(), 4, 7101, '#6f6a5e', 0.64, 0.2), 9, 4, 7102, 6); },
+  ashlarmoss() { return bumpFbm(blotches(MATS0.ashlarmoss(), 4, 7201, '#3d5222', 0.6, 0.3), 9, 4, 7202, 6); },
+  cobble() { return bumpFbm(MATS0.cobble(), 9, 4, 7301, 4); },
+  plank() { return bumpFbm(MATS0.plank(), 4, 4, 7401, 6); },
+  plankdk() { return bumpFbm(blotches(MATS0.plankdk(), 4, 7451, '#2e1d12', 0.64, 0.3), 4, 4, 7452, 6); },
+  planklt() { return bumpFbm(MATS0.planklt(), 4, 4, 7501, 6); },
+  /* reboco das paredes: só o grão, aplicado por cima da cor */
+  wallgrain() {
+    const S = 256, c = natural(S, ['#c8c8c8', '#e2e2e2', '#f4f4f4', '#ffffff'], 6, 5, 7601, 1.2, 18);
+    blotches(c, 4, 7602, '#a8a8a8', 0.64, 0.4);
+    return c;
+  },
+});
 
 /* ==========================================================
    Mansão da Parte Alta (térreo, 2º andar, sótão, porão)
