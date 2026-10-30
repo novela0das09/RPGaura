@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d1417">
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://nevoa-apogeu-default-rtdb.firebaseio.com">
 <meta name="description" content="Mesa de RPG de Névoa Sobre Apogeu: mapa, fichas e mural ao vivo.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230d1417' stroke='%23e9b45a' stroke-width='4'/%3E%3Cpath d='M32 12l7 20-7 20-7-20z' fill='%23e9b45a'/%3E%3C/svg%3E">
 <title>Névoa Sobre Apogeu</title>
@@ -1098,8 +1100,8 @@ textarea.notes:focus { border-color: var(--lamp); }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610281840"></script>
-<script src="fb-adapter.js?v=202610281840"></script>
+<script src="firebase-config.js?v=202610302005"></script>
+<script src="fb-adapter.js?v=202610302005"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -4982,8 +4984,10 @@ MAPS['mina-entrada'] = {
     m.o('sign', 10.2, 16.4, { w: 1.6, text: 'PERIGO', color: '#8a2a1e', rot: -8 });
     m.o('campfire', 10.8, 13.4, { r: 0.5 }); m.o('log', 9.6, 12.6, { w: 1.4, rot: 20 }); m.o('log', 12, 12.8, { w: 1.2, rot: -30 });
     m.o('watertank', 27.8, 11, { r: 0.9 });
+    m.path('trail', [[26.8, 13.1], [28.6, 12.8], [31, 12.5]], 1.1, { organic: 0.25, edge: 'rgba(40,30,20,0.3)' });
+    m.label('trilha', 29.4, 13.7, { size: 0.18 });
     // mata em volta
-    const avoid = [{ poly: hill }, { c: [14.4, 13.6], r: 10 }, [1.8, 10, 7.4, 6], { line: [[-1, 18.6], [3.4, 18], [6.4, 16.6], [8.4, 15.6]], w: 2.6 }];
+    const avoid = [{ poly: hill }, { c: [14.4, 13.6], r: 10 }, [1.8, 10, 7.4, 6], { line: [[-1, 18.6], [3.4, 18], [6.4, 16.6], [8.4, 15.6]], w: 2.6 }, { line: [[26.8, 13.1], [31, 12.5]], w: 2.2 }];
     m.trees([0, 6, 30, 16], 26, { kinds: ['dark', 'broad', 'dark', 'mango', 'palm'], rmin: 1, rmax: 1.8, avoid, margin: 0.2, minDist: 2 });
     m.trees([0, -1, 30, 6], 10, { kinds: ['dark', 'broad', 'dead'], rmin: 0.9, rmax: 1.5, minDist: 2.4 });
     m.scatter([0, 6, 30, 16], 24, { avoid, minDist: 1 }, (x, y, R) => m.tree(x, y, 0.35 + R() * 0.35, R() < 0.5 ? 'fern' : 'bush'));
@@ -5036,6 +5040,563 @@ MAPS['mina-subterranea'] = {
     for (const [[x, y], r] of beams) m.o('beam', x, y, { w: 2.9, rot: r });
     for (const [x, y] of [[3.2, 2.6], [10.8, 8.6], [13.6, 9.6], [6.6, 12.8], [25.4, 15], [17.6, 6.2]]) m.o('lantern', x, y);
     m.o('mushrooms', 4.2, 9.6); m.o('mushrooms', 26.8, 18.6);
+  },
+};
+
+/* ==========================================================
+   Mansão da Parte Alta (térreo, 2º andar, sótão, porão)
+   e o esconderijo na mata depois da mina
+   ========================================================== */
+Object.assign(PROPS, {
+  fireplace(ctx, o) { // lareira encostada na parede (fundo em -y, boca para +y)
+    const w = o.w ?? 1.8, h = o.h ?? 0.6;
+    box(ctx, o, w, h, '#8c8378', { r: 0.03, e: 0.08 });
+    for (let x = -w / 2 + 0.14; x < w / 2 - 0.05; x += 0.26) line(ctx, x, -h / 2 + 0.03, x, h / 2 - 0.03, 'rgba(40,30,20,0.22)', 0.01);
+    rr(ctx, -w * 0.3, -h / 2 + 0.08, w * 0.6, h * 0.64, 0.06); ctx.fillStyle = '#1a1210'; ctx.fill();
+    for (let i = 0; i < 3; i++) { ctx.save(); ctx.translate((i - 1) * w * 0.09, -h / 2 + 0.1 + h * 0.3); ctx.rotate((i - 1) * 0.5); ctx.fillStyle = '#4a2f1a'; ctx.fillRect(-w * 0.12, -0.035, w * 0.24, 0.07); ctx.restore(); }
+    if (o.lit !== false) glowAt(ctx, 0, -h / 2 + 0.1 + h * 0.3, w * 0.34, '#ff8a3a', 0.6);
+    rr(ctx, -w / 2 - 0.1, h / 2 - 0.02, w + 0.2, 0.3, 0.03); ctx.fillStyle = '#b8b0a2'; ctx.fill(); ctx.strokeStyle = OUT; ctx.lineWidth = 0.015; ctx.stroke();
+  },
+  chandelier(ctx, o) { // lustre visto de cima
+    const r0 = o.r ?? 0.6, n = o.n ?? 8;
+    glowAt(ctx, 0, 0, r0 * 3.4, '#ffe3a8', 0.22);
+    ctx.beginPath(); ctx.arc(0, 0, r0, 0, TAU); ctx.strokeStyle = '#c9a24a'; ctx.lineWidth = 0.04; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, r0 * 0.55, 0, TAU); ctx.lineWidth = 0.025; ctx.stroke();
+    for (let i = 0; i < n; i++) { const a = (i / n) * TAU; line(ctx, Math.cos(a) * r0 * 0.55, Math.sin(a) * r0 * 0.55, Math.cos(a) * r0, Math.sin(a) * r0, '#c9a24a', 0.02); circ(ctx, Math.cos(a) * r0, Math.sin(a) * r0, 0.065, '#fff4cf', '#a8842e', 0.01); }
+    circ(ctx, 0, 0, 0.12, '#d9b45a', OUT, 0.012);
+  },
+  winerack(ctx, o, r) { // adega: garrafas deitadas vistas pela ponta
+    const w = o.w ?? 2, h = o.h ?? 0.5;
+    box(ctx, o, w, h, '#3e2817', { r: 0.02, e: 0.07 });
+    for (let x = -w / 2 + 0.1; x < w / 2 - 0.06; x += 0.15) for (const y of [-h * 0.22, h * 0.22]) {
+      if (r() < 0.14) continue;
+      circ(ctx, x, y, 0.056, ['#2a3a22', '#4a1a1e', '#1e2a1a', '#3a2a12'][(r() * 4) | 0], 'rgba(0,0,0,0.5)', 0.008); circ(ctx, x - 0.015, y - 0.015, 0.015, 'rgba(255,255,255,0.35)');
+    }
+  },
+  boiler(ctx, o) { // caldeira antiga
+    const r0 = o.r ?? 0.85;
+    sh(ctx, 0.12); circ(ctx, 0, 0, r0, '#5a5650'); nosh(ctx); circ(ctx, 0, 0, r0, null, OUT, 0.025);
+    const g = ctx.createRadialGradient(-r0 * 0.3, -r0 * 0.3, 0.05, 0, 0, r0); g.addColorStop(0, 'rgba(255,255,255,0.2)'); g.addColorStop(1, 'rgba(0,0,0,0.28)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, r0, 0, TAU); ctx.fill();
+    for (let i = 0; i < 12; i++) { const a = (i / 12) * TAU; circ(ctx, Math.cos(a) * r0 * 0.86, Math.sin(a) * r0 * 0.86, 0.025, '#2a2826'); }
+    circ(ctx, 0, 0, r0 * 0.32, '#3a3632', OUT, 0.015);
+    rr(ctx, -0.2, r0 - 0.06, 0.4, 0.24, 0.03); ctx.fillStyle = '#2a2622'; ctx.fill(); ctx.strokeStyle = OUT; ctx.lineWidth = 0.015; ctx.stroke();
+    glowAt(ctx, 0, r0 + 0.1, 0.55, '#ff7a2a', 0.45);
+    circ(ctx, r0 * 0.5, -r0 * 0.5, 0.09, '#e8e2d0', OUT, 0.01); line(ctx, r0 * 0.5, -r0 * 0.5, r0 * 0.5 + 0.05, -r0 * 0.5 - 0.05, '#a01a1a', 0.012);
+  },
+  pipe(ctx, o) { // cano reto (comprimento em h)
+    const h = o.h ?? 3, w = o.w ?? 0.12;
+    ctx.fillStyle = o.color ?? '#7a6a58'; ctx.fillRect(-w / 2, -h / 2, w, h);
+    line(ctx, -w / 2 + 0.02, -h / 2, -w / 2 + 0.02, h / 2, 'rgba(255,255,255,0.25)', 0.015);
+    for (let y = -h / 2 + 0.4; y < h / 2; y += 0.9) { ctx.fillStyle = '#4a3e32'; ctx.fillRect(-w / 2 - 0.03, y - 0.03, w + 0.06, 0.06); }
+  },
+  workbench(ctx, o, r) { // bancada de oficina
+    const w = o.w ?? 2.2, h = o.h ?? 0.7;
+    box(ctx, o, w, h, '#8a6a42', { r: 0.02, e: 0.08 });
+    for (let i = 1; i < 4; i++) line(ctx, -w / 2 + 0.04, -h / 2 + (h * i) / 4, w / 2 - 0.04, -h / 2 + (h * i) / 4, 'rgba(50,30,10,0.25)', 0.01);
+    box(ctx, o, 0.3, 0.26, '#4a5560', { x: -w / 2 + 0.25, y: h / 2 - 0.16, e: 0.02, r: 0.02 });
+    for (let i = 0; i < 6; i++) { const x = -w / 2 + 0.6 + r() * (w - 0.9), y = (r() - 0.5) * h * 0.6; ctx.save(); ctx.translate(x, y); ctx.rotate(r() * TAU); ctx.fillStyle = ['#5a5f64', '#a33', '#c9a24a', '#3a3a3a'][(r() * 4) | 0]; ctx.fillRect(-0.12, -0.025, 0.24, 0.05); ctx.restore(); }
+  },
+  chest(ctx, o, r) { // baú
+    const w = o.w ?? 0.9, h = o.h ?? 0.55, col = o.color ?? '#6b4a2e';
+    box(ctx, o, w, h, col, { r: 0.05, e: 0.07 });
+    if (o.open) { rr(ctx, -w / 2 + 0.06, -h / 2 + 0.06, w - 0.12, h - 0.12, 0.03); ctx.fillStyle = '#2a1c12'; ctx.fill(); for (let i = 0; i < 4; i++) { ctx.save(); ctx.translate((r() - 0.5) * w * 0.5, (r() - 0.5) * h * 0.4); ctx.rotate((r() - 0.5) * 0.8); ctx.fillStyle = r() < 0.5 ? '#e8e0cc' : '#d8ccb0'; ctx.fillRect(-0.12, -0.08, 0.24, 0.16); ctx.restore(); } }
+    for (const x of [-w * 0.3, w * 0.3]) { ctx.fillStyle = '#4a4440'; ctx.fillRect(x - 0.04, -h / 2, 0.08, h); }
+    if (!o.open) { line(ctx, -w / 2 + 0.03, h * 0.12, w / 2 - 0.03, h * 0.12, 'rgba(0,0,0,0.35)', 0.015); rr(ctx, -0.07, h / 2 - 0.12, 0.14, 0.1, 0.02); ctx.fillStyle = '#c9a24a'; ctx.fill(); }
+  },
+  covered(ctx, o, r) { // móvel coberto com lençol
+    const w = o.w ?? 1.4, h = o.h ?? 0.9, n = 18;
+    sh(ctx, 0.07, 0.4);
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) { const a = (i / n) * TAU, k = 1 + (Math.sin(i * 2.3 + w * 7) * 0.06); const x = Math.cos(a) * (w / 2) * k, y = Math.sin(a) * (h / 2) * k; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.closePath(); ctx.fillStyle = o.color ?? '#d8d3c6'; ctx.fill(); nosh(ctx);
+    ctx.fillStyle = lightGrad(ctx, o, Math.max(w, h) / 2, 0.25); ctx.fill(); ctx.strokeStyle = 'rgba(60,50,40,0.55)'; ctx.lineWidth = 0.015; ctx.stroke();
+    for (let i = 0; i < 4; i++) { const x = (r() - 0.5) * w * 0.7; ctx.beginPath(); ctx.moveTo(x, (-h / 2) * 0.8); ctx.quadraticCurveTo(x + (r() - 0.5) * 0.3, 0, x + (r() - 0.5) * 0.2, (h / 2) * 0.85); ctx.strokeStyle = 'rgba(90,80,64,0.3)'; ctx.lineWidth = 0.02; ctx.stroke(); }
+  },
+  cobweb(ctx, o) { // teia de canto: o canto fica em (0,0) e ela abre para +x/+y
+    const r0 = o.r ?? 0.8, c = 'rgba(235,235,230,0.42)';
+    for (let i = 0; i <= 5; i++) { const a = ((i / 5) * Math.PI) / 2; line(ctx, 0, 0, Math.cos(a) * r0, Math.sin(a) * r0, c, 0.01); }
+    for (let k = 1; k <= 4; k++) { ctx.beginPath(); for (let i = 0; i <= 5; i++) { const a = ((i / 5) * Math.PI) / 2, d = ((r0 * k) / 4.4) * (i % 2 ? 0.9 : 1); const x = Math.cos(a) * d, y = Math.sin(a) * d; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.strokeStyle = c; ctx.lineWidth = 0.01; ctx.stroke(); }
+  },
+  globe(ctx, o) { // globo terrestre de escritório
+    const r0 = o.r ?? 0.32;
+    sh(ctx, 0.05); circ(ctx, 0, 0, r0 + 0.06, '#5a3a22'); nosh(ctx); circ(ctx, 0, 0, r0, '#3a6a8a', OUT, 0.012);
+    ctx.save(); ctx.beginPath(); ctx.arc(0, 0, r0, 0, TAU); ctx.clip(); ctx.fillStyle = '#b8a46a';
+    ctx.beginPath(); ctx.ellipse(-r0 * 0.3, -r0 * 0.2, r0 * 0.35, r0 * 0.25, 0.5, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(r0 * 0.35, r0 * 0.3, r0 * 0.25, r0 * 0.3, -0.3, 0, TAU); ctx.fill(); ctx.restore();
+    ctx.beginPath(); ctx.arc(0, 0, r0 + 0.03, -2.2, 0.9); ctx.strokeStyle = '#c9a24a'; ctx.lineWidth = 0.02; ctx.stroke();
+  },
+  clock(ctx, o) { // relógio de pêndulo
+    box(ctx, o, 0.55, 0.38, '#4a2c18', { r: 0.03, e: 0.08 });
+    circ(ctx, 0, 0.02, 0.13, '#efe6cc', '#c9a24a', 0.02); line(ctx, 0, 0.02, 0, -0.07, '#222', 0.012); line(ctx, 0, 0.02, 0.06, 0.04, '#222', 0.012);
+  },
+  vanity(ctx, o) { // penteadeira com espelho (fundo em -y)
+    const w = o.w ?? 1.1;
+    box(ctx, o, w, 0.45, o.color ?? '#e8e0d0', { r: 0.03, e: 0.06 });
+    rr(ctx, -w * 0.35, -0.2, w * 0.7, 0.07, 0.02); ctx.fillStyle = '#a7cddd'; ctx.fill();
+    for (let i = 0; i < 4; i++) circ(ctx, -w * 0.3 + i * w * 0.2, 0.07, 0.035, ['#c94a6a', '#e8c9b8', '#6a4a8a', '#c9a24a'][i]);
+  },
+  tent(ctx, o) { // barraca de lona (cumeeira no eixo y, porta em +y)
+    const w = o.w ?? 2, h = o.h ?? 2.4, col = o.color ?? '#5f6b3a';
+    for (const [x, y] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) line(ctx, x * w * 0.38, y * h * 0.45, x * (w / 2 + 0.4), y * (h / 2 + 0.25), 'rgba(230,220,190,0.6)', 0.015);
+    sh(ctx, 0.12, 0.45); ctx.beginPath(); ctx.rect(-w / 2, -h / 2, w, h); ctx.fillStyle = col; ctx.fill(); nosh(ctx);
+    ctx.fillStyle = shade(col, 0.16); ctx.fillRect(-w / 2, -h / 2, w / 2, h);
+    ctx.fillStyle = shade(col, -0.2); ctx.fillRect(0, -h / 2, w / 2, h);
+    line(ctx, 0, -h / 2, 0, h / 2, shade(col, -0.45), 0.04);
+    ctx.strokeStyle = OUT; ctx.lineWidth = 0.02; ctx.strokeRect(-w / 2, -h / 2, w, h);
+    ctx.beginPath(); ctx.moveTo(-w * 0.28, h / 2); ctx.lineTo(0, h / 2 - h * 0.22); ctx.lineTo(w * 0.28, h / 2); ctx.closePath(); ctx.fillStyle = '#1a1610'; ctx.fill();
+    for (const x of [-w / 2, w / 2]) for (const y of [-h / 2, h / 2]) circ(ctx, x, y, 0.03, '#2a2a2a');
+  },
+  tarp(ctx, o) { // lona esticada entre árvores, meio transparente para ver o que tem embaixo
+    const w = o.w ?? 3.6, h = o.h ?? 2.8, col = o.color ?? '#55707a';
+    for (const [x, y] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) line(ctx, (x * w) / 2, (y * h) / 2, x * (w / 2 + 0.5), y * (h / 2 + 0.4), 'rgba(220,210,180,0.7)', 0.02);
+    ctx.save(); ctx.globalAlpha = o.alpha ?? 0.7; sh(ctx, 0.2, 0.35);
+    ctx.beginPath(); ctx.moveTo(-w / 2, -h / 2); ctx.quadraticCurveTo(0, -h / 2 + 0.18, w / 2, -h / 2); ctx.quadraticCurveTo(w / 2 - 0.15, 0, w / 2, h / 2); ctx.quadraticCurveTo(0, h / 2 - 0.18, -w / 2, h / 2); ctx.quadraticCurveTo(-w / 2 + 0.15, 0, -w / 2, -h / 2); ctx.closePath();
+    ctx.fillStyle = col; ctx.fill(); nosh(ctx);
+    const g = ctx.createRadialGradient(0, 0, 0.1, 0, 0, Math.max(w, h) / 2); g.addColorStop(0, 'rgba(0,0,0,0.22)'); g.addColorStop(1, 'rgba(255,255,255,0.1)'); ctx.fillStyle = g; ctx.fill();
+    ctx.restore(); ctx.strokeStyle = 'rgba(20,24,26,0.6)'; ctx.lineWidth = 0.02; ctx.stroke();
+    for (const [x, y] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) circ(ctx, (x * w) / 2, (y * h) / 2, 0.04, '#c9c2a8');
+  },
+  platform(ctx, o) { // plataforma de vigia nas árvores, com escada
+    const s = o.s ?? 2.2;
+    sh(ctx, 0.35, 0.45); ctx.fillStyle = pat(ctx, 'planklt'); ctx.fillRect(-s / 2, -s / 2, s, s); nosh(ctx);
+    ctx.strokeStyle = '#4a3220'; ctx.lineWidth = 0.08; ctx.strokeRect(-s / 2 + 0.04, -s / 2 + 0.04, s - 0.08, s - 0.08);
+    for (const [x, y] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) circ(ctx, x * (s / 2 - 0.1), y * (s / 2 - 0.1), 0.1, '#5a3c22', OUT, 0.01);
+    ctx.save(); ctx.translate(0, s / 2 + 0.7); PROPS.ladder(ctx, { h: 1.4 }); ctx.restore();
+  },
+  chalk(ctx, o, r) { // círculo riscado a giz no chão
+    const r0 = o.r ?? 1.6; ctx.strokeStyle = 'rgba(232,228,214,0.72)';
+    ctx.lineWidth = 0.035; ctx.beginPath(); ctx.arc(0, 0, r0, 0, TAU); ctx.stroke();
+    ctx.lineWidth = 0.02; ctx.beginPath(); ctx.arc(0, 0, r0 * 0.78, 0, TAU); ctx.stroke();
+    for (let i = 0; i < 12; i++) { ctx.save(); ctx.rotate((i / 12) * TAU); ctx.translate(0, -r0 * 0.89); ctx.beginPath(); ctx.moveTo(-0.06, -0.05); ctx.lineTo(0.05, 0.06); ctx.moveTo(0.05, -0.06); ctx.lineTo(r() * 0.1 - 0.05, 0.06); ctx.moveTo(-0.07, 0); ctx.lineTo(0.07, 0); ctx.lineWidth = 0.018; ctx.stroke(); ctx.restore(); }
+    ctx.beginPath(); for (let i = 0; i <= 3; i++) { const a = -Math.PI / 2 + (i / 3) * TAU, x = Math.cos(a) * r0 * 0.7, y = Math.sin(a) * r0 * 0.7; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.lineWidth = 0.025; ctx.stroke();
+  },
+  dollhouse(ctx, o) { // casinha de bonecas
+    box(ctx, o, 0.8, 0.5, '#e8d8c0', { r: 0.02, e: 0.06 });
+    ctx.fillStyle = '#a4553a'; ctx.beginPath(); ctx.moveTo(-0.42, -0.02); ctx.lineTo(0, -0.27); ctx.lineTo(0.42, -0.02); ctx.closePath(); ctx.fill(); ctx.strokeStyle = OUT; ctx.lineWidth = 0.012; ctx.stroke();
+    for (const x of [-0.2, 0.2]) { ctx.fillStyle = '#7aa8c0'; ctx.fillRect(x - 0.06, 0.04, 0.12, 0.1); }
+  },
+});
+Object.assign(PROP_LAYER, { chandelier: 'top', tarp: 'tall', cobweb: 'top', chalk: 'floor', platform: 'tall' });
+
+/* o terreno em volta da mansão (igual em todos os andares que enxergam o lado de fora) */
+const MANSAO = { w: 44, h: 38 };
+function mansaoFora(m, o = {}) {
+  m.ground('lawn');
+  // rua e calçada
+  m.road([[-1, 36.4], [45, 36.4]], 2.6, { walk: 1, smooth: false });
+  m.label('Alameda das Palmeiras', 9, 36.4, { kind: 'street' });
+  // muro baixo dos lados e de trás, grade de ferro na frente com dois portões
+  m.walls([[0.3, 33.6], [0.3, 0.3], [43.7, 0.3], [43.7, 33.6]], { kind: 'low' });
+  m.walls([[0.3, 33.6], [19.2, 33.6]], { kind: 'iron' }); m.walls([[20.8, 33.6], [36.9, 33.6]], { kind: 'iron' }); m.walls([[40.1, 33.6], [43.7, 33.6]], { kind: 'iron' });
+  m.door(20, 33.6, 'h', { w: 1.6, kind: 'gate' }); m.door(38.5, 33.6, 'h', { w: 3.2, kind: 'gate' });
+  for (const x of [19.1, 20.9, 36.8, 40.2]) m.o('pillar', x, 33.6, { s: 0.42, color: '#d8d0bf' });
+  // entrada de carros, rotatória com chafariz e caminho até a varanda
+  m.path('cobble', [[38.5, 35.4], [38.5, 27.2]], 3.4, { smooth: false, cap: 'butt' });
+  m.path('gravel', circlePts(20, 31.2, 2.5, 30), 1.4, { closed: true });
+  m.path('gravel', [[22.4, 31.6], [27, 31.6], [36.8, 31.4]], 1.4, { smooth: false });
+  m.path('flagstone', [[20, 33.6], [20, 32.5]], 1.4, { smooth: false });
+  m.ellipse('lawn', 20, 31.2, 1.8, 1.8, { layer: 'ground2' });
+  // fundos: terraço, piscina, deque e gazebo
+  m.fill('flagstone', 8, 9, 24, 3, { edge: 'rgba(40,35,28,0.4)', edgeW: 0.06 });
+  m.fill('tile', 8, 1.6, 16, 6.4, { edge: 'rgba(40,35,28,0.4)', edgeW: 0.06 });
+  m.fill('pool', 10, 2.6, 10, 4.2, { edge: '#e8e2d6', edgeW: 0.14 });
+  m.path('flagstone', [[24, 9], [27.4, 6.6], [29.4, 5.6]], 1.1, { smooth: true });
+  m.path('flagstone', [[8, 10.5], [4.5, 10.5], [3.4, 14], [3.4, 26]], 1.1, { smooth: true });
+  // canteiros e cerca viva
+  m.walls([[1, 1], [1, 32.8]], { kind: 'hedge' }); m.walls([[1.1, 1], [42.9, 1]], { kind: 'hedge' }); m.walls([[42.9, 1], [42.9, 11]], { kind: 'hedge' });
+  m.walls([[1.4, 32.8], [17.6, 32.8]], { kind: 'hedge' }); m.walls([[22.4, 32.8], [35.6, 32.8]], { kind: 'hedge' });
+  if (o.objetos !== false) {
+    m.o('fountain', 20, 31.2, { r: 1.3 });
+    m.o('flowerbed', 11.4, 27.8, { w: 8, h: 0.7, colors: ['#e84a5f', '#f6d743'] }); m.o('flowerbed', 28.6, 27.8, { w: 8, h: 0.7, colors: ['#c86bd0', '#f4f1e8'] });
+    m.o('flowerbed', 26.4, 30.2, { w: 2.2, h: 0.9 }); m.o('flowerbed', 13.6, 30.2, { w: 2.2, h: 0.9 });
+    for (const y of [3.4, 5.4]) m.o('beachchair', 22.6, y, { rot: 90, color: '#f4efe2' });
+    m.o('umbrella', 22.6, 4.4, { r: 0.85, colors: ['#2f5a4a', '#f4efe2'] });
+    m.o('gazebo', 30.6, 5.2, { r: 2.3 });
+    m.tableSet(30.6, 5.2, { round: true, w: 1.2, h: 1.2, chairs: 4, color: '#e8e2d6', chairColor: '#e8e2d6' });
+    m.tableSet(28.4, 10.5, { w: 2.2, h: 1, chairs: 6, color: '#e8e2d6', chairColor: '#c9c1b0' });
+    m.o('umbrella', 28.4, 10.5, { r: 1.1, colors: ['#e8e2d6', '#c9a24a'] });
+    m.o('statue', 37.4, 6.2, { s: 0.9 }); m.o('bench', 37.4, 8.2, { w: 1.4, rot: 180, color: '#e8e2d6' });
+    m.o('bench', 3.4, 18, { w: 1.4, rot: 90, color: '#7a5232' });
+    for (const [x, y, r] of [[25.4, 30.4, 0], [14.6, 30.4, 0], [5.6, 10.3, 90], [35.2, 8.4, 0]]) m.o('lamppost', x, y, { rot: r });
+    m.o('flowerbed', 37.4, 3.2, { w: 4, h: 0.8, colors: ['#f6d743', '#e84a5f'] });
+  }
+  // árvores (sempre nos mesmos lugares, em qualquer andar)
+  const casa = [5.4, 11.4, 37.2, 16.4];
+  const avoid = [casa, [7.6, 1.2, 17, 11.6], [27.6, 2.4, 6.2, 6], [34.4, 26.4, 8, 10.4], { c: [20, 31.2], r: 4.4 }, [17, 26.8, 6, 3], { line: [[22.4, 31.6], [36.8, 31.4]], w: 2.2 }, [33.6, 2, 7.6, 7.8], { line: [[8, 10.5], [4.5, 10.5], [3.4, 14], [3.4, 26]], w: 2.4 }];
+  m.trees([1.6, 1.6, 41, 31], 22, { kinds: ['broad', 'mango', 'palm', 'ipey', 'broad', 'light', 'palm'], rmin: 1, rmax: 1.9, avoid, margin: 0.4, minDist: 2.8, seed: 70707 });
+  m.scatter([1.6, 1.6, 41, 31], 18, { avoid, margin: 0.2, minDist: 1.3, seed: 70717 }, (x, y, R) => m.tree(x, y, 0.35 + R() * 0.3, R() < 0.3 ? 'banana' : 'bush'));
+}
+
+MAPS.mansao = {
+  id: 'mansao', w: MANSAO.w, h: MANSAO.h,
+  draw(m) {
+    mansaoFora(m);
+    // varanda de entrada com colunas
+    m.fill('marble', 16.6, 27, 6.8, 1.9, { edge: 'rgba(40,35,28,0.45)', edgeW: 0.06 });
+    for (const x of [17.1, 18.8, 21.2, 22.9]) m.o('column', x, 28.45, { r: 0.2 });
+    m.o('stairs', 20, 29.25, { w: 3.4, h: 0.7, n: 3, arrow: false, color: '#cfc8b8' });
+    m.o('plant', 17.1, 27.5, { s: 0.26 }); m.o('plant', 22.9, 27.5, { s: 0.26 });
+    // pisos
+    m.floor('marble', 16, 19, 8, 8);
+    m.floor('parquet', 6, 19, 10, 8); m.floor('parquet', 24, 19, 10, 8);
+    m.floor('check', 24, 12, 10, 7); m.floor('concrete', 31, 12, 3, 3.5);
+    m.floor('carpetg', 6, 12, 7, 7); m.floor('concrete', 13, 12, 3, 3.5); m.floor('tilew', 13, 15.5, 3, 3.5);
+    m.floor('terracota', 16, 12, 8, 7);
+    m.floor('tilew', 34, 12, 4.5, 5.5); m.floor('parquet', 38.5, 12, 3.5, 5.5); m.floor('concrete', 34, 17.5, 8, 9.5);
+    // paredes externas (o lado do jardim de inverno é de vidro)
+    const EXT = { kind: 'white', t: 0.32 };
+    m.walls([[16, 12], [6, 12], [6, 27], [34, 27], [42, 27], [42, 12], [24, 12]], EXT);
+    m.walls([[16, 12], [24, 12]], { kind: 'glass' });
+    // paredes internas
+    m.walls([[6, 19], [34, 19]]); m.walls([[16, 12], [16, 27]]); m.walls([[24, 12], [24, 27]]);
+    m.walls([[13, 12], [13, 19]]); m.walls([[13, 15.5], [16, 15.5]]);
+    m.walls([[31, 12], [31, 15.5], [34, 15.5]]);
+    m.walls([[34, 12], [34, 27]], { kind: 'white', t: 0.28 }); m.walls([[34, 17.5], [42, 17.5]]); m.walls([[38.5, 12], [38.5, 17.5]]);
+    // portas
+    m.door(20, 27, 'h', { w: 1.9, double: true, side: -1, t: 0.32, color: '#4a2c18' });
+    m.door(16, 23, 'v', { w: 2.2, kind: 'arch' }); m.door(24, 23, 'v', { w: 2.2, kind: 'arch' });
+    m.door(17.6, 19, 'h', { w: 1.3, double: true, kind: 'glass', side: 1 });
+    m.door(20, 12, 'h', { w: 1.8, double: true, kind: 'glass', side: 1, t: 0.2 });
+    m.door(28.6, 19, 'h', { w: 1.1, side: -1 }); m.door(32.5, 15.5, 'h', { w: 0.9, side: -1 });
+    m.door(26.4, 12, 'h', { w: 1, side: 1, t: 0.32 }); m.door(34, 13.8, 'v', { w: 0.9, side: 1, t: 0.28 });
+    m.door(38.5, 16.2, 'v', { w: 0.9, side: 1 }); m.door(36.2, 17.5, 'h', { w: 0.9, side: 1 });
+    m.door(38, 27, 'h', { w: 3.8, kind: 'roll', t: 0.32 }); m.door(42, 24.8, 'v', { w: 0.9, side: -1, t: 0.32 });
+    m.door(10, 19, 'h', { w: 1.2, side: 1 }); m.door(13, 13.8, 'v', { w: 0.9, side: 1 }); m.door(16, 13.8, 'v', { w: 0.9, side: -1 });
+    m.door(14.5, 19, 'h', { w: 0.8, side: -1 });
+    // janelas
+    for (const [x, y, d, l] of [[8.6, 27, 'h', 1.8], [12.8, 27, 'h', 1.8], [27.2, 27, 'h', 1.8], [31.4, 27, 'h', 1.8], [6, 21.4, 'v', 1.6], [6, 25, 'v', 1.6], [6, 16.2, 'v', 1.8],
+      [29.2, 12, 'h', 1.6], [42, 14.6, 'v', 1.4], [42, 20.6, 'v', 1.4], [36.2, 12, 'h', 1.2], [40.2, 12, 'h', 1.2], [34, 21.6, 'v', 0.01]]) if (l > 0.1) m.win(x, y, d, l, { t: 0.32 });
+    // hall de entrada com a escadaria
+    m.o('carpetrunner', 20, 25.2, { w: 1.5, h: 3.2 });
+    m.o('stairs', 20, 21.5, { w: 2.4, h: 3.4, color: '#8a6a4a' });
+    m.walls([[18.7, 23.2], [18.7, 19.8]], { kind: 'rail' }); m.walls([[21.3, 23.2], [21.3, 19.8]], { kind: 'rail' });
+    m.label('sobe', 20, 23.75, { size: 0.2 });
+    m.o('chandelier', 20, 25.4, { r: 0.7 }); m.light(20, 25.4, 4, '#ffe3a8');
+    m.o('desk', 17.3, 26.55, { w: 1.4, h: 0.42, color: '#3e2817' }); m.o('plant', 17.3, 26.5, { s: 0.18 });
+    m.o('desk', 22.7, 26.55, { w: 1.4, h: 0.42, color: '#3e2817' }); m.o('lamp', 22.7, 26.5, { r: 0.8 });
+    m.o('clock', 16.45, 20.6, { rot: -90 }); m.o('rack', 23.5, 20.2, { w: 0.9, rot: 90 });
+    m.o('painting', 16.2, 25.4, { w: 1.4, rot: 90 }); m.o('painting', 23.8, 25.4, { w: 1.4, rot: 90 });
+    m.label('Hall', 20, 26.2, { size: 0.26 });
+    // sala de estar com lareira e piano
+    m.o('fireplace', 6.45, 23.2, { w: 2, rot: -90 }); m.light(7, 23.2, 3.6, '#ff9a4a');
+    m.o('rug', 9.4, 23.2, { w: 4.6, h: 3.4, color: '#6a2a24', border: '#c9a24a' });
+    m.o('sofa', 10.6, 23.2, { w: 2.6, rot: 90, color: '#5a3a3a', pillow: '#c9a24a' });
+    m.o('armchair', 8.4, 21.2, { color: '#3a4a5a' }); m.o('armchair', 8.4, 25.2, { rot: 180, color: '#3a4a5a' });
+    m.o('coffeetable', 8.6, 23.2, { w: 0.8, h: 1.5, items: 'coffee' });
+    m.o('shelf', 6.4, 20.4, { w: 1.8, rot: -90 }); m.o('shelf', 6.4, 26, { w: 1.6, rot: -90 });
+    m.o('piano', 14, 19.62, { w: 1.7, h: 0.66 }); m.o('stool', 14, 20.35, { r: 0.18, color: '#2a1a14' });
+    m.o('sofa', 13.6, 26.25, { w: 2.2, rot: 180, color: '#5a3a3a' }); m.o('armchair', 15.2, 24, { rot: -90, color: '#3a4a5a' });
+    m.o('coffeetable', 13.4, 24.9, { w: 1.2, h: 0.55, items: 'papers' });
+    m.o('plant', 15.4, 21, { s: 0.28 }); m.o('plant', 6.8, 26.5, { s: 0.24 }); m.o('lamp', 11.9, 21.1, { r: 0.9 });
+    m.label('Sala de estar', 11.6, 21.6, { size: 0.28 });
+    // sala de jantar
+    m.tableSet(29, 23.1, { w: 5, h: 1.4, chairs: 10, color: '#4a2c18', chairColor: '#5a1f22', items: 'plates', cloth: '#efe9dc' });
+    m.o('chandelier', 29, 23.1, { r: 0.55, n: 6 }); m.light(29, 23.1, 4, '#ffe3a8');
+    m.o('desk', 29, 19.45, { w: 3.2, h: 0.5, color: '#3e2817', items: 'plates' });
+    m.o('wardrobe', 33.6, 23.1, { w: 2.2, h: 0.5, rot: 90, color: '#3e2817' });
+    m.o('painting', 26.4, 19.2, { w: 1.2 }); m.o('plant', 24.6, 26.4, { s: 0.26 }); m.o('plant', 33.4, 26.4, { s: 0.26 });
+    m.label('Sala de jantar', 29, 25.9, { size: 0.28 });
+    // cozinha e despensa
+    m.o('counter', 27, 12.42, { w: 5, h: 0.62, sink: -1.2, stove: 1.2 });
+    m.o('fridge', 30.4, 12.45, { w: 0.75, h: 0.6 });
+    m.o('counter', 24.42, 16.4, { w: 3, h: 0.6, rot: -90 });
+    m.o('counter', 28, 15.8, { w: 3, h: 1.1, top: '#d8d0c0' });
+    for (const x of [27, 28, 29]) m.o('stool', x, 16.75, { r: 0.17, color: '#5a3a22' });
+    m.tableSet(32, 17.4, { round: true, w: 1, h: 1, chairs: 3, color: '#8a5a33', chairColor: '#6b4426', items: 'food' });
+    m.o('oven', 25.1, 18.45, { w: 1.2, h: 0.6, rot: 180 });
+    m.o('shelf', 32.5, 12.32, { w: 2.6, kind: 'goods' }); m.o('shelf', 33.66, 14, { w: 2.2, kind: 'goods', rot: 90 });
+    m.o('sack', 31.6, 14.6); m.o('sack', 32.1, 14.9, { color: '#e6dcc2' }); m.o('crate', 31.7, 13.6, { s: 0.45 });
+    m.label('Cozinha', 28, 14.4, { size: 0.28 }); m.label('Despensa', 32.5, 13.5, { size: 0.18 });
+    // biblioteca
+    m.o('shelf', 9.5, 12.34, { w: 6.6 }); m.o('shelf', 6.4, 14.4, { w: 3.6, rot: -90 }); m.o('shelf', 12.66, 16.9, { w: 3.6, rot: 90 });
+    m.o('rug', 9.6, 16.2, { w: 4, h: 3, color: '#2a3a4a', border: '#c9a24a' });
+    m.o('desk', 9.6, 15.3, { w: 1.9, h: 0.85, items: 'papers', lamp: true, color: '#3e2817' }); m.o('chair', 9.6, 14.6, { color: '#5a1f22' });
+    m.o('armchair', 8, 17.9, { rot: 180, color: '#5a1f22' }); m.o('armchair', 11.2, 17.9, { rot: 180, color: '#5a1f22' });
+    m.o('globe', 7.4, 13.4); m.o('safe', 12.3, 13.2); m.o('painting', 12.8, 13.2, { w: 0.9, rot: 90 });
+    m.label('Biblioteca', 9.6, 17.1, { size: 0.26 });
+    // escada do porão e lavabo
+    m.o('stairs', 14.5, 13.75, { w: 1.6, h: 2.6, rot: 180, arrow: false, color: '#6a6258' });
+    m.label('desce', 14.5, 15.1, { size: 0.18 }); m.label('Porão', 14.5, 12.5, { size: 0.18 });
+    m.o('toilet', 13.6, 15.88); m.o('sink', 15.3, 18.6, { rot: 180 }); m.o('mirror', 15.3, 18.92, { w: 0.6 });
+    m.label('Lavabo', 14.5, 17.2, { size: 0.18 });
+    // jardim de inverno
+    for (const [x, y, s] of [[16.6, 12.6, 0.3], [23.4, 12.6, 0.3], [16.6, 18.4, 0.28], [23.4, 18.4, 0.32], [18.6, 18.5, 0.22], [21.6, 12.5, 0.22]]) m.o('plant', x, y, { s });
+    m.o('flowerbed', 16.5, 15.6, { w: 2.4, h: 0.6, rot: 90 }); m.o('flowerbed', 23.5, 15.6, { w: 2.4, h: 0.6, rot: 90, colors: ['#f6d743', '#e84a5f'] });
+    m.tableSet(20, 15.6, { round: true, w: 1, h: 1, chairs: 3, color: '#e8e2d6', chairColor: '#b08a5a', items: 'coffee' });
+    m.o('armchair', 18.2, 13.6, { color: '#b08a5a', rot: 20 }); m.o('armchair', 21.8, 13.6, { color: '#b08a5a', rot: -20 });
+    m.label('Jardim de inverno', 20, 17.6, { size: 0.24 });
+    // lavanderia, quarto da governanta e garagem
+    m.o('washer', 34.6, 12.45); m.o('washer', 35.3, 12.45); m.o('sink', 36.4, 12.4); m.o('varal', 36.2, 15.4, { w: 2.6 });
+    m.o('shelf', 37.95, 14, { w: 2, kind: 'goods', rot: 90 }); m.o('table', 35, 16.6, { w: 1.2, h: 0.35, color: '#c9c1b0', metal: true });
+    m.label('Lavanderia', 36.2, 14.2, { size: 0.2 });
+    m.o('bed', 40.9, 13.2, { color: '#7a8a6a' }); m.o('nightstand', 39.9, 12.5); m.o('wardrobe', 41.62, 16.1, { w: 1.6, rot: 90 });
+    m.o('desk', 39.6, 17.05, { w: 1, h: 0.5, rot: 180 }); m.o('chair', 39.6, 16.4, { rot: 180 });
+    m.label('Governanta', 40.3, 15, { size: 0.18 });
+    m.o('car', 36.2, 22.6, { rot: 180, color: '#1c1f22' }); m.o('car', 39.9, 22.6, { rot: 180, color: '#6a1a1e' });
+    m.o('toolwall', 41.8, 20.4, { w: 2.2, rot: 90 }); m.o('shelf', 34.4, 25, { w: 2.4, kind: 'boxes', rot: -90 }); m.o('bike', 35, 18.4, { rot: 0, color: '#2f74b8' });
+    m.label('Garagem', 38, 19, { size: 0.24 });
+    m.label('Terraço', 20, 10.5, { kind: 'street', size: 0.28 }); m.label('Piscina', 15, 4.7, { kind: 'water', size: 0.32 });
+  },
+};
+
+MAPS['mansao-2'] = {
+  id: 'mansao-2', w: MANSAO.w, h: MANSAO.h,
+  draw(m) {
+    mansaoFora(m);
+    // telhados do que só tem um andar: garagem e ala de serviço
+    m.fill('roof', 33.9, 11.9, 8.3, 15.3, { edge: 'rgba(30,22,15,0.6)', edgeW: 0.08 });
+    m.fill('rgba(0,0,0,0.18)', 33.9, 19.4, 8.3, 0.12);
+    // sacada sobre a varanda
+    m.fill('planklt', 16.6, 27, 6.8, 1.9);
+    m.walls([[16.6, 27.1], [16.6, 28.9], [23.4, 28.9], [23.4, 27.1]], { kind: 'rail' });
+    m.o('chair', 18, 28.2, { color: '#e8e2d6' }); m.o('chair', 22, 28.2, { color: '#e8e2d6' }); m.o('table', 20.9, 28.1, { round: true, w: 0.6, h: 0.6, color: '#e8e2d6' });
+    m.o('plant', 17.1, 28.5, { s: 0.2 }); m.o('plant', 22.9, 28.5, { s: 0.2 });
+    m.label('Sacada', 20, 28.75, { size: 0.18 });
+    // pisos
+    m.floor('carpet', 6, 18.5, 10, 2); m.floor('parquet', 16, 18.5, 8, 8.5);
+    m.floor('parquet', 6, 12, 6, 6.5); m.floor('tilew', 12, 12, 4, 6.5); m.floor('carpetg', 16, 12, 5, 6.5); m.floor('plankdk', 21, 12, 3, 6.5);
+    m.floor('carpet', 24, 18.5, 10, 8.5); m.floor('parquet', 24, 12, 4, 6.5); m.floor('marble', 28, 12, 6, 6.5);
+    m.floor('parquet', 6, 20.5, 5, 6.5); m.floor('carpetb', 11, 20.5, 5, 6.5);
+    // paredes
+    m.box(6, 12, 28, 15, { kind: 'white', t: 0.32 });
+    m.walls([[6, 18.5], [34, 18.5]]); m.walls([[6, 20.5], [16, 20.5]]);
+    for (const x of [12, 16, 21, 28]) m.walls([[x, 12], [x, 18.5]]);
+    m.walls([[16, 20.5], [16, 27]]); m.walls([[24, 12], [24, 27]]); m.walls([[11, 20.5], [11, 27]]);
+    // portas
+    m.door(9, 18.5, 'h', { w: 0.9, side: -1 }); m.door(14, 18.5, 'h', { w: 0.8, side: -1 }); m.door(18.5, 18.5, 'h', { w: 0.9, side: -1 });
+    m.door(22.5, 18.5, 'h', { w: 1, side: -1 }); m.door(24, 22.6, 'v', { w: 1.2, side: 1, color: '#4a2c18' });
+    m.door(26, 18.5, 'h', { w: 0.9, side: -1 }); m.door(31, 18.5, 'h', { w: 0.9, side: -1 });
+    m.door(8.5, 20.5, 'h', { w: 0.9, side: 1 }); m.door(13.5, 20.5, 'h', { w: 0.9, side: 1 });
+    m.door(20, 27, 'h', { w: 1.8, double: true, kind: 'glass', side: 1, t: 0.32 });
+    for (const [x, y, d, l] of [[8.6, 27, 'h', 1.6], [13.6, 27, 'h', 1.6], [27.2, 27, 'h', 1.6], [31.2, 27, 'h', 1.6], [9, 12, 'h', 1.6], [14, 12, 'h', 1], [18.5, 12, 'h', 1.6], [31, 12, 'h', 1.4],
+      [6, 15.2, 'v', 1.6], [6, 23.6, 'v', 1.6], [34, 15.2, 'v', 1.4], [34, 22.6, 'v', 1.8]]) m.win(x, y, d, l, { t: 0.32 });
+    // escada (chegada do térreo) com guarda-corpo
+    m.o('stairs', 20, 21.5, { w: 2.4, h: 3.4, rot: 180, arrow: false, color: '#8a6a4a' });
+    m.walls([[18.7, 19.8], [18.7, 23.3], [21.3, 23.3], [21.3, 19.8]], { kind: 'rail' });
+    m.label('desce', 20, 21.6, { size: 0.2 });
+    // sala íntima no patamar
+    m.o('sofa', 16.55, 24.6, { w: 2, rot: -90, color: '#4a5a4a' }); m.o('armchair', 23.3, 24.6, { rot: 90, color: '#4a5a4a' });
+    m.o('coffeetable', 18, 24.6, { w: 0.6, h: 1.2, items: 'papers' }); m.o('shelf', 23.65, 21.4, { w: 2, rot: 90 });
+    m.o('chandelier', 20, 25.2, { r: 0.45, n: 6 }); m.light(20, 25.2, 3.4, '#ffe3a8'); m.o('plant', 16.6, 26.5, { s: 0.24 }); m.o('radio', 23.5, 26.5);
+    m.label('Sala íntima', 20, 26.2, { size: 0.22 });
+    // corredor
+    m.o('carpetrunner', 11, 19.5, { w: 1.1, h: 9.4, rot: 90 });
+    m.o('painting', 8, 18.72, { w: 1.1 }); m.o('painting', 14.6, 20.28, { w: 1.1 }); m.o('desk', 6.5, 19.5, { w: 1.2, h: 0.4, rot: -90, color: '#3e2817' });
+    m.label('Corredor', 11, 19.5, { size: 0.2 });
+    // suíte principal
+    m.o('bed', 32.75, 22.6, { double: true, w: 2, h: 2.2, rot: 90, color: '#6a2a3a' });
+    m.o('nightstand', 33.55, 21.05); m.o('nightstand', 33.55, 24.15);
+    m.o('rug', 30.4, 22.6, { w: 3, h: 3.8, color: '#3a2a3a', border: '#c9a24a' });
+    m.o('fireplace', 29, 26.6, { w: 1.4, rot: 180 }); m.light(29, 26.1, 3, '#ff9a4a');
+    m.o('armchair', 27.4, 25.3, { rot: 150, color: '#6a5a4a' }); m.o('armchair', 30.6, 25.3, { rot: 210, color: '#6a5a4a' });
+    m.o('vanity', 25.2, 18.9, { w: 1 }); m.o('stool', 25.2, 19.5, { r: 0.16, color: '#c9a2a8' });
+    m.o('wardrobe', 24.4, 25.4, { w: 1.6, h: 0.5, rot: -90 }); m.o('clock', 33.6, 19.1, { rot: 90 });
+    m.label('Suíte principal', 29, 20.4, { size: 0.26 });
+    // closet e banheiro da suíte
+    m.o('rack', 24.5, 15, { w: 4.2, rot: 90 }); m.o('rack', 27.5, 15, { w: 4.2, rot: 90 }); m.o('shelf', 26, 12.3, { w: 3.6, kind: 'boxes' });
+    m.o('table', 26, 15.6, { w: 0.7, h: 1.8, color: '#e8e0d0' }); m.o('mirror', 26, 18.3, { w: 1 });
+    m.label('Closet', 26, 17.4, { size: 0.2 });
+    m.o('tub', 33.3, 14.3, { w: 0.85, h: 1.8 }); m.o('counter', 30, 12.4, { w: 2.4, h: 0.55, sink: 0.5, top: '#e8e2d6' }); m.o('mirror', 30, 12.12, { w: 2 });
+    m.o('toilet', 28.5, 15.4, { rot: -90 }); m.o('shower', 28.5, 17.6, { s: 0.85 });
+    m.label('Banheiro da suíte', 31, 16.6, { size: 0.18 });
+    // quarto da filha
+    m.o('bed', 7.1, 13.1, { color: '#c98aa0' }); m.o('nightstand', 8.1, 12.45);
+    m.o('wardrobe', 11.62, 14.4, { w: 1.8, rot: 90, color: '#e8e0d0' }); m.o('desk', 10.6, 18.05, { w: 1.2, h: 0.5, rot: 180, color: '#e8e0d0', items: 'papers' }); m.o('chair', 10.6, 17.4, { rot: 180, color: '#c98aa0' });
+    m.o('rug', 8.6, 15.6, { w: 2, h: 1.4, color: '#e8b8c8', border: '#f4efe2', fringe: false }); m.o('dollhouse', 6.6, 17.4, { rot: -90 });
+    m.label('Quarto da filha', 9, 16.6, { size: 0.2 });
+    // banheiro do corredor
+    m.o('tub', 15.5, 14.2, { w: 0.75, h: 1.6 }); m.o('toilet', 12.6, 12.5); m.o('sink', 12.36, 16.6, { rot: -90 }); m.o('mirror', 12.12, 16.6, { w: 0.6, rot: 90 });
+    m.label('Banheiro', 14, 17.3, { size: 0.18 });
+    // escritório particular
+    m.o('desk', 18.5, 14.2, { w: 1.7, h: 0.8, items: 'papers', lamp: true, color: '#3e2817' }); m.o('chair', 18.5, 13.5, { color: '#2a1a14' });
+    m.o('shelf', 16.36, 15.2, { w: 4, rot: -90 }); m.o('filecab', 20.6, 12.4); m.o('corkboard', 20.85, 15.6, { w: 1.6, rot: 90 }); m.o('armchair', 19.6, 17.4, { rot: 200, color: '#5a1f22' });
+    m.label('Escritório', 18.5, 16.4, { size: 0.2 });
+    // escada estreita do sótão e rouparia
+    m.o('stairs', 22.5, 15.2, { w: 1.2, h: 3, color: '#6b4a2e' });
+    m.o('shelf', 23.66, 17.4, { w: 1.8, kind: 'boxes', rot: 90 });
+    m.label('sótão', 22.5, 12.6, { size: 0.18 });
+    // quarto do filho
+    m.o('bed', 6.9, 23.4, { rot: -90, color: '#3a5a7a' }); m.o('nightstand', 6.5, 22.1);
+    m.o('wardrobe', 10.62, 25.2, { w: 1.8, rot: 90 }); m.o('desk', 9.4, 21, { w: 1.4, h: 0.55, items: 'papers' }); m.o('chair', 9.4, 21.65, { rot: 180, color: '#2a2a2a' });
+    m.o('rug', 8.4, 24.6, { w: 1.8, h: 1.4, color: '#3a5a7a', border: '#e8e2d6', fringe: false }); m.o('surfboard', 6.5, 26.2, { rot: 80, color: '#f2d43a', stripe: '#2f74b8' });
+    m.label('Quarto do filho', 8.5, 26.2, { size: 0.2 });
+    // quarto de hóspedes
+    m.o('bed', 15, 23.6, { double: true, rot: 90, color: '#7a8a9a' }); m.o('nightstand', 15.6, 22.4); m.o('nightstand', 15.6, 24.8);
+    m.o('wardrobe', 11.4, 25.3, { w: 1.6, rot: -90 }); m.o('armchair', 12, 21.4, { color: '#7a8a9a' });
+    m.label('Hóspedes', 13.2, 26.2, { size: 0.2 });
+  },
+};
+
+MAPS['mansao-sotao'] = {
+  id: 'mansao-sotao', w: MANSAO.w, h: MANSAO.h,
+  draw(m) {
+    mansaoFora(m);
+    // telhado por cima de tudo o que não é sótão
+    m.fill('roof', 5.8, 11.8, 28.4, 15.4, { edge: 'rgba(30,22,15,0.6)', edgeW: 0.08 });
+    m.fill('roof', 33.9, 11.9, 8.3, 15.3, { edge: 'rgba(30,22,15,0.6)', edgeW: 0.08 });
+    m.fill('roofgray', 16.6, 27, 6.8, 1.9);
+    // o sótão: tábuas velhas, teto baixo nas laterais
+    m.floor('plankdk', 8, 13, 24, 13);
+    for (let i = 0; i < 5; i++) { const a = 0.5 - i * 0.1; m.fill(`rgba(0,0,0,${a})`, 8, 13 + i * 0.6, 24, 0.6, { layer: 'floor' }); m.fill(`rgba(0,0,0,${a})`, 8, 25.4 - i * 0.6, 24, 0.6, { layer: 'floor' }); }
+    m.box(8, 13, 24, 13, { kind: 'wood', t: 0.26 });
+    m.walls([[27.5, 13], [27.5, 22.6]], { kind: 'wood', t: 0.18 }); m.walls([[27.5, 24.1], [27.5, 26]], { kind: 'wood', t: 0.18 });
+    m.door(27.5, 23.35, 'v', { w: 1.1, side: 1, t: 0.18, color: '#4a3220' });
+    m.win(8, 19.5, 'v', 1.2, { t: 0.26 }); m.win(32, 19.5, 'v', 1.2, { t: 0.26 });
+    // caibros e cumeeira
+    m.o('beam', 20, 19.5, { w: 24 });
+    for (let x = 10; x <= 30; x += 3.4) m.o('beam', x, 19.5, { w: 12.6, rot: 90 });
+    // chegada da escada
+    m.o('stairs', 22.5, 15.2, { w: 1.2, h: 3, rot: 180, arrow: false, color: '#6b4a2e' });
+    m.walls([[21.8, 13.6], [21.8, 16.8], [23.2, 16.8], [23.2, 13.6]], { kind: 'rail' });
+    m.label('desce', 22.5, 15.3, { size: 0.18 });
+    // tralha guardada
+    m.o('covered', 11, 15.4, { w: 2, h: 1 }); m.o('covered', 13.6, 14.6, { w: 1.2, h: 1.2 }); m.o('covered', 10.4, 23.4, { w: 2.2, h: 1.2 }); m.o('covered', 16.6, 24.6, { w: 1.4, h: 0.9 });
+    m.o('chest', 14.2, 23.2, { rot: 8 }); m.o('chest', 18.8, 14.4, { rot: -6, color: '#4a3a2e' }); m.o('chest', 25.4, 24.4, { open: true, rot: 4 });
+    m.o('mannequin', 12.2, 19.6); m.o('mirror', 9.2, 17.4, { w: 1.2, rot: 70 }); m.o('armchair', 24, 21.4, { rot: 30, color: '#6a5a4a' });
+    for (const [x, y, s] of [[16, 14.1, 0.5], [16.6, 14.3, 0.45], [9.3, 21.4, 0.55], [9.8, 22, 0.45], [25.6, 14, 0.5], [26.4, 14.4, 0.55], [19.4, 24.9, 0.5]]) m.o('crate', x, y, { s, rot: (x * 37) % 20 - 10 });
+    m.o('painting', 15.2, 19.6, { w: 1.2, rot: 12 }); m.o('painting', 15.4, 19.9, { w: 1, rot: 8 });
+    m.o('bed', 20.6, 24.4, { rot: 90, color: '#6a6a5a' }); m.o('rack', 13.2, 25.3, { w: 1.6 });
+    m.o('lantern', 21.2, 17.4);
+    for (const [x, y, r] of [[8.15, 13.15, 0], [8.15, 25.85, -90], [27.35, 13.15, 90]]) m.o('cobweb', x, y, { r: 0.9, rot: r });
+    m.label('Sótão', 15, 19.5, { size: 0.32 });
+    m.label('teto baixo', 20, 13.5, { size: 0.16 }); m.label('teto baixo', 20, 25.5, { size: 0.16 });
+    // quartinho no fundo
+    m.floor('plank', 27.5, 13, 4.5, 13);
+    m.o('bunk', 31, 15, { w: 0.8, h: 1.6, color: '#5a5a4a' }); m.o('desk', 30.2, 21.8, { w: 1.2, h: 0.6, items: 'papers', rot: 90 }); m.o('chair', 29.5, 21.8, { rot: -90 });
+    m.o('corkboard', 31.85, 16.9, { w: 1.6, rot: 90 }); m.o('lantern', 30.4, 23.6); m.o('candles', 28.4, 13.6, { n: 4 });
+    m.o('chest', 28.6, 17.6, { rot: 90, w: 0.8 }); m.o('cobweb', 31.85, 25.85, { r: 0.8, rot: 180 });
+    m.label('Quartinho', 29.8, 25.2, { size: 0.2 });
+  },
+};
+
+MAPS['mansao-porao'] = {
+  id: 'mansao-porao', w: MANSAO.w, h: MANSAO.h,
+  draw(m) {
+    m.ground('soil');
+    m.fill('rgba(8,6,4,0.45)', -1, -1, MANSAO.w + 2, MANSAO.h + 2);
+    const ST = { kind: 'stone', t: 0.4 };
+    // pisos
+    m.floor('concrete', 6, 18, 28, 2); m.floor('concrete', 13, 12, 3, 6);
+    m.floor('flagstone', 6, 12, 7, 6); m.floor('concrete', 16, 12, 8, 6); m.floor('concrete', 24, 12, 10, 6);
+    m.floor('concrete', 6, 20, 10, 7); m.floor('tilegray', 16, 20, 5, 7); m.floor('ashlarmoss', 21, 20, 13, 7);
+    // paredes de pedra
+    m.box(6, 12, 28, 15, ST);
+    const SI = { kind: 'stone', t: 0.3 };
+    m.walls([[6, 18], [13, 18]], SI); m.walls([[16, 18], [34, 18]], SI); m.walls([[13, 12], [13, 18]], SI); m.walls([[16, 12], [16, 18]], SI); m.walls([[24, 12], [24, 18]], SI);
+    m.walls([[6, 20], [34, 20]], SI); m.walls([[16, 20], [16, 27]], SI); m.walls([[21, 20], [21, 23.2]], ST); m.walls([[21, 24.8], [21, 27]], ST);
+    m.door(9.5, 18, 'h', { w: 1, side: -1, color: '#4a3220' }); m.door(20, 18, 'h', { w: 1, side: -1, kind: 'metal' }); m.door(27, 18, 'h', { w: 1, side: -1 });
+    m.door(11, 20, 'h', { w: 1, side: 1 }); m.door(18.5, 20, 'h', { w: 1, side: 1, kind: 'metal', t: 0.2 });
+    // escada (chegada do térreo)
+    m.o('stairs', 14.5, 13.75, { w: 1.6, h: 2.6, arrow: false, color: '#6a6258' });
+    m.label('sobe', 14.5, 15.4, { size: 0.18 });
+    // corredor com lampiões e canos no teto
+    m.o('pipe', 20, 18.35, { h: 27.6, w: 0.1, rot: 90 });
+    for (const [x, y] of [[8, 19], [15, 16.6], [24.5, 19], [32.5, 19]]) m.o('lantern', x, y);
+    m.label('Corredor', 28, 19, { size: 0.2 });
+    // adega
+    m.o('winerack', 9.5, 12.42, { w: 6.4 }); m.o('winerack', 6.42, 15, { w: 4.4, rot: -90 }); m.o('winerack', 12.58, 15.4, { w: 3.6, rot: 90 });
+    for (const [x, y] of [[8.4, 16.9], [9.1, 17.3], [9.8, 16.9]]) m.o('barrel', x, y, { r: 0.32 });
+    m.tableSet(10, 14.8, { round: true, w: 0.8, h: 0.8, chairs: 2, color: '#4a2c18', chairColor: '#3e2817' }); m.o('candles', 10, 14.8, { n: 3 });
+    m.label('Adega', 9.6, 13.6, { size: 0.24 });
+    // caldeira
+    m.o('boiler', 19.6, 14.6, { r: 1 }); m.light(19.6, 15.8, 2.6, '#ff7a2a');
+    m.o('tank', 22.8, 13.4, { r: 0.7 }); m.o('coal', 17.2, 16.6, { r: 0.7 });
+    m.o('pipe', 19.6, 12.9, { h: 1.6, w: 0.16 }); m.o('pipe', 21.4, 13.4, { h: 2.4, w: 0.12, rot: 90 }); m.o('filecab', 23.5, 17.3, { color: '#5a5f64', rot: 180 });
+    m.label('Caldeira', 20, 17.2, { size: 0.22 });
+    // oficina
+    m.o('workbench', 27.5, 12.5, { w: 3 }); m.o('toolwall', 31.4, 12.14, { w: 2.4 });
+    m.o('crate', 33.3, 14.2, { s: 0.6 }); m.o('crate', 33.3, 15, { s: 0.5 }); m.o('barrel', 25, 16.9, { color: '#4a5a3a' }); m.o('barrel', 25.6, 17.2, { color: '#4a5a3a' });
+    m.o('ladder', 33.6, 16.6, { h: 1.8, rot: 90 }); m.o('bike', 29.6, 16.8, { rot: 90, color: '#5a5a5a' });
+    m.label('Oficina', 29, 15, { size: 0.22 });
+    // depósito
+    m.o('shelf', 11, 26.6, { w: 9, kind: 'boxes' }); m.o('shelf', 6.4, 23.6, { w: 4.6, kind: 'boxes', rot: -90 });
+    m.o('covered', 9, 22.4, { w: 1.8, h: 1 }); m.o('covered', 13.6, 23.4, { w: 1.4, h: 1.2 });
+    for (const [x, y] of [[11, 22], [11.5, 22.5], [8, 24.6], [14.6, 21]]) m.o('crate', x, y, { s: 0.55 });
+    m.o('chest', 12.4, 25, { rot: 6 }); m.o('cobweb', 6.2, 20.2, { r: 0.8 });
+    m.label('Depósito', 10.6, 24, { size: 0.24 });
+    // sala forte, com a estante que é uma porta
+    m.o('safe', 17, 26.4); m.o('safe', 17.8, 26.4); m.o('filecab', 16.4, 21, { rot: -90 }); m.o('filecab', 16.4, 21.7, { rot: -90 });
+    m.o('shelf', 18.6, 26.62, { w: 1.6, kind: 'boxes' });
+    m.door(21, 24, 'v', { w: 1.5, kind: 'arch', t: 0.4 });
+    m.o('shelf', 20.6, 23.3, { w: 1.5, kind: 'books', rot: 60 });
+    m.label('Sala forte', 18.5, 22.4, { size: 0.2 }); m.label('estante falsa', 20.1, 24.9, { size: 0.15 });
+    // sala escondida
+    m.o('chalk', 27.6, 23.6, { r: 1.7 });
+    m.o('desk', 24.2, 21.2, { w: 2.2, h: 0.9, items: 'map', color: '#3e2817' }); m.o('chair', 24.2, 21.9, { rot: 180 });
+    m.o('corkboard', 27.6, 20.15, { w: 2.6 }); m.o('corkboard', 33.85, 23.4, { w: 2.2, rot: 90 });
+    m.o('shelf', 31.4, 26.62, { w: 3.6 }); m.o('chest', 22, 26.3, { open: true });
+    for (const [x, y] of [[26, 22.2], [29.2, 22.2], [26, 25], [29.2, 25], [32.6, 21]]) m.o('candles', x, y, { n: 3 });
+    m.o('papers', 30.6, 24.4, { w: 0.9, h: 0.7 });
+    m.label('Sala escondida', 27.6, 26.2, { size: 0.24 });
+    // túnel que sai pelo fundo e desabou
+    m.door(34, 25.2, 'v', { w: 1.3, kind: 'arch', t: 0.4 });
+    tunnel(m, [[33.8, 25.2], [37, 25.8], [40, 27.4], [43, 28.2]], 1.6);
+    m.o('rubble', 41.4, 27.9, { n: 18, s: 1.2 }); m.o('rubble', 42.6, 28.4, { n: 12, s: 0.9 }); m.o('beam', 37.2, 25.8, { w: 1.9, rot: 80 });
+    m.label('túnel desabado', 39, 29.2, { size: 0.2 });
+  },
+};
+
+/* esconderijo na mata, depois da mina */
+MAPS.esconderijo = {
+  id: 'esconderijo', w: 36, h: 26,
+  draw(m) {
+    m.ground('forest');
+    // paredão de pedra ao norte, com uma reentrância que serve de depósito
+    const pared = [[-1, -1], [37, -1], [37, 4.6], [31, 5.4], [27.6, 4.4], [24.2, 6.6], [20.4, 6.3], [17.4, 4.8], [12, 5.4], [7.6, 4.6], [3.2, 5.6], [-1, 4.8]];
+    m.poly('cliff', pared, { organic: 0.45, shadow: 0.3 });
+    m.o('cave', 22.3, 6.1, { w: 4.2, h: 1.8 });
+    // clareira
+    m.ellipse('dirt', 17, 14, 10.4, 6.6, { organic: 0.45 });
+    m.ellipse('leaves', 6.6, 19.4, 3.2, 2.2, { organic: 0.5, layer: 'ground2' }); m.ellipse('leaves', 29.6, 18.8, 3, 2, { organic: 0.5, layer: 'ground2' });
+    const trilha = [[-1, 17.6], [3.4, 17.1], [7.2, 16], [11.6, 15.2]];
+    m.path('trail', trilha, 1.5, { organic: 0.15, edge: 'rgba(40,30,20,0.35)' });
+    // riacho a sudeste
+    const rio = [[25.2, 27], [26.4, 24.6], [29, 23.2], [32.6, 22.8], [37, 22.4], [37, 27]];
+    m.water('river', rio, { organic: 0.35 });
+    // fogueira no meio, com troncos e tocos para sentar
+    m.o('campfire', 17, 14, { r: 0.55 });
+    m.o('log', 15.2, 13.2, { w: 1.6, rot: 70 }); m.o('log', 18.9, 13.1, { w: 1.5, rot: -65 }); m.o('log', 17, 15.9, { w: 1.7 });
+    m.o('stump', 15.6, 15.4); m.o('stump', 18.6, 15.3); m.o('barrel', 18.4, 12.3, { r: 0.2, color: '#2a2826' });
+    // barracas
+    m.o('tent', 9.8, 9.6, { w: 2.2, h: 2.6, color: '#5f6b3a', rot: 18 });
+    m.o('tent', 13.6, 8.2, { w: 2, h: 2.4, color: '#7a5a3a', rot: -6 });
+    m.o('tent', 26.2, 12.4, { w: 2.2, h: 2.8, color: '#4a5a52', rot: -78 });
+    m.o('tent', 23.4, 17.6, { w: 1.8, h: 2.2, color: '#6a6a48', rot: -130 });
+    // lona com a mesa de planejamento
+    m.o('desk', 20.4, 9.7, { w: 1.9, h: 0.9, items: 'map', color: '#6b4a2e' });
+    m.o('stool', 19.6, 10.6, { r: 0.18, color: '#5a3a22' }); m.o('stool', 21.3, 10.6, { r: 0.18, color: '#5a3a22' }); m.o('radio', 21.6, 9.4); m.o('lantern', 19.3, 9.3);
+    m.o('corkboard', 20.4, 8.4, { w: 1.6 });
+    m.o('tarp', 20.4, 9.6, { w: 4, h: 3, color: '#4f6670' });
+    // suprimentos na reentrância da pedra
+    for (const [x, y, s] of [[21, 6.4, 0.55], [21.6, 6.2, 0.5], [23.6, 6.5, 0.6], [24.2, 6.1, 0.5]]) m.o('crate', x, y, { s });
+    m.o('sack', 22.4, 6.8); m.o('sack', 22.9, 7, { color: '#c9b48c' }); m.o('barrel', 25.6, 7, { color: '#3a5a6a' }); m.o('barrel', 26.2, 7.4, { color: '#3a5a6a' });
+    m.o('lantern', 22.3, 7.6); m.o('tnt', 20.2, 7, { rot: 10 });
+    m.label('Depósito na pedra', 22.4, 5.2, { size: 0.2 });
+    // varal, redes e vigia
+    m.o('varal', 7.6, 12.6, { w: 2.6, rot: 28 });
+    m.o('hammock', 29.4, 16, { w: 2.4, rot: 75, color: '#5a6a3a' }); m.tree(29.1, 14.5, 1.1, 'dark'); m.tree(29.8, 17.6, 1.2, 'broad');
+    m.o('platform', 4.8, 8.4, { s: 2.2 }); m.label('Vigia', 4.8, 11.4, { size: 0.2 });
+    m.o('shed', 33, 9.2, { w: 1.3, h: 1.3 }); m.label('Latrina', 33, 10.6, { size: 0.16 });
+    m.o('log', 24.4, 14.6, { w: 1.4, rot: 10 }); m.o('log', 24.6, 15.1, { w: 1.3, rot: 6 }); m.o('log', 24.3, 15.6, { w: 1.4, rot: -4 }); m.o('stump', 25.8, 15.2); m.label('lenha', 24.6, 16.4, { size: 0.16 });
+    m.o('table', 12.4, 12.4, { w: 1.4, h: 0.7, color: '#7a5232', items: 'food' }); m.o('stool', 12, 13.2, { r: 0.16, color: '#5a3a22' }); m.o('stool', 12.9, 13.2, { r: 0.16, color: '#5a3a22' });
+    m.o('crate', 8.4, 11.2, { s: 0.5, rot: 12 }); m.o('crate', 15.4, 9.4, { s: 0.45, rot: -8 }); m.o('sack', 27.8, 11.2, { color: '#c9b48c' });
+    m.o('barrel', 27.4, 9.4, { color: '#2f5a8a' }); m.o('barrel', 28, 9.8, { color: '#2f5a8a' }); m.o('bike', 12.2, 18.8, { rot: 60, color: '#4a4a3a' });
+    // alçapão escondido sob folhas
+    m.o('trapdoor', 13.2, 19.4, { s: 0.9 }); m.ellipse('leaves', 13.2, 19.4, 0.7, 0.5, { organic: 0.4, layer: 'props' });
+    m.label('alçapão', 13.2, 20.4, { size: 0.16 });
+    // arame com latas em volta da clareira
+    m.walls([[5.4, 21.6], [10, 22.6], [15.4, 22.9], [20.6, 22.4]], { kind: 'wire' });
+    m.walls([[30.6, 7.4], [32.6, 12.6], [32.2, 17.2]], { kind: 'wire' });
+    for (const [x, y] of [[7.6, 22.1], [12.6, 22.8], [18, 22.7], [31.6, 10], [32.4, 15]]) { m.o('barrel', x, y, { r: 0.08, color: '#a8adb0' }); m.o('barrel', x + 0.22, y + 0.05, { r: 0.08, color: '#8a8f92' }); }
+    m.label('arame com latas', 13, 23.6, { size: 0.16 });
+    m.label('Trilha para a mina', 3.6, 18.9, { kind: 'street', size: 0.24 });
+    m.label('Acampamento', 17, 11.2, { size: 0.32 });
+    // mata fechada em volta
+    const avoid = [{ poly: pared }, { c: [17, 14], r: 11 }, { line: trilha, w: 2.6 }, { poly: rio }, [3.2, 6.8, 3.4, 5.4], [31.8, 8, 2.6, 3]];
+    m.trees([0, 3, 36, 23], 34, { kinds: ['dark', 'broad', 'dark', 'mango', 'dead', 'broad'], rmin: 1, rmax: 1.9, avoid, margin: 0.2, minDist: 2.1 });
+    m.trees([0, -1, 36, 5], 9, { kinds: ['dark', 'broad', 'dead'], rmin: 0.9, rmax: 1.5, minDist: 2.4 });
+    m.scatter([0, 3, 36, 23], 30, { avoid, minDist: 1 }, (x, y, R) => m.tree(x, y, 0.35 + R() * 0.35, R() < 0.5 ? 'fern' : 'bush'));
   },
 };
 
@@ -5159,6 +5720,10 @@ const LOCS = [
   { id: 'entrada-cidade', cat: 'entrada', name: 'Entrada da cidade', blurb: 'Rodovia de chegada com pórtico, guarita, ponto de ônibus, capelinha de beira de estrada e a rotatória.', hs: [[0, 326], [186, 326], [192, 358], [238, 364], [238, 412], [0, 412]] },
   { id: 'parte-alta', cat: 'alta', name: 'Parte Alta', blurb: 'Casas grandes com piscina, ruas arborizadas e a pracinha do ipê-amarelo.', hs: [[190, 300], [232, 236], [300, 170], [360, 122], [400, 100], [470, 96], [520, 84], [580, 82], [628, 104], [640, 160], [618, 200], [616, 252], [640, 300], [600, 330], [500, 345], [400, 352], [300, 366], [238, 362], [188, 344]] },
   { id: 'mirante', cat: 'alta', name: 'Mirante', blurb: 'Pavilhão de colunas no alto do morro, com binóculos virados para o mar e o penhasco.', hs: [[396, 36], [512, 36], [512, 92], [470, 98], [396, 92]] },
+  { id: 'mansao', cat: 'alta', name: 'Mansão', blurb: 'Casarão de dois andares na Parte Alta: hall com escadaria, salas de estar e de jantar, biblioteca, cozinha, jardim de inverno, piscina, gazebo e garagem.', hs: [[560, 95], [620, 95], [636, 124], [630, 162], [612, 198], [560, 200], [546, 170], [548, 114]] },
+  { id: 'mansao-2', cat: 'alta', sub: 'mansao', name: 'Mansão · 2º andar', blurb: 'Suíte principal com closet e lareira, quartos dos filhos e de hóspedes, escritório particular, sala íntima e a sacada.' },
+  { id: 'mansao-sotao', cat: 'alta', sub: 'mansao', name: 'Mansão · Sótão', blurb: 'Tábuas velhas sob o telhado, móveis cobertos com lençóis, baús, um manequim e um quartinho no fundo.' },
+  { id: 'mansao-porao', cat: 'alta', sub: 'mansao', name: 'Mansão · Porão', blurb: 'Adega, caldeira, oficina, depósito, sala forte e, atrás de uma estante falsa, uma sala escondida com um túnel desabado.' },
   { id: 'praca', cat: 'centro', name: 'Praça Central', blurb: 'Chafariz, coreto, banca de jornal, carrinho de sorvete e bancos em volta da fonte.', hs: [[566, 346], [680, 346], [684, 470], [566, 470]] },
   { id: 'igreja', cat: 'centro', name: 'Igreja', blurb: 'Nave com bancos, altar, capela lateral, sacristia com alçapão, torre do sino e batistério.', hs: [[686, 348], [766, 348], [766, 430], [686, 430]] },
   { id: 'prefeitura', cat: 'centro', name: 'Prefeitura', blurb: 'Gabinete do prefeito, secretaria, arquivo, câmara municipal e a praça cívica.', hs: [[624, 166], [714, 166], [714, 252], [624, 252]] },
@@ -5182,6 +5747,7 @@ const LOCS = [
   { id: 'cachoeira', cat: 'floresta', name: 'Cachoeira do Véu', blurb: 'Queda d\'água do penhasco, poço fundo, prainha de cascalho e uma gruta atrás do véu.', hs: [[1338, 118], [1458, 118], [1458, 304], [1338, 304]] },
   { id: 'mina-entrada', cat: 'floresta', name: 'Mina de Carvão', blurb: 'Boca da mina na encosta, trilhos e vagonetes, escritório do capataz e o depósito de explosivos.', hs: [[1452, 22], [1524, 22], [1524, 104], [1452, 104]] },
   { id: 'mina-subterranea', cat: 'floresta', sub: 'mina-entrada', name: 'Galerias da Mina', blurb: 'Galerias escoradas com trilhos, câmara de extração, galeria alagada, passagem desabada e um poço que desce mais fundo.' },
+  { id: 'esconderijo', cat: 'floresta', name: 'Acampamento escondido', blurb: 'Clareira na mata depois da mina: barracas, fogueira, mesa de planejamento sob a lona, depósito na pedra, posto de vigia e arame com latas.', hs: [[1478, 124], [1524, 124], [1524, 172], [1478, 172]] },
   { id: 'monumento', cat: 'floresta', name: 'Monumento', blurb: 'Ruína de pedra com câmara central, altar entalhado, escada que desce e um obelisco marcado.', hs: [[1298, 452], [1408, 452], [1408, 568], [1298, 568]] },
   { id: 'monumento-subsolo', cat: 'floresta', sub: 'monumento', name: 'Subsolo do Monumento', blurb: 'Câmara do altar sob as ruínas, ossuário com nichos, cisterna alagada e uma passagem desabada.' },
   { id: 'monumento-topo', cat: 'floresta', sub: 'monumento', name: 'Plataforma do Monumento', blurb: 'O alto das ruínas: círculo de pedras gravadas, uma bacia ritual e a vista sobre a mata.' },
@@ -5198,8 +5764,13 @@ const SUB_HS = (() => {
     'monumento-topo': [a('sub-topo-desce', 'monumento', sq(6.2, 5.5, 7.8, 7.7))],
     farol: [a('sub-farol-sobe', 'farol-topo', sq(17.9, 8.8, 21.3, 12.2))],
     cachoeira: [a('sub-cachoeira-mina', 'mina-entrada', sq(27.6, 9.8, 30, 13.4))],
-    [CITY_ID]: [{ id: 'h-mina-entrada', to: 'mina-entrada', pts: LOC['mina-entrada'].hs }], // aparece mesmo se o mestre já tiver mexido nas áreas da cidade
-    'mina-entrada': [a('sub-mina-entra', 'mina-subterranea', sq(12.4, 6.8, 16.4, 9.4)), a('sub-mina-volta', 'cachoeira', sq(0, 16.8, 2.4, 20.4))],
+    [CITY_ID]: ['mina-entrada', 'mansao', 'esconderijo'].map(id => ({ id: 'h-' + id, to: id, pts: LOC[id].hs })), // aparecem mesmo se o mestre já tiver mexido nas áreas da cidade
+    'mina-entrada': [a('sub-mina-entra', 'mina-subterranea', sq(12.4, 6.8, 16.4, 9.4)), a('sub-mina-volta', 'cachoeira', sq(0, 16.8, 2.4, 20.4)), a('sub-mina-esconderijo', 'esconderijo', sq(28.4, 11.6, 30, 14.2))],
+    esconderijo: [a('sub-esconderijo-mina', 'mina-entrada', sq(0, 15.6, 2.6, 19.6))],
+    mansao: [a('sub-mansao-sobe', 'mansao-2', sq(18.8, 19.8, 21.2, 23.2)), a('sub-mansao-porao', 'mansao-porao', sq(13.7, 12.4, 15.3, 15.1))],
+    'mansao-2': [a('sub-mansao2-desce', 'mansao', sq(18.8, 19.8, 21.2, 23.2)), a('sub-mansao2-sotao', 'mansao-sotao', sq(21.9, 13.7, 23.1, 16.7))],
+    'mansao-sotao': [a('sub-sotao-desce', 'mansao-2', sq(21.9, 13.7, 23.1, 16.7))],
+    'mansao-porao': [a('sub-porao-sobe', 'mansao', sq(13.7, 12.4, 15.3, 15.1))],
     'mina-subterranea': [a('sub-galeria-sai', 'mina-entrada', sq(2.4, 0, 5.4, 2.6))],
     'farol-topo': [a('sub-faroltopo-desce', 'farol', sq(7.1, 9.7, 8.9, 11.5))],
     prefeitura: [a('sub-prefeitura-sobe', 'prefeitura-2', sq(17.1, 1.7, 19.4, 5.1))],
