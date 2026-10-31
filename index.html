@@ -1094,14 +1094,77 @@ textarea.notes:focus { border-color: var(--lamp); }
 @keyframes vc-tok { to { box-shadow: 0 0 0 4px #a8f0c0, 0 0 30px 9px rgba(120, 230, 160, .4); } }
 @media (max-width: 520px) { .vc { left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 70vh; } }
 @media (prefers-reduced-motion: reduce) { .vc-led.on, .tok.vc-fala .disc { animation: none; } }
+/* quadro dos personagens */
+.qd { position: absolute; inset: 0; z-index: 10; overflow: hidden; background: #070b0d; opacity: 0; transition: opacity 0.7s ease; }
+.qd.in { opacity: 1; }
+.qd.out { opacity: 0; pointer-events: none; }
+.qd-fx { position: absolute; inset: 0; width: 100%; height: 100%; }
+.qd-fog { position: absolute; inset: -20% -40%; pointer-events: none; opacity: 0.5; background: radial-gradient(ellipse 30% 18% at 20% 40%, rgba(210, 220, 224, 0.10), transparent 70%), radial-gradient(ellipse 26% 14% at 65% 70%, rgba(210, 220, 224, 0.08), transparent 70%), radial-gradient(ellipse 34% 16% at 85% 25%, rgba(210, 220, 224, 0.07), transparent 70%); animation: qd-drift 70s linear infinite; }
+.qd-fog2 { opacity: 0.35; animation-duration: 110s; animation-direction: reverse; transform: scale(1.3); }
+@keyframes qd-drift { from { transform: translateX(-12%); } to { transform: translateX(12%); } }
+.qd-vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(0, 0, 0, 0.65) 100%); }
+.qd-in { position: absolute; inset: 0; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 34px 20px 120px; }
+.qd-head { text-align: center; margin-bottom: 26px; }
+.qd-ov { font: 600 11px/1 var(--f-ui); letter-spacing: 0.34em; text-transform: uppercase; color: var(--lamp); opacity: 0.85; }
+.qd-tt { margin: 10px 0 0; font: 600 clamp(28px, 4.2vw, 46px)/1.05 var(--f-display); color: #efe7d4; text-shadow: 0 4px 30px rgba(0, 0, 0, 0.9); }
+.qd-tt::after { content: ''; display: block; width: 90px; height: 1px; margin: 14px auto 0; background: linear-gradient(90deg, transparent, var(--lamp), transparent); }
+.qd-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(22px, 3.2vw, 46px) clamp(18px, 2.8vw, 40px); max-width: 1180px; width: 100%; }
+.qd-card { position: relative; width: clamp(138px, 17vw, 210px); display: flex; flex-direction: column; align-items: center; opacity: 0; transform: translateY(16px); animation: qd-in 0.9s cubic-bezier(.2, .7, .2, 1) forwards; animation-delay: var(--d); }
+.qd-card > .qd-frame { animation: qd-bob 7s ease-in-out infinite; animation-delay: var(--b); }
+@keyframes qd-in { to { opacity: 1; transform: none; } }
+@keyframes qd-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.qd-frame { position: relative; width: 100%; aspect-ratio: 4 / 5; padding: 9px; border-radius: 4px; background: linear-gradient(145deg, #7a5a2c, #3c2a12 40%, #8a6a34 70%, #3a2810); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(255, 226, 160, 0.35), inset 0 0 0 4px rgba(20, 12, 4, 0.55); }
+.qd-frame::before { content: ''; position: absolute; inset: 5px; border: 1px solid rgba(255, 222, 150, 0.45); border-radius: 2px; pointer-events: none; }
+.qd-cn { position: absolute; width: 14px; height: 14px; border: 2px solid rgba(240, 205, 130, 0.75); z-index: 2; }
+.qd-cn.tl { left: 2px; top: 2px; border-right: 0; border-bottom: 0; }
+.qd-cn.tr { right: 2px; top: 2px; border-left: 0; border-bottom: 0; }
+.qd-cn.bl { left: 2px; bottom: 2px; border-right: 0; border-top: 0; }
+.qd-cn.br { right: 2px; bottom: 2px; border-left: 0; border-top: 0; }
+.qd-pic { position: relative; width: 100%; height: 100%; overflow: hidden; background: #0d1215; box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.85); }
+.qd-pic img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.88) contrast(1.04); }
+.qd-pic::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255, 240, 210, 0.07), transparent 35%, rgba(0, 0, 0, 0.35)); pointer-events: none; }
+.qd-ini { width: 100%; height: 100%; display: grid; place-items: center; font: 600 clamp(30px, 4vw, 48px)/1 var(--f-display); color: #efe7d4; background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--c) 70%, #fff 0%), #10181b 90%); }
+.qd-plate { margin-top: 12px; padding: 6px 14px 7px; min-width: 70%; text-align: center; border-radius: 3px; background: linear-gradient(180deg, rgba(30, 22, 12, 0.92), rgba(16, 11, 6, 0.92)); border: 1px solid rgba(233, 180, 90, 0.4); box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55); }
+.qd-plate b { display: block; font: 600 clamp(16px, 1.6vw, 20px)/1.1 var(--f-display); color: #f2e9d4; letter-spacing: 0.02em; }
+.qd-plate span { display: block; margin-top: 2px; font: 500 11px/1.2 var(--f-ui); letter-spacing: 0.14em; text-transform: uppercase; color: #c9b48a; }
+.qd-item { position: absolute; right: -24px; bottom: 74px; z-index: 3; width: 74px; display: flex; flex-direction: column; align-items: center; color: var(--ic); pointer-events: none; animation: qd-float 5.5s ease-in-out infinite; animation-delay: var(--b); }
+.qd-item .qd-svg, .qd-item img { display: block; width: 64px; height: 64px; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--ic) 70%, transparent)) drop-shadow(0 0 16px color-mix(in srgb, var(--ic) 35%, transparent)); opacity: 0.88; }
+.qd-item .qd-svg svg { fill: color-mix(in srgb, var(--ic) 10%, transparent); }
+.qd-item img { object-fit: contain; mix-blend-mode: screen; opacity: 0.8; }
+.qd-inm { margin-top: 2px; max-width: 96px; text-align: center; font: 500 10px/1.2 var(--f-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ic); opacity: 0.8; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9); }
+@keyframes qd-float { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-7px) rotate(4deg); } }
+.qd-empty { margin-top: 40px; font: 500 15px/1.5 var(--f-ui); color: #b9c3c6; text-align: center; }
+.qd-gm { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 4; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 8px; border-radius: 12px; background: rgba(10, 16, 19, 0.82); border: 1px solid var(--line); backdrop-filter: blur(6px); }
+.qd-peek { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 12; box-shadow: var(--shadow); }
+.qd-calm .qd-fog, .qd-calm .qd-card > .qd-frame, .qd-calm .qd-item { animation: none; }
+.qd-calm .qd-card { animation-duration: 0.01s; }
+#qd-top.on { color: var(--lamp); }
+@media (max-width: 640px) {
+  .qd-in { padding: 66px 12px 150px; }
+  .qd-card { width: calc(50% - 14px); max-width: 190px; }
+  .qd-item { right: -6px; bottom: 66px; width: 58px; }
+  .qd-item .qd-svg, .qd-item img { width: 48px; height: 48px; }
+}
+/* janela do mestre */
+.qd-it { margin-top: 6px; display: grid; gap: 6px; }
+.qd-gal { display: flex; flex-wrap: wrap; gap: 4px; }
+.qd-ic { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 8px; border: 1px solid var(--line); background: var(--ink-3, #1b2a2f); color: var(--ic, #f4f1ea); cursor: pointer; font: 600 13px/1 var(--f-ui); }
+.qd-ic.on { border-color: var(--lamp); box-shadow: 0 0 0 2px rgba(233, 180, 90, 0.35); }
+.qd-ic img { width: 26px; height: 26px; object-fit: contain; }
+.qd-up svg { width: 16px; height: 16px; }
+.qd-itrow { display: grid; grid-template-columns: 1fr 120px; gap: 6px; }
+.qd-fora { display: flex; flex-wrap: wrap; gap: 6px; }
+.qd-add { display: inline-flex; align-items: center; gap: 6px; }
+.qd-add .sh-av { width: 22px; height: 22px; font-size: 9px; }
+.qd-add svg { width: 14px; height: 14px; }
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610302058"></script>
-<script src="fb-adapter.js?v=202610302058"></script>
+<script src="firebase-config.js?v=202610302120"></script>
+<script src="fb-adapter.js?v=202610302120"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -7916,6 +7979,7 @@ const Sheets = {
   },
   refresh(force) {
     if (ROLE === 'gm' && Init.get().on) Init.renderSoon();
+    if (typeof Quadro !== 'undefined' && Quadro.el) Quadro.syncSoon();
     if (!this.open) return;
     const root = $('#sheets'); if (!root) return;
     if (!root.firstChild) root.innerHTML = '<div class="sh-wrap" id="sh-wrap"><aside class="sh-list" id="sh-list"></aside><main class="sh-main" id="sh-main"></main></div>';
@@ -10126,6 +10190,196 @@ function openAberturaModal() {
   body.addEventListener('change', e => { if (e.target.type === 'checkbox') setTimeout(render, 0); });
 }
 
+/* ---------- quadro dos personagens ----------
+   O mestre troca o mapa de todos por uma tela com os retratos em molduras,
+   névoa passando ao fundo e o objeto especial de cada um (só a silhueta, sem descrição). */
+const QD_ITENS = {
+  ficha: ['Ficha de cassino', '<circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5v3.2M12 18.3v3.2M2.5 12h3.2M18.3 12h3.2M5.3 5.3l2.2 2.2M16.5 16.5l2.2 2.2M18.7 5.3l-2.2 2.2M7.5 16.5l-2.2 2.2"/>'],
+  moeda: ['Moeda antiga', '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6.8" stroke-dasharray="1.2 1.4"/><path d="M12 8.2l1.2 2.5 2.7.4-2 1.9.5 2.7L12 14.4l-2.4 1.3.5-2.7-2-1.9 2.7-.4z"/>'],
+  chave: ['Chave', '<circle cx="7" cy="12" r="4"/><circle cx="7" cy="12" r="1.5"/><path d="M11 12h10M17.5 12v3M20.5 12v2.2M14.5 12v2"/>'],
+  relogio: ['Relógio de bolso', '<circle cx="12" cy="13.5" r="7.5"/><path d="M12 3.5v2.5M10.3 3.5h3.4M12 13.5V9.5M12 13.5l2.8 1.8"/><path d="M12 6.8v.8M18.7 13.5h-.8M12 20.2v-.8M5.3 13.5h.8"/>'],
+  colar: ['Colar com pingente', '<path d="M4 4c1.5 6 4.5 9 8 9s6.5-3 8-9"/><path d="M12 13v1.5"/><path d="M12 14.5l3 3.2-3 4.3-3-4.3z"/>'],
+  livro: ['Livro', '<path d="M5 4.5h11a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h11"/><path d="M9 8h6M9 11h4"/>'],
+  diario: ['Diário', '<rect x="5" y="3.5" width="13" height="17" rx="1.5"/><path d="M8 3.5v17"/><path d="M14 3.5v6l1.6-1.2 1.6 1.2"/>'],
+  foto: ['Fotografia', '<rect x="4" y="3.5" width="16" height="17" rx="1"/><rect x="6.5" y="6" width="11" height="9.5"/><path d="M6.5 13.5l3-3 2.5 2.5 2-2 3.5 3.5"/><circle cx="14.5" cy="8.6" r="1"/>'],
+  camera: ['Câmera', '<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7l1.5-2.5h5L16 7"/><circle cx="12" cy="13" r="3.6"/><circle cx="12" cy="13" r="1.4"/><path d="M17.5 9.5h1"/>'],
+  isqueiro: ['Isqueiro', '<rect x="7" y="10" width="10" height="11" rx="1.5"/><path d="M7 13h10"/><path d="M12 9.5c-2-1.5-1.6-3.6 0-5.5 1.6 1.9 2 4 0 5.5z"/>'],
+  lanterna: ['Lanterna', '<path d="M9 3h6l-1 6h-4z"/><rect x="10" y="9" width="4" height="12" rx="1"/><path d="M8 3l-2.5-1.5M16 3l2.5-1.5M12 3V1"/>'],
+  terco: ['Terço', '<circle cx="12" cy="9" r="5.5" stroke-dasharray="0.1 2.1" stroke-width="2.2"/><path d="M12 14.5v8M9.5 18h5"/>'],
+  bussola: ['Bússola', '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21"/>'],
+  cartas: ['Baralho', '<rect x="4" y="5" width="10" height="14" rx="1.5" transform="rotate(-10 9 12)"/><rect x="10" y="5" width="10" height="14" rx="1.5" transform="rotate(8 15 12)"/><path d="M15.2 9.6c-1-1.2-2.8.3-1.2 1.9l1.3 1.3 1.3-1.3c1.6-1.6-.3-3.1-1.4-1.9z"/>'],
+  dado: ['Dado', '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r="1"/><circle cx="15.5" cy="15.5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="15.5" cy="8.5" r="1"/><circle cx="8.5" cy="15.5" r="1"/>'],
+  anel: ['Anel', '<circle cx="12" cy="15" r="6"/><circle cx="12" cy="15" r="4.2"/><path d="M9.5 6.5L12 3.5l2.5 3L12 9z"/>'],
+  carta: ['Carta', '<rect x="3" y="6" width="18" height="12" rx="1"/><path d="M3 6.5l9 6.5 9-6.5"/><circle cx="12" cy="13.5" r="1.6"/>'],
+  faca: ['Faca', '<path d="M4 20l8.5-8.5"/><path d="M12.5 11.5L19.5 4.5c.6 3.4-1.2 7-4.6 8.6z"/><path d="M6.5 15.5l2 2"/>'],
+  revolver: ['Revólver', '<path d="M3 8h15v3H9.5l-1 1.5H7v-1.5H3z"/><path d="M7 12.5l-1.6 7h3.4l1.4-5.5"/><path d="M18 8V6.5M12 11v2.2"/>'],
+  distintivo: ['Distintivo', '<path d="M12 3l2.4 4.8 5.3.8-3.8 3.7.9 5.3L12 15.1l-4.8 2.5.9-5.3-3.8-3.7 5.3-.8z"/><circle cx="12" cy="11" r="2"/>'],
+  fone: ['Fone de ouvido', '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>'],
+  celular: ['Celular', '<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M10.5 5h3M11.5 18.5h1"/>'],
+  garrafa: ['Garrafa', '<path d="M10 2.5h4v4l1.5 3V20a1.5 1.5 0 0 1-1.5 1.5h-4A1.5 1.5 0 0 1 8.5 20V9.5l1.5-3z"/><path d="M8.5 13h7"/>'],
+  oculos: ['Óculos', '<circle cx="7" cy="13" r="3.5"/><circle cx="17" cy="13" r="3.5"/><path d="M10.5 13h3M3.5 12l-1-3M20.5 12l1-3"/>'],
+  flor: ['Flor', '<circle cx="12" cy="8" r="2"/><path d="M12 6c0-2.5 3-2.5 3 0M14 8c2.5 0 2.5 3 0 3M12 10c0 2.5-3 2.5-3 0M10 8c-2.5 0-2.5-3 0-3"/><path d="M12 10.5V21M12 16c-2-2-4-1.5-4-1.5s.5 2.5 4 3"/>'],
+};
+const QD_CORES = { dourado: '#e9c46a', prata: '#d9dee3', branco: '#f4f1ea', vermelho: '#e8826f', azul: '#8cbbe6', verde: '#97cc8f', roxo: '#b9a0e6' };
+const qdSvg = (ic, size) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(QD_ITENS[ic] || QD_ITENS.ficha)[1]}</svg>`;
+
+const Quadro = {
+  el: null, cvs: null, g: null, raf: 0, so: false, sig: '', last: 0,
+  cfg() {
+    const c = Store.data.vtt?.quadro || {};
+    return { on: !!c.on, titulo: String(c.titulo ?? 'Os personagens').slice(0, 60), ids: Array.isArray(c.ids) ? c.ids.map(String) : [], itens: c.itens && typeof c.itens === 'object' ? c.itens : {} };
+  },
+  put(fn) { const c = this.cfg(); fn(c); Store.put('vtt/quadro', c, 0); this.sync(); },
+  todos() { return Object.entries(Sheets.data || {}).filter(([, s]) => s && String(s.nome || '').trim() && (!isNpc(s) || s.visivel)).map(([id, s]) => ({ id, s })); },
+  cast(c = this.cfg()) { return c.ids.map(id => ({ id, s: Sheets.data?.[id] })).filter(x => x.s && String(x.s.nome || '').trim()); },
+  /* mostrar ou esconder conforme o que o mestre ligou (o mestre pode espiar o mapa só para ele) */
+  sync() {
+    const c = this.cfg(), want = c.on && !(ROLE === 'gm' && this.so);
+    const b = $('#qd-top'); if (b) b.classList.toggle('on', c.on);
+    if (!want) { this.close(); this.renderPeek(c); return; }
+    this.renderPeek(c);
+    if (!this.el) this.build();
+    const sig = JSON.stringify([c.titulo, c.ids, c.itens, this.cast(c).map(x => [x.s.nome, x.s.retrato, x.s.cor, x.s.conceito])]);
+    if (sig !== this.sig) { this.sig = sig; this.render(c); }
+  },
+  syncSoon() { clearTimeout(this._t); this._t = setTimeout(() => this.sync(), 250); },
+  /* botão do mestre para voltar ao quadro depois de espiar o mapa */
+  renderPeek(c) {
+    let p = $('#qd-peek');
+    const show = ROLE === 'gm' && c.on && this.so;
+    if (!show) { p?.remove(); return; }
+    if (!p) { p = h('button', { class: 'btn primary qd-peek', id: 'qd-peek', type: 'button', html: icon('users') + 'Voltar ao quadro (os jogadores estão vendo ele)', onclick: () => { this.so = false; this.sync(); } }); $('#stage')?.append(p); }
+  },
+  build() {
+    const cvs = h('canvas', { class: 'qd-fx', 'aria-hidden': 'true' });
+    this.el = h('section', { class: 'qd' + (REDUCED ? ' qd-calm' : ''), id: 'qd', 'aria-label': 'Quadro dos personagens' },
+      cvs, h('div', { class: 'qd-fog qd-fog1', 'aria-hidden': 'true' }), h('div', { class: 'qd-fog qd-fog2', 'aria-hidden': 'true' }),
+      h('div', { class: 'qd-in' }, h('header', { class: 'qd-head' }, h('div', { class: 'qd-ov' }, 'Névoa Sobre Apogeu'), h('h1', { class: 'qd-tt', id: 'qd-tt' })), h('div', { class: 'qd-grid', id: 'qd-grid' })),
+      h('div', { class: 'qd-vig', 'aria-hidden': 'true' }),
+      ROLE === 'gm' ? h('div', { class: 'qd-gm' },
+        h('button', { class: 'btn sm', type: 'button', html: icon('edit') + 'Editar quadro', onclick: () => openQuadroModal() }),
+        h('button', { class: 'btn sm', type: 'button', html: icon('compass') + 'Ver o mapa (só eu)', onclick: () => { this.so = true; this.sync(); } }),
+        h('button', { class: 'btn sm', type: 'button', html: icon('x') + 'Fechar para todos', onclick: () => this.put(x => { x.on = false; }) })) : null);
+    this.cvs = cvs; this.g = cvs.getContext('2d');
+    $('#stage').append(this.el);
+    this.size(); this.onResize = () => this.size(); addEventListener('resize', this.onResize);
+    this.t0 = performance.now();
+    const loop = now => { if (!this.el) return; if (now - this.last > 40) { this.last = now; this.draw((now - this.t0) / 1000); } this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+    requestAnimationFrame(() => this.el?.classList.add('in'));
+  },
+  size() { if (!this.cvs) return; const r = this.el.getBoundingClientRect(), k = Math.min(1, 720 / Math.max(r.width, r.height, 1)); this.cvs.width = Math.max(2, Math.round(r.width * k)); this.cvs.height = Math.max(2, Math.round(r.height * k)); },
+  close() {
+    if (!this.el) return;
+    cancelAnimationFrame(this.raf); removeEventListener('resize', this.onResize);
+    const el = this.el; this.el = null; this.sig = '';
+    el.classList.remove('in'); el.classList.add('out'); setTimeout(() => el.remove(), 700);
+  },
+  /* fundo escuro com névoa passando devagar */
+  draw(t) {
+    const g = this.g, W = this.cvs.width, H = this.cvs.height, R = Math.max(W, H);
+    if (REDUCED) t = 0;
+    const bg = g.createLinearGradient(0, 0, W * 0.3, H); bg.addColorStop(0, '#16232a'); bg.addColorStop(1, '#070b0d');
+    g.globalCompositeOperation = 'source-over'; g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    const blob = (x, y, r, a) => { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(206,216,220,${a})`); gr.addColorStop(1, 'rgba(206,216,220,0)'); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); };
+    g.globalCompositeOperation = 'screen';
+    for (let i = 0; i < 11; i++) {
+      const sp = 0.012 + (i % 4) * 0.005, x = (((i * 0.29 + t * sp) % 1.5) - 0.25) * W, y = H * (0.12 + 0.82 * ((i * 0.53) % 1)) + Math.sin(t * 0.35 + i * 1.7) * H * 0.05;
+      blob(x, y, R * (0.18 + 0.07 * (i % 3)), 0.06 + 0.03 * (i % 2));
+    }
+    const lamp = g.createRadialGradient(W * 0.5, H * 0.1, 0, W * 0.5, H * 0.1, R * 0.6); lamp.addColorStop(0, 'rgba(233,180,90,0.10)'); lamp.addColorStop(1, 'rgba(233,180,90,0)');
+    g.fillStyle = lamp; g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'source-over';
+  },
+  itemEl(it) {
+    if (!it || (!it.ic && !it.img)) return null;
+    const cor = QD_CORES[it.cor] || QD_CORES.branco;
+    return h('div', { class: 'qd-item', style: { '--ic': cor }, title: it.nome || '' },
+      it.img ? h('img', { src: it.img, alt: it.nome || 'objeto especial' }) : h('span', { class: 'qd-svg', html: qdSvg(it.ic, 64) }),
+      it.nome ? h('div', { class: 'qd-inm' }, String(it.nome).slice(0, 32)) : null);
+  },
+  render(c) {
+    if (!this.el) return;
+    $('#qd-tt').textContent = c.titulo || 'Os personagens';
+    const list = this.cast(c), grid = $('#qd-grid');
+    grid.style.setProperty('--n', list.length || 1);
+    fill(grid, list.length ? list.map(({ id, s }, i) => {
+      const nm = String(s.nome).trim().replace(/\s+/g, ' '), parts = nm.split(' ');
+      return h('article', { class: 'qd-card', style: { '--d': (i * 0.12).toFixed(2) + 's', '--b': (i * 1.37 % 4).toFixed(2) + 's', '--c': s.cor || '#4fa3a5' } },
+        h('div', { class: 'qd-frame' }, h('i', { class: 'qd-cn tl' }), h('i', { class: 'qd-cn tr' }), h('i', { class: 'qd-cn bl' }), h('i', { class: 'qd-cn br' }),
+          h('div', { class: 'qd-pic' }, s.retrato ? h('img', { src: imgSrc(s.retrato), alt: 'Retrato de ' + nm }) : h('div', { class: 'qd-ini' }, initials(nm)))),
+        h('div', { class: 'qd-plate' }, h('b', null, parts[0]), parts.length > 1 ? h('span', null, parts.slice(1).join(' ')) : null),
+        this.itemEl(c.itens[id]));
+    }) : h('p', { class: 'qd-empty' }, ROLE === 'gm' ? 'Ninguém no quadro ainda. Toque em Editar quadro e escolha os personagens.' : 'O mestre está preparando o quadro…'));
+  },
+};
+
+/* imagem enviada pelo mestre vira silhueta clara e translúcida */
+async function qdItemFromFile(file) {
+  if (!/^image\//.test(file.type || '')) throw new Error('Escolha um arquivo de imagem (PNG, JPG ou WebP).');
+  const img = await fileToImage(file), S = 160, c = cv(S, S), x = c.getContext('2d', { willReadFrequently: true });
+  const k = Math.min(S / img.naturalWidth, S / img.naturalHeight), w = img.naturalWidth * k, hh = img.naturalHeight * k;
+  x.drawImage(img, (S - w) / 2, (S - hh) / 2, w, hh);
+  const d = x.getImageData(0, 0, S, S), a = d.data;
+  // fundo claro e liso (foto de objeto em fundo branco) vira transparente
+  const corner = [0, (S - 1) * 4, (S * (S - 1)) * 4, (S * S - 1) * 4].map(o => (a[o] + a[o + 1] + a[o + 2]) / 3), bgLight = corner.every(v => v > 225);
+  for (let i = 0; i < a.length; i += 4) {
+    const l = (a[i] * 0.3 + a[i + 1] * 0.59 + a[i + 2] * 0.11) / 255;
+    let al = a[i + 3] / 255; if (bgLight) al *= Math.min(1, (1 - l) * 3.2);
+    const v = 150 + l * 105; a[i] = a[i + 1] = a[i + 2] = v; a[i + 3] = Math.round(al * 255);
+  }
+  x.putImageData(d, 0, 0);
+  const url = c.toDataURL('image/png');
+  if (url.length > 160000) return c.toDataURL('image/webp', 0.85);
+  return url;
+}
+
+/* janela do mestre: ligar, quem aparece, ordem e o objeto de cada um */
+function openQuadroModal() {
+  let close;
+  const body = h('div', { class: 'ab-cfg qd-cfg' });
+  const render = () => {
+    const c = Quadro.cfg(), todos = Quadro.todos(), dentro = c.ids.filter(id => todos.some(x => x.id === id)), fora = todos.filter(x => !c.ids.includes(x.id));
+    const move = (id, d) => Quadro.put(x => { const i = x.ids.indexOf(id), j = i + d; if (i < 0 || j < 0 || j >= x.ids.length) return; [x.ids[i], x.ids[j]] = [x.ids[j], x.ids[i]]; });
+    const av = s => h('span', { class: 'sh-av', style: { '--c': s.cor || '#4fa3a5' }, html: s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome)) });
+    const itemCtl = id => {
+      const it = c.itens[id] || {};
+      const set = patch => Quadro.put(x => { const cur = Object.assign({}, x.itens[id] || {}, patch); for (const k of Object.keys(cur)) if (cur[k] === '' || cur[k] == null) delete cur[k]; if (Object.keys(cur).length) x.itens[id] = cur; else delete x.itens[id]; });
+      const file = h('input', { type: 'file', accept: 'image/*', hidden: true, onchange: async e => { const f = e.target.files?.[0]; if (!f) return; try { UI.loading(true, 'Preparando a imagem…'); const url = await qdItemFromFile(f); set({ img: url, ic: '' }); render(); } catch (er) { UI.toast(er.message || 'Não deu para usar essa imagem.', 'err'); } finally { UI.loading(false); } } });
+      return h('div', { class: 'qd-it' },
+        h('div', { class: 'qd-gal', role: 'group', 'aria-label': 'Objeto especial' },
+          h('button', { class: 'qd-ic' + (!it.ic && !it.img ? ' on' : ''), type: 'button', title: 'Sem objeto', onclick: () => { set({ ic: '', img: '' }); render(); } }, '—'),
+          Object.entries(QD_ITENS).map(([k, [nome]]) => h('button', { class: 'qd-ic' + (it.ic === k && !it.img ? ' on' : ''), type: 'button', title: nome, 'aria-label': nome, style: { '--ic': QD_CORES[it.cor] || QD_CORES.branco }, html: qdSvg(k, 22), onclick: () => { set({ ic: k, img: '', nome: it.nome || nome }); render(); } })),
+          h('button', { class: 'qd-ic qd-up' + (it.img ? ' on' : ''), type: 'button', title: 'Usar uma imagem minha', html: it.img ? `<img src="${esc(it.img)}" alt="">` : icon('upload'), onclick: () => file.click() }), file),
+        h('div', { class: 'qd-itrow' },
+          h('input', { class: 'inp', value: it.nome || '', placeholder: 'Nome do objeto (opcional)', maxlength: 32, onchange: e => set({ nome: e.target.value.trim() }) }),
+          h('select', { class: 'inp', 'aria-label': 'Brilho do objeto', onchange: e => { set({ cor: e.target.value }); render(); } },
+            Object.keys(QD_CORES).map(k => h('option', { value: k, selected: (it.cor || 'branco') === k || null }, k[0].toUpperCase() + k.slice(1))))));
+    };
+    fill(body,
+      kvSwitch('Mostrar o quadro para todos (no lugar do mapa)', c.on, v => { Quadro.put(x => { x.on = v; }); if (v) Quadro.so = false; }, 'qd-on'),
+      h('label', { class: 'field' }, h('span', null, 'Título'), h('input', { class: 'inp', value: c.titulo, maxlength: 60, placeholder: 'Os personagens', onchange: e => Quadro.put(x => { x.titulo = e.target.value.trim(); }) })),
+      h('h4', null, 'No quadro'),
+      dentro.length ? h('div', { class: 'ab-list' }, dentro.map((id, i) => { const s = Sheets.data[id]; return h('div', { class: 'ab-row qd-row' },
+        av(s),
+        h('div', { class: 'ab-rw' }, h('b', null, s.nome), itemCtl(id)),
+        h('div', { class: 'ab-mv' },
+          h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Subir', disabled: i === 0 || null, onclick: () => { move(id, -1); render(); } }, '↑'),
+          h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Descer', disabled: i === dentro.length - 1 || null, onclick: () => { move(id, 1); render(); } }, '↓'),
+          h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Tirar do quadro', title: 'Tirar do quadro', html: icon('x'), onclick: () => { Quadro.put(x => { x.ids = x.ids.filter(y => y !== id); }); render(); } }))); }))
+        : h('p', { class: 'hint' }, 'Ninguém ainda. Adicione abaixo.'),
+      h('h4', null, 'Fora do quadro'),
+      fora.length ? h('div', { class: 'qd-fora' }, fora.map(({ id, s }) => h('button', { class: 'btn sm qd-add', type: 'button', onclick: () => { Quadro.put(x => { if (!x.ids.includes(id)) x.ids.push(id); }); render(); } }, av(s), h('span', null, s.nome), h('span', { html: icon('plus') }))))
+        : h('p', { class: 'hint' }, todos.length ? 'Todos já estão no quadro.' : 'Quando houver fichas com nome, elas aparecem aqui.'),
+      h('p', { class: 'hint' }, 'Os jogadores veem só o retrato, o nome e a silhueta do objeto, sem nenhuma descrição. Imagens enviadas viram uma silhueta clara e translúcida.'));
+  };
+  render();
+  close = modal(h('h2', null, 'Quadro dos personagens'), h('p', null, 'Troca o mapa de todos por uma tela com os personagens em molduras e a névoa passando ao fundo.'), body,
+    h('div', { class: 'acts' },
+      h('button', { class: 'btn ghost', type: 'button', onclick: () => close() }, 'Fechar'),
+      h('button', { class: 'btn primary', type: 'button', html: icon('users') + 'Mostrar para todos', onclick: () => { Quadro.so = false; Quadro.put(x => { x.on = true; }); close(); } })));
+}
+
 /* ---------- crises de estresse (regra do livro, automática) ----------
    Quando a ficha de um jogador cai para uma faixa pior de Estresse, a tela do mestre
    recebe um alerta. O mestre rola (ou escolhe) o efeito, decide quem fica sabendo,
@@ -11098,6 +11352,7 @@ function buildShell() {
       h('button', { class: 'iconbtn vc-btn', id: 'vc-top', type: 'button', hidden: true, html: icon('mic') + '<span class="vc-count" hidden></span>', title: 'Call de voz da mesa', 'aria-label': 'Call de voz da mesa', onclick: () => Voice.toggle() }),
       h('button', { class: 'iconbtn', id: 'dz-top', type: 'button', html: icon('dice'), title: 'Rolar dados', 'aria-label': 'Rolar dados', onclick: () => Dados.open() }),
       h('button', { class: 'iconbtn', id: 'lock-top', type: 'button', html: icon('lock'), title: 'Travar o mapa e as peças', 'aria-label': 'Travar o mapa e as peças', onclick: () => { if (UI.tab !== 'fichas') UI.setTab('fichas'); UI.openRight(); setTimeout(() => $('#tv-pecas')?.focus(), 50); } }),
+      h('button', { class: 'iconbtn', id: 'qd-top', type: 'button', html: icon('users'), title: 'Quadro dos personagens (no lugar do mapa)', 'aria-label': 'Quadro dos personagens', onclick: () => openQuadroModal() }),
       h('button', { class: 'iconbtn', id: 'ab-top', type: 'button', html: icon('film'), title: 'Abertura dos personagens', 'aria-label': 'Abertura dos personagens', onclick: () => (ROLE === 'gm' ? openAberturaModal() : Abertura.local()) }),
       modeSwitch('mode-top'),
       window.APOGEU_FB?.discord ? h('a', { class: 'iconbtn', href: window.APOGEU_FB.discord, target: '_blank', rel: 'noopener', title: 'Discord da mesa', 'aria-label': 'Abrir o Discord da mesa', html: icon('chat') }) : null,
@@ -11178,11 +11433,13 @@ function wireStore() {
       if (k === 'cal') { Cal.render(); if (UI.tab === 'mapa' && origin === 'remote') UI.renderRightSoon(); }
       if (k === 'sonsauto') { Som.autoSoon(); Som.paneSoon(); }
       if (k === 'travas') onTravas();
+      if (k === 'quadro') Quadro.syncSoon();
       if (k === 'abertura') { Abertura.renderBtn(); if (origin === 'remote' && val && val.ativa === false && Abertura.on && ROLE !== 'gm') Abertura.close(); }
       if (k === 'rolls' && origin === 'remote') onRolls(val);
       if (k === 'mural') { if (origin === 'remote') Mural.onRemote(val); else if (Mural.open) Mural.renderHeadSoon(); }
     }
   });
+  setTimeout(() => Quadro.sync(), 1200);
   Live.on('scene', d => { if (VIEWMODE === 'players' && d && typeof d.map === 'string' && mapExists(d.map) && d.map !== CUR) goTo(d.map, { noScene: true }); });
   Live.on('cam', d => { if (VIEWMODE === 'players' && PL_FOLLOW && d && d.map === CUR && !Input.loading) applyCamRect(d.r); });
   Live.on('tok', d => {
