@@ -1157,14 +1157,139 @@ textarea.notes:focus { border-color: var(--lamp); }
 .qd-add { display: inline-flex; align-items: center; gap: 6px; }
 .qd-add .sh-av { width: 22px; height: 22px; font-size: 9px; }
 .qd-add svg { width: 14px; height: 14px; }
+/* anotações por tópico */
+.nt-pick { display: flex; gap: 6px; align-items: center; }
+.nt-pick .inp { flex: 1; min-width: 0; }
+.nt-pick .btn { flex: none; }
+.nt-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: -4px; }
+.nt-chip { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; padding: 3px 9px 3px 4px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.03); color: var(--mist-2); font: 500 12px/1.2 var(--f-ui); cursor: pointer; }
+.nt-chip:hover { color: var(--mist); border-color: var(--lamp); }
+.nt-chip > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+.nt-chip .sh-av { width: 18px; height: 18px; font-size: 8px; }
+.nt-g { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; background: rgba(233, 180, 90, 0.14); color: var(--lamp); font-size: 11px; }
+.nt-head { display: flex; align-items: center; gap: 10px; }
+.nt-head .sh-av { width: 40px; height: 40px; font-size: 14px; flex: none; }
+.nt-head b { display: block; font: 600 18px/1.15 var(--f-display); color: var(--mist); }
+.nt-head span { display: block; font-size: 12px; color: var(--mist-3); }
+.nt-lug { display: block; font: 600 18px/1.15 var(--f-display); color: var(--mist); }
+/* relógio */
+.cal-hr { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.cal-hr #cal-h { width: 78px; text-align: center; font: 600 15px/1 var(--f-mono); }
+.cal-pre { flex-wrap: wrap; gap: 4px; }
+.seg button:disabled { opacity: 0.32; cursor: not-allowed; text-decoration: line-through; text-decoration-thickness: 1px; }
+/* sons só para um jogador */
+.spv-card { display: grid; gap: 8px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); border-left: 3px solid var(--c); background: rgba(255, 255, 255, 0.02); }
+.spv-card.on { box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent), 0 0 18px color-mix(in srgb, var(--c) 18%, transparent); }
+.spv-h { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.spv-h .sh-av { width: 30px; height: 30px; font-size: 11px; flex: none; }
+.spv-n { flex: 1; min-width: 0; }
+.spv-n b { display: block; font-size: 14px; color: var(--mist); }
+.spv-n span { display: block; font-size: 11px; color: var(--mist-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spv-h .btn { flex: none; }
+.spv-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.spv-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px 5px 7px; border-radius: 8px; border: 1px solid var(--line); background: var(--ink-3, #1b2a2f); color: var(--mist); font: 500 12.5px/1.2 var(--f-ui); cursor: pointer; max-width: 100%; }
+.spv-chip:hover { border-color: var(--c); }
+.spv-chip.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 22%, var(--ink-3, #1b2a2f)); }
+.spv-chip .som-ic { display: inline-grid; color: var(--c); }
+.spv-chip .som-ic svg { width: 14px; height: 14px; }
+.spv-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 4px 10px; padding: 8px; border-radius: 8px; background: rgba(0, 0, 0, 0.18); }
+.spv-pick .chk { font-size: 12.5px; }
+/* alertas */
+textarea.notes.al-ta { min-height: 96px; font: 14px/1.5 var(--f-ui); }
+.al-acts { flex-wrap: wrap; gap: 6px; }
+.al-pr { display: grid; gap: 6px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); border-left: 3px solid var(--c); background: rgba(255, 255, 255, 0.02); }
+.al-pr-t { display: flex; align-items: center; gap: 8px; }
+.al-pr-t b { flex: 1; min-width: 0; color: var(--mist); font-size: 14px; }
+.al-pr-t .som-tag { color: var(--c); border-color: color-mix(in srgb, var(--c) 50%, transparent); }
+.al-pr p { margin: 0; font-size: 12.5px; color: var(--mist-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-wrap; }
+.al-pr-a { display: flex; gap: 6px; align-items: center; }
+.al-pr-a .inp { flex: 1; min-width: 0; padding-top: 5px; padding-bottom: 5px; }
+.al-env { display: grid; gap: 4px; }
+.al-env-r { display: flex; gap: 8px; align-items: baseline; padding: 4px 8px; border-left: 2px solid var(--c); font-size: 12.5px; }
+.al-env-r b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--mist-2); font-weight: 500; }
+.al-note .al-ic { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 50%; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--c) 60%, transparent), 0 0 30px color-mix(in srgb, var(--c) 35%, transparent); animation: al-ring 2.4s ease-in-out infinite; }
+.al-note .al-ic svg { width: 26px; height: 26px; }
+.al-note .al-txt { white-space: pre-wrap; font-size: 15px; line-height: 1.55; }
+.al-note.al-sussurro .crise-box h2 { font-style: italic; }
+.al-note.al-misterio .crise-box { background: linear-gradient(180deg, color-mix(in srgb, var(--c) 10%, var(--panel)), var(--panel)); }
+@keyframes al-ring { 0%, 100% { transform: rotate(0); } 8% { transform: rotate(-12deg); } 16% { transform: rotate(10deg); } 24% { transform: rotate(-6deg); } 32% { transform: rotate(0); } }
+@media (prefers-reduced-motion: reduce) { .al-note .al-ic { animation: none; } }
+/* molduras do quadro */
+.qd-mrow { display: flex; align-items: center; gap: 6px; }
+.qd-mrow .inp { flex: 1; min-width: 0; }
+.qd-msw { width: 26px; height: 32px; flex: none; border-radius: 3px; padding: 4px; }
+.qd-msw::after { content: ''; display: block; width: 100%; height: 100%; background: #0d1215; }
+.qd-msw.m-ouro, .qd-frame.m-ouro { background: linear-gradient(145deg, #7a5a2c, #3c2a12 40%, #8a6a34 70%, #3a2810); }
+.qd-msw.m-madeira, .qd-frame.m-madeira { background: repeating-linear-gradient(92deg, rgba(0, 0, 0, 0.18) 0 2px, transparent 2px 7px), linear-gradient(145deg, #4e321c, #2a180c 45%, #5c3c22 75%, #22140a); }
+.qd-msw.m-prata, .qd-frame.m-prata { background: linear-gradient(145deg, #d6dbde, #6b7378 38%, #e4e8ea 62%, #596064 85%, #4d5458); }
+.qd-msw.m-ebano, .qd-frame.m-ebano { background: linear-gradient(145deg, #1c1a18, #070605 45%, #24211d 75%, #050404); }
+.qd-msw.m-cobre, .qd-frame.m-cobre { background: radial-gradient(circle at 18% 82%, rgba(90, 170, 140, 0.45), transparent 22%), radial-gradient(circle at 86% 14%, rgba(90, 170, 140, 0.35), transparent 18%), linear-gradient(145deg, #c27a46, #5a2e14 42%, #d08c58 70%, #4a240e); }
+.qd-msw.m-ferro, .qd-frame.m-ferro { background: radial-gradient(circle at 70% 90%, rgba(150, 70, 30, 0.55), transparent 30%), radial-gradient(circle at 10% 20%, rgba(140, 66, 28, 0.45), transparent 25%), linear-gradient(145deg, #50565a, #2b2e30 45%, #5f6468 72%, #222527); border-radius: 0; }
+.qd-msw.m-marfim, .qd-frame.m-marfim { background: linear-gradient(145deg, #efe6d0, #b9a986 40%, #f4ecda 68%, #a8977a); }
+.qd-msw.m-barco, .qd-frame.m-barco { background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 6px), linear-gradient(145deg, #8e877a, #5c574c 40%, #a39c8c 70%, #4d483f); border-radius: 1px; }
+.qd-frame.m-madeira { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(200, 150, 100, 0.22), inset 0 0 0 4px rgba(10, 5, 2, 0.6); }
+.qd-frame.m-madeira::before { border-color: rgba(190, 140, 90, 0.3); }
+.qd-frame.m-madeira .qd-cn { border-color: rgba(176, 124, 74, 0.55); }
+.qd-frame.m-prata { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(255, 255, 255, 0.55), inset 0 0 0 4px rgba(30, 34, 38, 0.5); }
+.qd-frame.m-prata::before { border-color: rgba(255, 255, 255, 0.5); }
+.qd-frame.m-prata .qd-cn { border-color: rgba(245, 250, 255, 0.9); }
+.qd-frame.m-ebano { padding: 12px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(222, 180, 96, 0.7), inset 0 0 0 3px #0a0908, inset 0 0 0 4px rgba(222, 180, 96, 0.45); }
+.qd-frame.m-ebano::before { inset: 7px; border-color: rgba(230, 190, 110, 0.75); }
+.qd-frame.m-ebano .qd-cn { width: 18px; height: 18px; border-width: 3px; border-color: rgba(232, 192, 108, 0.9); }
+.qd-frame.m-cobre { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(255, 200, 150, 0.35), inset 0 0 0 4px rgba(40, 16, 4, 0.5); }
+.qd-frame.m-cobre::before { border-color: rgba(255, 196, 140, 0.4); }
+.qd-frame.m-cobre .qd-cn { border-color: rgba(120, 210, 176, 0.75); }
+.qd-frame.m-ferro { padding: 10px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(190, 200, 205, 0.25), inset 0 0 0 4px rgba(10, 12, 13, 0.6); }
+.qd-frame.m-ferro::before { border-radius: 0; border-color: rgba(180, 120, 80, 0.35); border-style: dashed; }
+.qd-frame.m-ferro .qd-cn { width: 9px; height: 9px; border: 0; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #9aa0a4, #3a3e41 70%); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); }
+.qd-frame.m-ferro .qd-cn.tl { left: 4px; top: 4px; } .qd-frame.m-ferro .qd-cn.tr { right: 4px; top: 4px; } .qd-frame.m-ferro .qd-cn.bl { left: 4px; bottom: 4px; } .qd-frame.m-ferro .qd-cn.br { right: 4px; bottom: 4px; }
+.qd-frame.m-marfim { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 0 0 4px rgba(90, 70, 40, 0.35); }
+.qd-frame.m-marfim::before { border-color: rgba(120, 90, 40, 0.45); }
+.qd-frame.m-marfim .qd-cn { border-color: rgba(150, 110, 50, 0.7); border-radius: 50% 0 0 0; }
+.qd-frame.m-marfim .qd-cn.tr { border-radius: 0 50% 0 0; } .qd-frame.m-marfim .qd-cn.bl { border-radius: 0 0 0 50%; } .qd-frame.m-marfim .qd-cn.br { border-radius: 0 0 50% 0; }
+.qd-frame.m-barco { padding: 11px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(230, 220, 200, 0.2), inset 0 0 0 4px rgba(20, 18, 14, 0.5); }
+.qd-frame.m-barco::before { border-color: rgba(220, 210, 190, 0.18); }
+.qd-frame.m-barco .qd-cn { border: 0; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #c9b58a, #5a4a2a 75%); }
+.qd-frame.m-barco .qd-cn.tl { left: 3px; top: 3px; } .qd-frame.m-barco .qd-cn.tr { right: 3px; top: 3px; } .qd-frame.m-barco .qd-cn.bl { left: 3px; bottom: 3px; } .qd-frame.m-barco .qd-cn.br { right: 3px; bottom: 3px; }
+/* rolagens no canto do mapa do mestre */
+.rfeed { position: absolute; right: 12px; top: 12px; z-index: 14; display: flex; flex-direction: column; gap: 8px; width: min(290px, calc(100% - 96px)); pointer-events: none; }
+.rf-card { pointer-events: auto; cursor: pointer; display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; padding: 9px 12px 9px 9px; border-radius: 13px; background: rgba(13, 21, 24, 0.95); border: 2px solid var(--c); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 22px color-mix(in srgb, var(--c) 38%, transparent), inset 0 0 0 1px rgba(0, 0, 0, 0.4); backdrop-filter: blur(6px); animation: rf-in 0.38s cubic-bezier(.2, .8, .2, 1) both; transition: opacity 0.3s, transform 0.3s; }
+.rf-card.out { opacity: 0; transform: translateX(30px); }
+@keyframes rf-in { from { opacity: 0; transform: translateX(40px) scale(0.96); } to { opacity: 1; transform: none; } }
+.rf-av { width: 44px; height: 44px; font-size: 15px; box-shadow: 0 0 0 2px var(--c), 0 0 12px color-mix(in srgb, var(--c) 50%, transparent); }
+.rf-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.rf-m { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.rf-m b { font-size: 15px; color: var(--mist); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rf-m > span { font-size: 12px; color: var(--mist-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rf-m em, .rf-ex { font: 600 10.5px/1.2 var(--f-mono); font-style: normal; letter-spacing: 0.04em; color: var(--mist-3); text-transform: uppercase; }
+.rf-card.ok .rf-m em { color: #8fd18a; } .rf-card.bad .rf-m em { color: #ef8a78; }
+.rf-tot { min-width: 48px; text-align: center; font: 600 30px/1 var(--f-display); color: color-mix(in srgb, var(--c) 70%, #fff); text-shadow: 0 0 14px color-mix(in srgb, var(--c) 55%, transparent); }
+.rf-tot small { display: block; margin-top: 2px; font: 500 11px/1 var(--f-mono); color: var(--mist-3); text-shadow: none; }
+.rf-grp { cursor: default; grid-template-columns: 1fr; gap: 6px; border-color: var(--lamp); --c: var(--lamp); }
+.rf-gh { display: flex; align-items: center; gap: 8px; }
+.rf-gh > div { flex: 1; min-width: 0; }
+.rf-gh b { display: block; font-size: 14px; color: var(--mist); }
+.rf-gh span { display: block; font-size: 11px; color: var(--mist-3); }
+.rf-gi { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: rgba(233, 180, 90, 0.15); color: var(--lamp); }
+.rf-gi svg { width: 16px; height: 16px; }
+.rf-row { display: grid; grid-template-columns: 30px 1fr auto 40px; gap: 8px; align-items: center; padding: 4px 6px 4px 4px; border-radius: 9px; border: 1.5px solid var(--c); background: color-mix(in srgb, var(--c) 9%, transparent); }
+.rf-row .rf-av { width: 30px; height: 30px; font-size: 11px; box-shadow: 0 0 0 2px var(--c); }
+.rf-rn { font-size: 13.5px; color: var(--mist); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rf-row em { font: 600 10px/1.1 var(--f-mono); font-style: normal; text-transform: uppercase; color: var(--mist-3); text-align: right; }
+.rf-row.ok em { color: #8fd18a; } .rf-row.bad em { color: #ef8a78; }
+.rf-rt { text-align: right; font: 600 22px/1 var(--f-display); color: color-mix(in srgb, var(--c) 70%, #fff); }
+.rt-atr { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.rt-atr .btn { justify-content: center; }
+.rt-who { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+@media (max-width: 640px) { .rfeed { top: 64px; width: min(270px, calc(100% - 24px)); } .rf-tot { font-size: 26px; } }
 </style>
 </head>
 <body>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610302120"></script>
-<script src="fb-adapter.js?v=202610302120"></script>
+<script src="firebase-config.js?v=202610311235"></script>
+<script src="fb-adapter.js?v=202610311235"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -6159,11 +6284,11 @@ const KINDS = { pj: 'Jogador', npc: 'NPC', inimigo: 'Inimigo' };
 
 /* ---------- estado sincronizado ---------- */
 /* caminhos: maps/<id>, tokens/<id>, vtt/scene, vtt/rolls, secret/gm/tokens/<id>, secret/gm/notes/<id> */
-const BUCKETS = { maps: 'maps', tokens: 'tokens', vtt: 'vtt', mural: 'mural', sons: 'sons', sons_arq: 'sonsarq', 'secret/gm/tokens': 'htokens', 'secret/gm/notes': 'notes', 'secret/gm/mural': 'hmural', 'secret/gm/init': 'hinit' };
+const BUCKETS = { maps: 'maps', tokens: 'tokens', vtt: 'vtt', mural: 'mural', sons: 'sons', sons_arq: 'sonsarq', 'secret/gm/tokens': 'htokens', 'secret/gm/notes': 'notes', 'secret/gm/mural': 'hmural', 'secret/gm/init': 'hinit', 'secret/gm/cfg': 'hcfg' };
 function splitPath(path) { const i = path.lastIndexOf('/'); return [BUCKETS[path.slice(0, i)], path.slice(i + 1)]; }
 const Store = {
   mode: 'local', db: null, writable: true,
-  data: { maps: {}, tokens: {}, htokens: {}, notes: {}, vtt: {}, mural: {}, hmural: {}, sons: {}, sonsarq: {}, hinit: {} },
+  data: { maps: {}, tokens: {}, htokens: {}, notes: {}, vtt: {}, mural: {}, hmural: {}, sons: {}, sonsarq: {}, hinit: {}, hcfg: {} },
   subs: new Set(), dirty: new Set(), pending: new Map(), inflight: new Set(), timers: {}, bc: null,
   get(path) { const [b, k] = splitPath(path); return this.data[b]?.[k]; },
   on(fn) { this.subs.add(fn); },
@@ -6230,7 +6355,7 @@ const Store = {
   },
   initDb(db, gm) {
     this.mode = 'db'; this.db = db;
-    const cols = ['maps', 'tokens', 'vtt', 'mural', 'sons'].concat(gm ? ['secret/gm/tokens', 'secret/gm/notes', 'secret/gm/mural', 'secret/gm/init'] : []);
+    const cols = ['maps', 'tokens', 'vtt', 'mural', 'sons'].concat(gm ? ['secret/gm/tokens', 'secret/gm/notes', 'secret/gm/mural', 'secret/gm/init', 'secret/gm/cfg'] : []);
     const firsts = cols.map(col => new Promise(resolve => {
       let done = false;
       const listen = () => db.collection(col).onSnapshot(snap => {
@@ -7251,11 +7376,11 @@ const UI = {
     const pane = $('#pane'); if (!pane || VIEWMODE !== 'gm' || ROLE !== 'gm') return;
     document.querySelectorAll('.tabs button').forEach(b => { const on = b.dataset.tab === UI.tab; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
     const act = document.activeElement, keep = act && pane.contains(act) && act.id ? act.id : null;
-    if (keep === 'notes-ta' && UI.tab === 'notas' && pane.dataset.map === CUR) return;
+    if (keep === 'notes-ta' && UI.tab === 'notas' && pane.dataset.map === CUR && pane.dataset.nota === Notas.key()) return;
     const sel = keep && typeof act.selectionStart === 'number' ? [act.selectionStart, act.selectionEnd] : null;
-    const build = { fichas: paneTokens, dados: paneDice, notas: paneNotes, mapa: paneMap, sons: paneSons, combate: paneCombate }[UI.tab] || paneTokens;
+    const build = { fichas: paneTokens, dados: paneDice, notas: paneNotes, mapa: paneMap, sons: paneSons, combate: paneCombate, alertas: paneAlertas }[UI.tab] || paneTokens;
     pane.replaceChildren(...build().filter(Boolean));
-    pane.dataset.map = CUR;
+    pane.dataset.map = CUR; pane.dataset.nota = UI.tab === 'notas' ? Notas.key() : '';
     if (keep) { const el = document.getElementById(keep); if (el) { el.focus({ preventScroll: true }); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch {} } }
   },
   renderSubbar() {
@@ -7461,6 +7586,7 @@ function paneDice() {
   out.push(kvSwitch('Rolagem secreta (só você vê)', st.secret, v => { st.secret = v; }, 'dice-secret'));
   out.push(h('div', { class: 'field' }, h('span', null, 'Mostrar o resultado'), seg([['soma', 'Somado'], ['sep', 'Dado por dado']], ROLL_SEP ? 'sep' : 'soma', v => setRollSep(v === 'sep'), 'roll-sep')));
   out.push(h('p', { class: 'hint' }, 'Funciona com qualquer sistema: ', h('b', null, '1d20+5'), ', ', h('b', null, '3d6'), ', ', h('b', null, '4d6kh3'), ' (fica com os 3 maiores), ', h('b', null, '2d20kl1'), ' (o menor), ', h('b', null, '5d10>=7'), ' (conta sucessos).'));
+  out.push(...rollTodosSection());
   const pub = (Store.data.vtt.rolls?.list || []).filter(r => r && r.id);
   const all = [...pub, ...SECRET_ROLLS].sort((a, b) => (b.t || 0) - (a.t || 0)).slice(0, 25);
   out.push(h('h4', null, 'Histórico', h('span', { class: 'sp' }), confirmButton('Limpar histórico', () => clearAllRolls(), 'btn sm ghost')));
@@ -7474,26 +7600,133 @@ function paneDice() {
   return out;
 }
 
-/* ---------- aba Notas ---------- */
-const saveNote = (() => {
-  let t;
-  return (id, text) => {
-    const s = $('#notes-state'); if (s) s.textContent = 'Salvando…';
-    clearTimeout(t);
-    t = setTimeout(() => { Store.put('secret/gm/notes/' + id, { text: String(text).slice(0, 50000), t: Date.now() }, 0); const s2 = $('#notes-state'); if (s2) s2.textContent = 'Salvo'; }, 700);
-  };
-})();
+/* ---------- aba Notas: tópicos (geral, lugares, personagens, NPCs e os do mestre), com cópia neste aparelho ---------- */
+ICONS.bell = '<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.6 2.2H4.4z"/><path d="M10 20.4a2 2 0 0 0 4 0"/>';
+ICONS.clock = '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>';
+const Notas = {
+  sel: String(LS.get('notaSel', '@lugar') || '@lugar'), tm: {},
+  key(sel = this.sel) { return sel === '@lugar' ? CUR : sel; },
+  path(k) { return 'secret/gm/notes/' + k; },
+  doc(k) { const d = Store.data.notes?.[k]; return d && typeof d === 'object' ? d : null; },
+  bkp() { const b = LS.get('notasBkp', {}); return b && typeof b === 'object' ? b : {}; },
+  setBkp(k, v) { const b = this.bkp(); if (v) b[k] = v; else delete b[k]; LS.set('notasBkp', b); },
+  pick(sel) { this.sel = sel; LS.set('notaSel', sel); UI.renderRight(); },
+  /* nome e grupo de um tópico */
+  info(k) {
+    if (k === 'geral') return { g: 'Geral', nome: 'Anotações gerais' };
+    if (k.startsWith('pj_') || k.startsWith('npc_')) {
+      const id = k.slice(k.indexOf('_') + 1), s = Sheets.data?.[id];
+      return { g: k.startsWith('pj_') ? 'Personagens' : 'NPCs', nome: s ? String(s.nome || '').trim() || 'Sem nome' : 'Ficha apagada', s, id };
+    }
+    if (k.startsWith('t_')) return { g: 'Meus tópicos', nome: String(this.doc(k)?.titulo || 'Tópico sem nome') };
+    let nome = k; try { nome = k === CITY_ID ? 'Cidade (mapa geral)' : mapInfo(k).name || k; } catch {}
+    return { g: 'Lugares', nome, lugar: true };
+  },
+  temTexto(k) { const d = this.doc(k); return !!(d && (String(d.text || '').trim() || d.titulo)); },
+  /* todos os tópicos, em grupos, para a lista de escolha */
+  grupos() {
+    const sheets = Object.entries(Sheets.data || {}).filter(([, s]) => s && String(s.nome || '').trim()).sort((a, b) => String(a[1].nome).localeCompare(String(b[1].nome), 'pt'));
+    const lugares = new Set([CITY_ID, ...Object.keys(MAPS), ...Object.keys(Store.data.maps || {})]);
+    const notas = Object.keys(Store.data.notes || {});
+    for (const k of notas) if (!/^(geral|pj_|npc_|t_)/.test(k)) lugares.add(k);
+    const lug = [...lugares].filter(k => k !== CITY_ID).map(k => [k, this.info(k).nome]).sort((a, b) => a[1].localeCompare(b[1], 'pt'));
+    const meus = notas.filter(k => k.startsWith('t_')).map(k => [k, this.info(k).nome]).sort((a, b) => a[1].localeCompare(b[1], 'pt'));
+    const apagadas = notas.filter(k => /^(pj_|npc_)/.test(k) && !Sheets.data?.[k.slice(k.indexOf('_') + 1)] && this.temTexto(k)).map(k => [k, this.info(k).nome + ' (ficha apagada)']);
+    return [
+      ['Geral', [['geral', 'Anotações gerais'], ['@lugar', 'Lugar aberto agora: ' + this.info(CUR).nome], [CITY_ID, 'Cidade (mapa geral)']]],
+      ['Personagens', sheets.filter(([, s]) => !isNpc(s)).map(([id, s]) => ['pj_' + id, String(s.nome).trim()])],
+      ['NPCs', sheets.filter(([, s]) => isNpc(s)).map(([id, s]) => ['npc_' + id, String(s.nome).trim()]).concat(apagadas)],
+      ['Meus tópicos', meus],
+      ['Lugares', lug],
+    ].filter(([, l]) => l.length);
+  },
+  /* salva na mesa e guarda uma cópia neste aparelho (se a internet cair ou o mestre fechar a aba, nada se perde) */
+  save(k, patch) {
+    const cur = Object.assign({}, this.doc(k) || {}, patch, { t: Date.now() });
+    cur.text = String(cur.text || '').slice(0, 50000);
+    this.setBkp(k, cur);
+    Store.put(this.path(k), cur, 600);
+    this.state('Salvando…');
+    clearInterval(this.tm.w); const t0 = Date.now();
+    this.tm.w = setInterval(() => {
+      const busy = Store.mode === 'db' && (Store.dirty.has(this.path(k)) || Store.pending.has(this.path(k)));
+      if (!busy) { clearInterval(this.tm.w); this.state(Store.mode === 'db' ? 'Salvo na mesa · ' + this.hm(cur.t) : 'Salvo neste navegador'); }
+      else if (Date.now() - t0 > 12000) { clearInterval(this.tm.w); this.state('Sem conexão: guardado neste aparelho'); }
+    }, 300);
+  },
+  hm(t) { return new Date(t || Date.now()).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); },
+  state(txt) { const s = $('#notes-state'); if (s) s.textContent = txt; },
+  /* fechar a aba: manda já o que ainda estava esperando */
+  flushAll() {
+    for (const p of [...Store.pending.keys()]) if (p.startsWith('secret/gm/notes/')) { clearTimeout(Store.timers[p]); Store.flush(p); }
+  },
+  /* ao abrir a mesa: o que só ficou neste aparelho volta para a mesa */
+  restore() {
+    if (Store.mode !== 'db' || ROLE !== 'gm' || !Store.writable) return;
+    const b = this.bkp(); let n = 0;
+    for (const [k, v] of Object.entries(b)) {
+      if (!v || typeof v !== 'object') continue;
+      const d = this.doc(k);
+      if (!d || (+v.t || 0) > (+d.t || 0)) { if (!d && !String(v.text || '').trim() && !v.titulo) continue; if (d && d.text === v.text && d.titulo === v.titulo) continue; Store.put(this.path(k), v, 0); n++; }
+      else if (d && (+d.t || 0) > (+v.t || 0)) b[k] = d;
+    }
+    LS.set('notasBkp', b);
+    if (n) { UI.toast(n === 1 ? 'Uma anotação que só estava neste aparelho voltou para a mesa.' : n + ' anotações que só estavam neste aparelho voltaram para a mesa.'); if (UI.tab === 'notas') UI.renderRightSoon(); }
+  },
+  remote(k, val) {
+    if (val && (+val.t || 0) >= (+this.bkp()[k]?.t || 0)) this.setBkp(k, val);
+    if (UI.tab !== 'notas') return;
+    const ta = $('#notes-ta');
+    if (k === this.key()) { if (ta && document.activeElement !== ta) ta.value = val?.text || ''; }
+    else if (!ta || document.activeElement !== ta) UI.renderRightSoon();
+  },
+  novo() {
+    const k = 't_' + uid();
+    this.save(k, { titulo: 'Novo tópico', text: '' });
+    this.sel = k; LS.set('notaSel', k); UI.renderRight();
+    setTimeout(() => { const i = $('#notes-tt'); if (i) { i.focus(); i.select(); } }, 30);
+  },
+  apagar(k) {
+    Store.put(this.path(k), null, 0); this.setBkp(k, null);
+    this.sel = 'geral'; LS.set('notaSel', 'geral'); UI.renderRight();
+  },
+};
+addEventListener('pagehide', () => Notas.flushAll());
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') Notas.flushAll(); });
+
 function paneNotes() {
-  const info = mapInfo(CUR);
-  const ta = h('textarea', { class: 'notes', id: 'notes-ta', 'aria-label': 'Notas do mestre sobre este lugar', placeholder: 'Anotações secretas deste lugar: quem está aqui, o que pode ser encontrado, o que acontece se os jogadores mexerem onde não devem…' });
-  ta.value = Store.data.notes[CUR]?.text || '';
-  ta.addEventListener('input', () => saveNote(CUR, ta.value));
-  return [
-    h('div', null, h('h2', { class: 'loc-title' }, info.name), info.blurb ? h('p', { class: 'loc-blurb' }, info.blurb) : null),
-    h('h4', null, 'Notas do mestre', h('span', { class: 'sp' }), h('span', { class: 'saved', id: 'notes-state' })),
-    ta,
-    h('p', { class: 'hint' }, Store.mode === 'db' ? 'Só quem edita a mesa vê estas notas. Os jogadores nunca recebem este texto.' : 'As notas ficam guardadas neste navegador.'),
-  ];
+  const k = Notas.key(), inf = Notas.info(k), d = Notas.doc(k) || {}, out = [];
+  if (Notas.sel !== '@lugar' && Notas.sel !== 'geral' && Notas.sel !== CITY_ID && !Notas.grupos().some(([, l]) => l.some(([v]) => v === Notas.sel))) { Notas.sel = '@lugar'; return paneNotes(); }
+  out.push(h('div', null, h('h2', { class: 'loc-title' }, 'Anotações'), h('p', { class: 'loc-blurb' }, 'Escolha sobre o que anotar: a campanha, um lugar, um personagem, um NPC ou um tópico seu.')));
+  const selEl = h('select', { class: 'inp', id: 'notes-top', 'aria-label': 'Tópico da anotação', onchange: e => Notas.pick(e.target.value) },
+    Notas.grupos().map(([g, l]) => h('optgroup', { label: g }, l.map(([v, n]) => h('option', { value: v, selected: v === Notas.sel || null }, (Notas.temTexto(v === '@lugar' ? CUR : v) ? '• ' : '') + n)))));
+  out.push(h('div', { class: 'nt-pick' }, selEl, h('button', { class: 'btn sm', type: 'button', html: icon('plus') + 'Tópico', title: 'Criar um tópico seu (uma pista, um mistério, uma sessão…)', onclick: () => Notas.novo() })));
+  // atalhos: o que já tem anotação
+  const com = Object.keys(Store.data.notes || {}).filter(x => x !== k && Notas.temTexto(x)).sort((a, b) => (+Notas.doc(b)?.t || 0) - (+Notas.doc(a)?.t || 0)).slice(0, 14);
+  if (com.length) out.push(h('div', { class: 'nt-chips', role: 'group', 'aria-label': 'Anotações recentes' }, com.map(x => {
+    const i = Notas.info(x);
+    return h('button', { class: 'nt-chip', type: 'button', title: i.g + ' · ' + i.nome, onclick: () => Notas.pick(x) },
+      i.s ? h('span', { class: 'sh-av', style: { '--c': i.s.cor || '#4fa3a5' }, html: i.s.retrato ? `<img src="${esc(imgSrc(i.s.retrato))}" alt="">` : esc(initials(i.s.nome || '?')) }) : h('span', { class: 'nt-g' }, i.g === 'Lugares' ? '⌂' : i.g === 'Geral' ? '✦' : '#'),
+      h('span', null, i.nome));
+  })));
+  // cabeçalho do tópico
+  if (inf.s) out.push(h('div', { class: 'nt-head' },
+    h('span', { class: 'sh-av', style: { '--c': inf.s.cor || '#4fa3a5' }, html: inf.s.retrato ? `<img src="${esc(imgSrc(inf.s.retrato))}" alt="">` : esc(initials(inf.s.nome || '?')) }),
+    h('div', null, h('b', null, inf.nome), h('span', null, (isNpc(inf.s) ? KINDS[inf.s.tipo] || 'NPC' : 'Jogador' + (inf.s.jogador ? ' · ' + inf.s.jogador : '')) + (inf.s.conceito ? ' · ' + inf.s.conceito : '')))));
+  else if (inf.lugar) { const li = mapInfo(k); out.push(h('div', null, h('b', { class: 'nt-lug' }, li.name || inf.nome), li.blurb ? h('p', { class: 'loc-blurb' }, li.blurb) : null)); }
+  if (k.startsWith('t_')) out.push(h('div', { class: 'nt-pick' },
+    h('input', { class: 'inp', id: 'notes-tt', maxlength: 60, value: d.titulo || '', placeholder: 'Nome do tópico', 'aria-label': 'Nome do tópico', oninput: e => Notas.save(k, { titulo: e.target.value.slice(0, 60) || 'Tópico sem nome' }) }),
+    h('button', { class: 'iconbtn', type: 'button', title: UI.ntDel === k ? 'Toque de novo para apagar' : 'Apagar este tópico', 'aria-label': 'Apagar este tópico', html: icon('trash'), style: UI.ntDel === k ? { color: 'var(--danger, #de6b58)' } : null, onclick: () => { if (UI.ntDel === k) { UI.ntDel = null; Notas.apagar(k); } else { UI.ntDel = k; UI.renderRight(); setTimeout(() => { if (UI.ntDel === k) { UI.ntDel = null; if (UI.tab === 'notas') UI.renderRight(); } }, 3000); } } })));
+  const ph = inf.s ? (isNpc(inf.s) ? 'O que este NPC sabe, o que ele quer, o que esconde, como fala…' : 'Segredos, ganchos e planos para este personagem. O jogador nunca vê este texto.')
+    : inf.lugar ? 'Quem está aqui, o que pode ser encontrado, o que acontece se os jogadores mexerem onde não devem…'
+    : k === 'geral' ? 'Ideias da campanha, o que aconteceu na última sessão, o que preparar para a próxima…' : 'Escreva aqui…';
+  const ta = h('textarea', { class: 'notes', id: 'notes-ta', 'aria-label': 'Anotação: ' + inf.nome, placeholder: ph });
+  ta.value = d.text || '';
+  ta.addEventListener('input', () => Notas.save(k, { text: ta.value }));
+  out.push(h('h4', null, inf.g === 'Lugares' ? 'Notas do lugar' : inf.g === 'Personagens' ? 'Notas do personagem' : inf.g === 'NPCs' ? 'Notas do NPC' : 'Notas', h('span', { class: 'sp' }), h('span', { class: 'saved', id: 'notes-state' }, d.t ? (Store.mode === 'db' ? 'Salvo na mesa · ' : 'Salvo · ') + Notas.hm(d.t) : '')));
+  out.push(ta);
+  out.push(h('p', { class: 'hint' }, Store.mode === 'db' ? 'Só o mestre vê. Fica guardado na mesa (abre igual em qualquer aparelho) e uma cópia fica neste aparelho, caso a internet caia.' : 'As notas ficam guardadas neste navegador.'));
+  return out;
 }
 
 /* ---------- aba Mapa ---------- */
@@ -7511,7 +7744,7 @@ function paneMap() {
   }
   if (g.on) out.push(rangeField('Intensidade da grade', 'rg-op', 0.2, 1, 0.05, g.op ?? 1, v => setGrid({ op: v }), v => Math.round(v * 100) + '%'));
   out.push(h('h4', null, 'Luz e clima'));
-  out.push(h('div', { class: 'field' }, h('span', null, 'Hora do dia'), seg(TIMES, timeOf(CUR), v => { setTime(v); UI.renderRight(); }, 'mp-time')));
+  out.push(h('div', { class: 'field' }, h('span', null, luzOk(CUR) ? 'Luz do dia · segue o relógio (' + Cal.hora() + ')' : 'Luz do dia'), timeSeg(v => { setTime(v); UI.renderRight(); }, 'mp-time')));
   out.push(h('div', { class: 'field' }, h('span', null, 'Neblina'), seg(MISTS, +(mapDoc(CUR)?.mist || 0), v => setMist(v), 'mp-mist')));
   out.push(h('div', { class: 'field' }, h('span', null, 'Clima · agora: ' + climaNome(climaOf(CUR), timeOf(CUR))), seg(CLIMAS.map(([v]) => [v, climaNome(v, timeOf(CUR))]), climaOf(CUR), v => setClima(v), 'mp-clima')));
   out.push(...calSection());
@@ -7731,7 +7964,7 @@ function onScene(sc) {
   else if (sc.cam && PL_FOLLOW && sc.map === CUR && !Input.loading) applyCamRect(sc.cam);
 }
 function sanitizeRoll(r) {
-  return { id: String(r.id).slice(0, 40), expr: String(r.expr || '').slice(0, 80), why: String(r.why || '').slice(0, 60), total: Number(r.total) || 0, parts: Array.isArray(r.parts) ? r.parts : [], success: !!r.success, t: Number(r.t) || Date.now(), secret: false };
+  return { id: String(r.id).slice(0, 40), expr: String(r.expr || '').slice(0, 80), why: String(r.why || '').slice(0, 60), total: Number(r.total) || 0, parts: Array.isArray(r.parts) ? r.parts : [], success: !!r.success, t: Number(r.t) || Date.now(), secret: false, sid: typeof r.sid === 'string' ? r.sid.slice(0, 60) : '', cor: /^#[0-9a-f]{3,8}$/i.test(r.cor || '') ? r.cor : '', nome: String(r.nome || '').slice(0, 40), lbl: String(r.lbl || '').slice(0, 60), out: String(r.out || '').slice(0, 60) };
 }
 function onRolls(val) {
   const list = Array.isArray(val?.list) ? val.list : [];
@@ -8393,6 +8626,7 @@ const Sheets = {
   publish(s, label, expr, res, outcome) {
     const why = (shName(s) + ' · ' + label + (outcome ? ' · ' + outcome : '')).slice(0, 60);
     const r = { id: uid('r'), expr: normExpr(expr), why, total: res.total, parts: res.parts, success: false, t: Date.now(), secret: false };
+    Object.assign(r, rollMeta(Object.keys(this.data).find(k => this.data[k] === s)), { lbl: String(label).slice(0, 60), out: String(outcome || '').slice(0, 60) });
     if (ROLE === 'gm' && Store.writable) {
       ROLLS_SEEN.add(r.id); r.secret = true;
       SECRET_ROLLS.unshift(r); SECRET_ROLLS = SECRET_ROLLS.slice(0, 30); LS.set('secretRolls', SECRET_ROLLS);
@@ -8852,7 +9086,7 @@ const LANTERN_SIZES = [[1, 'P'], [2, 'M'], [3, 'G']];
 ICONS.bulb = '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/>';
 let LSEL = null;
 
-const timeOf = id => { const d = mapDoc(id); return d?.time || (d?.night ? 'noite' : 'dia'); };
+const timeOf = id => { const d = mapDoc(id); return luzAjustada(id, d?.time || (d?.night ? 'noite' : 'dia')); };
 function lanternOn(t) { if (mapDoc(t.map)?.lanterns === false) return false; return t.lantern ?? (t.kind === 'pj'); }
 function lanternRadius(t) {
   const base = WORLD_INFO?.kind === 'proc' ? 2.6 * CS : Math.max(36, cellSize() * 1.8);
@@ -8899,7 +9133,7 @@ function setAllLights(on) {
   putMap(CUR, { lightsOff: on ? [] : Array.from({ length: nB }, (_, i) => i), lights: (d.lights || []).map(L => Object.assign({}, L, { on })) }, 0);
   afterLights();
 }
-function setTime(t) { putMap(CUR, { time: t, night: t !== 'dia' }, 0); afterLights(); }
+function setTime(t) { const ok = luzOk(CUR); if (ok && !ok.includes(t)) { UI.toast('Às ' + Cal.hora() + ' não dá para ficar ' + (TIMES.find(x => x[0] === t)?.[1] || t).toLowerCase() + '. Mude a hora no relógio (aba Mapa).', 'err'); return; } putMap(CUR, { time: t, night: t !== 'dia' }, 0); afterLights(); }
 function setMist(v) { putMap(CUR, { mist: v }, 0); Mist.update(); UI.renderSubbar(); if (UI.tab === 'mapa') UI.renderRight(); }
 function afterLights() { Night.draw(); Wx.update(); Cal.render(); drawLightMarks(); UI.renderSubbar(); if (UI.tab === 'mapa' || UI.tab === 'fichas') UI.renderRightSoon(); }
 
@@ -8925,7 +9159,7 @@ const drawLightMarksSoon = rafOnceV(() => drawLightMarks());
 function lightSubbar() {
   const tm = timeOf(CUR), d = mapDoc(CUR) || {}, mist = +(d.mist || 0), lights = mapLights(), L = LSEL && lights.find(x => x.key === LSEL);
   const kids = [
-    seg(TIMES, tm, v => setTime(v)),
+    timeSeg(v => setTime(v)),
     h('span', { class: 'lbl' }, 'Neblina'), seg(MISTS, mist, v => setMist(v)),
     h('span', { class: 'lbl' }, 'Clima'), h('select', { class: 'inp sm-sel', 'aria-label': 'Clima', onchange: e => setClima(e.target.value) }, CLIMAS.map(([v]) => h('option', { value: v, selected: climaOf(CUR) === v || null }, climaNome(v, tm)))),
     h('label', { class: 'chk', title: 'Cada peça com lanterna ilumina em volta dela' }, h('input', { type: 'checkbox', checked: d.lanterns !== false || null, onchange: e => { putMap(CUR, { lanterns: e.target.checked }, 0); afterLights(); } }), 'Lanternas'),
@@ -9199,7 +9433,7 @@ const Som = {
 
   /* ---------- seguir o estado da mesa ---------- */
   apply() {
-    const want = somLoops(), sons = Store.data.sons || {};
+    const want = somWant(), sons = Store.data.sons || {};
     for (const [id, e] of Object.entries(want)) {
       const s = sons[id]; if (!s || !e) continue;
       const key = 'L:' + id, P = this.playing.get(key), v = this.level(s, e);
@@ -9227,7 +9461,7 @@ const Som = {
   setVol(v) { this.vol = clampN(v, 0, 1); LS.set('somVol', this.vol); this.refreshLevels(); },
   setMudo(v) { this.mudo = !!v; LS.set('somMudo', this.mudo); this.refreshLevels(); UI.renderPlayerChrome(); },
   refreshLevels() {
-    const want = somLoops(), sons = Store.data.sons || {};
+    const want = somWant(), sons = Store.data.sons || {};
     for (const [key, P] of this.playing) {
       if (P.dead) continue;
       if (key.startsWith('L:')) { const s = sons[key.slice(2)]; if (s) P.fade(this.level(s, want[key.slice(2)]), 150); }
@@ -9236,7 +9470,7 @@ const Som = {
   },
   renderPill() {
     const b = $('#som-pill'); if (!b) return;
-    const busy = Object.keys(somLoops()).length || [...this.playing.keys()].some(k => k.startsWith('O:'));
+    const busy = Object.keys(somWant()).length || [...this.playing.keys()].some(k => k.startsWith('O:'));
     const need = busy && (this.blocked || (this.ac && this.ac.state === 'suspended' && !this.active()));
     b.hidden = !need;
   },
@@ -9262,7 +9496,7 @@ const Som = {
     if (UI.tab === 'sons') UI.renderRightSoon();
   },
   stopAll() {
-    this.putLoops(a => { for (const [id, e] of Object.entries(a.loops)) if (e?.auto) a.skip[id] = this.sig(); a.loops = {}; });
+    this.putLoops(a => { for (const [id, e] of Object.entries(a.loops)) if (e?.auto) a.skip[id] = this.sig(); a.loops = {}; a.priv = {}; });
     this.stopOnes(); Live.emit('sfx', { stop: true, n: uid() });
     if (UI.tab === 'sons') UI.renderRightSoon();
   },
@@ -9287,7 +9521,7 @@ const Som = {
     if (Object.keys(nskip).length !== Object.keys(skip).length) changed = true;
     for (const [id, e] of Object.entries(next)) if (e?.auto && (!want.has(id) || nskip[id])) { delete next[id]; changed = true; }
     for (const id of want) if (!next[id] && !nskip[id]) { next[id] = { t: Date.now(), auto: true }; changed = true; }
-    if (changed) Store.put('vtt/audio', { loops: next, skip: nskip, t: Date.now() }, 0);
+    if (changed) Store.put('vtt/audio', Object.assign({}, cur, { loops: next, skip: nskip, t: Date.now() }), 0);
   },
   putAuto(fn) { const c = clone(somAuto()); c.regras = c.regras || []; fn(c); Store.put('vtt/sonsauto', c, 0); },
   remove(id) {
@@ -9377,6 +9611,8 @@ function paneSons() {
         h('span', { class: 'som-sub' }, (i < 9 ? (i + 1) + ' · ' : '') + somBadge(s))),
       h('button', { class: 'som-ed', type: 'button', title: 'Editar', 'aria-label': 'Editar ' + s.nome, html: icon('edit'), onclick: () => openSomEditor(s.id) }));
   })));
+
+  out.push(...somPrivSection());
 
   // adicionar
   out.push(h('h4', null, 'Adicionar som'));
@@ -9823,8 +10059,10 @@ addEventListener('resize', () => { if (Wx.c && !Wx.c.hidden) { Wx.resize(); Wx.s
 const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
 const SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 const Cal = {
-  get() { const c = Store.data.vtt.cal || {}; return { on: !!c.on, d: clampI(c.d || 1, 1, 31), m: clampI(c.m || 1, 1, 12), a: Number.isFinite(+c.a) && c.a !== '' && c.a != null ? Math.round(+c.a) : 1994, semana: c.semana !== false }; },
+  get() { const c = Store.data.vtt.cal || {}; return { on: !!c.on, d: clampI(c.d || 1, 1, 31), m: clampI(c.m || 1, 1, 12), a: Number.isFinite(+c.a) && c.a !== '' && c.a != null ? Math.round(+c.a) : 1994, semana: c.semana !== false, hh: c.hh == null || c.hh === '' ? null : clampI(+c.hh, 0, 23), mm: clampI(+c.mm || 0, 0, 59) }; },
   date(c = this.get()) { const dt = new Date(2000, 0, 1); dt.setFullYear(c.a, c.m - 1, 1); const last = new Date(dt.getFullYear(), dt.getMonth() + 1, 0); dt.setFullYear(c.a, c.m - 1, Math.min(c.d, last.getDate())); return dt; },
+  hora(c = this.get()) { return c.hh == null ? '' : String(c.hh).padStart(2, '0') + ':' + String(c.mm).padStart(2, '0'); },
+  addMin(n) { const c = this.get(); if (c.hh == null) { this.put({ hh: 8, mm: 0 }); return; } let t = c.hh * 60 + c.mm + n; const d = Math.floor(t / 1440); t -= d * 1440; const dt = this.date(c); dt.setDate(dt.getDate() + d); this.put({ hh: Math.floor(t / 60), mm: t % 60, d: dt.getDate(), m: dt.getMonth() + 1, a: dt.getFullYear() }); },
   text(c = this.get()) { const dt = this.date(c); return `${c.semana ? SEMANA[dt.getDay()] + ', ' : ''}${dt.getDate()} de ${MESES[dt.getMonth()]} de ${dt.getFullYear()}`; },
   put(patch) { if (ROLE !== 'gm' || !Store.writable) return; Store.put('vtt/cal', Object.assign(this.get(), patch, { t: Date.now() }), 0); },
   shift(days) { const dt = this.date(); dt.setDate(dt.getDate() + days); this.put({ d: dt.getDate(), m: dt.getMonth() + 1, a: dt.getFullYear() }); },
@@ -9833,7 +10071,7 @@ const Cal = {
     const c = this.get(), show = c.on && !Sheets.open && !!WORLD_INFO;
     el.hidden = !show; if (!show) return;
     const hora = timeOf(CUR), cl = climaOf(CUR), hn = (TIMES.find(t => t[0] === hora) || [, ''])[1];
-    el.innerHTML = `<span class="cal-d">${icon('cal')}${esc(this.text(c))}</span><span class="cal-w">${esc(hn)} · ${esc(climaNome(cl, hora))}</span>`;
+    el.innerHTML = `<span class="cal-d">${icon('cal')}${esc(this.text(c))}</span><span class="cal-w">${c.hh != null ? esc(this.hora(c)) + ' · ' : ''}${esc(hn)} · ${esc(climaNome(cl, hora))}</span>`;
   },
 };
 function calSection() {
@@ -9849,6 +10087,15 @@ function calSection() {
     h('button', { class: 'btn sm', type: 'button', onclick: () => { Cal.shift(1); setTimeout(() => UI.renderRight(), 30); } }, '+ 1 dia'),
     h('span', { class: 'hint', style: { flex: '1', textAlign: 'right' } }, Cal.text(c))));
   out.push(kvSwitch('Mostrar o dia da semana', c.semana, v => { Cal.put({ semana: v }); UI.renderRight(); }, 'cal-sem'));
+  out.push(h('h4', null, 'Hora da campanha', h('span', { class: 'sp' }), c.hh != null ? h('span', { class: 'saved' }, (TIMES.find(t => t[0] === timeOf(CUR)) || [, ''])[1]) : null));
+  out.push(h('div', { class: 'cal-hr' },
+    h('input', { class: 'inp', id: 'cal-h', type: 'text', inputmode: 'numeric', maxlength: 5, placeholder: '--:--', value: Cal.hora(c), 'aria-label': 'Hora da campanha (00:00 a 23:59)', title: 'Hora em 24 horas, ex.: 22:00', onkeydown: e => { if (e.key === 'Enter') e.target.blur(); }, onchange: e => { const v = String(e.target.value || '').trim(), m = /^(\d{1,2})(?:\s*[:h.]\s*(\d{1,2}))?$/i.exec(v); if (!v) Cal.put({ hh: null, mm: 0 }); else if (m && +m[1] < 24 && +(m[2] || 0) < 60) Cal.put({ hh: +m[1], mm: +(m[2] || 0) }); else { UI.toast('Escreva a hora assim: 22:00', 'err'); e.target.value = Cal.hora(); } } }),
+    h('button', { class: 'btn sm', type: 'button', onclick: () => Cal.addMin(-60) }, '− 1 h'),
+    h('button', { class: 'btn sm', type: 'button', onclick: () => Cal.addMin(15) }, '+ 15 min'),
+    h('button', { class: 'btn sm', type: 'button', onclick: () => Cal.addMin(60) }, '+ 1 h')));
+  out.push(h('div', { class: 'row cal-pre' }, [['Manhã', 7, 0], ['Meio-dia', 12, 0], ['Fim de tarde', 17, 30], ['Noite', 21, 0], ['Madrugada', 3, 0]].map(([n, hh, mm]) => h('button', { class: 'btn sm ghost', type: 'button', onclick: () => Cal.put({ hh, mm }) }, n)),
+    c.hh != null ? h('button', { class: 'btn sm ghost', type: 'button', title: 'Tirar a hora: a luz de cada mapa fica livre', onclick: () => Cal.put({ hh: null, mm: 0 }) }, 'Sem hora') : null));
+  out.push(h('p', { class: 'hint' }, c.hh == null ? 'Sem hora marcada, a luz de cada mapa é livre. Marque uma hora para a luz seguir o relógio.' : 'A luz de todos os mapas segue a hora: das 6h às 17h só dia; das 19h às 5h só noite ou breu; no fim da tarde e ao amanhecer você escolhe. Lugares no subsolo podem ficar no breu a qualquer hora. Passar da meia-noite muda o dia.'));
   return out;
 }
 
@@ -10227,7 +10474,7 @@ const Quadro = {
   el: null, cvs: null, g: null, raf: 0, so: false, sig: '', last: 0,
   cfg() {
     const c = Store.data.vtt?.quadro || {};
-    return { on: !!c.on, titulo: String(c.titulo ?? 'Os personagens').slice(0, 60), ids: Array.isArray(c.ids) ? c.ids.map(String) : [], itens: c.itens && typeof c.itens === 'object' ? c.itens : {} };
+    return { on: !!c.on, titulo: String(c.titulo ?? 'Os personagens').slice(0, 60), ids: Array.isArray(c.ids) ? c.ids.map(String) : [], itens: c.itens && typeof c.itens === 'object' ? c.itens : {}, molduras: c.molduras && typeof c.molduras === 'object' ? c.molduras : {} };
   },
   put(fn) { const c = this.cfg(); fn(c); Store.put('vtt/quadro', c, 0); this.sync(); },
   todos() { return Object.entries(Sheets.data || {}).filter(([, s]) => s && String(s.nome || '').trim() && (!isNpc(s) || s.visivel)).map(([id, s]) => ({ id, s })); },
@@ -10239,7 +10486,7 @@ const Quadro = {
     if (!want) { this.close(); this.renderPeek(c); return; }
     this.renderPeek(c);
     if (!this.el) this.build();
-    const sig = JSON.stringify([c.titulo, c.ids, c.itens, this.cast(c).map(x => [x.s.nome, x.s.retrato, x.s.cor, x.s.conceito])]);
+    const sig = JSON.stringify([c.titulo, c.ids, c.itens, c.molduras, this.cast(c).map(x => [x.s.nome, x.s.retrato, x.s.cor, x.s.conceito])]);
     if (sig !== this.sig) { this.sig = sig; this.render(c); }
   },
   syncSoon() { clearTimeout(this._t); this._t = setTimeout(() => this.sync(), 250); },
@@ -10306,7 +10553,7 @@ const Quadro = {
     fill(grid, list.length ? list.map(({ id, s }, i) => {
       const nm = String(s.nome).trim().replace(/\s+/g, ' '), parts = nm.split(' ');
       return h('article', { class: 'qd-card', style: { '--d': (i * 0.12).toFixed(2) + 's', '--b': (i * 1.37 % 4).toFixed(2) + 's', '--c': s.cor || '#4fa3a5' } },
-        h('div', { class: 'qd-frame' }, h('i', { class: 'qd-cn tl' }), h('i', { class: 'qd-cn tr' }), h('i', { class: 'qd-cn bl' }), h('i', { class: 'qd-cn br' }),
+        h('div', { class: 'qd-frame m-' + qdMold(c, id, i) }, h('i', { class: 'qd-cn tl' }), h('i', { class: 'qd-cn tr' }), h('i', { class: 'qd-cn bl' }), h('i', { class: 'qd-cn br' }),
           h('div', { class: 'qd-pic' }, s.retrato ? h('img', { src: imgSrc(s.retrato), alt: 'Retrato de ' + nm }) : h('div', { class: 'qd-ini' }, initials(nm)))),
         h('div', { class: 'qd-plate' }, h('b', null, parts[0]), parts.length > 1 ? h('span', null, parts.slice(1).join(' ')) : null),
         this.itemEl(c.itens[id]));
@@ -10347,6 +10594,7 @@ function openQuadroModal() {
       const set = patch => Quadro.put(x => { const cur = Object.assign({}, x.itens[id] || {}, patch); for (const k of Object.keys(cur)) if (cur[k] === '' || cur[k] == null) delete cur[k]; if (Object.keys(cur).length) x.itens[id] = cur; else delete x.itens[id]; });
       const file = h('input', { type: 'file', accept: 'image/*', hidden: true, onchange: async e => { const f = e.target.files?.[0]; if (!f) return; try { UI.loading(true, 'Preparando a imagem…'); const url = await qdItemFromFile(f); set({ img: url, ic: '' }); render(); } catch (er) { UI.toast(er.message || 'Não deu para usar essa imagem.', 'err'); } finally { UI.loading(false); } } });
       return h('div', { class: 'qd-it' },
+        qdMoldCtl(c, id, render),
         h('div', { class: 'qd-gal', role: 'group', 'aria-label': 'Objeto especial' },
           h('button', { class: 'qd-ic' + (!it.ic && !it.img ? ' on' : ''), type: 'button', title: 'Sem objeto', onclick: () => { set({ ic: '', img: '' }); render(); } }, '—'),
           Object.entries(QD_ITENS).map(([k, [nome]]) => h('button', { class: 'qd-ic' + (it.ic === k && !it.img ? ' on' : ''), type: 'button', title: nome, 'aria-label': nome, style: { '--ic': QD_CORES[it.cor] || QD_CORES.branco }, html: qdSvg(k, 22), onclick: () => { set({ ic: k, img: '', nome: it.nome || nome }); render(); } })),
@@ -10371,13 +10619,292 @@ function openQuadroModal() {
       h('h4', null, 'Fora do quadro'),
       fora.length ? h('div', { class: 'qd-fora' }, fora.map(({ id, s }) => h('button', { class: 'btn sm qd-add', type: 'button', onclick: () => { Quadro.put(x => { if (!x.ids.includes(id)) x.ids.push(id); }); render(); } }, av(s), h('span', null, s.nome), h('span', { html: icon('plus') }))))
         : h('p', { class: 'hint' }, todos.length ? 'Todos já estão no quadro.' : 'Quando houver fichas com nome, elas aparecem aqui.'),
-      h('p', { class: 'hint' }, 'Os jogadores veem só o retrato, o nome e a silhueta do objeto, sem nenhuma descrição. Imagens enviadas viram uma silhueta clara e translúcida.'));
+      h('p', { class: 'hint' }, 'Cada personagem ganha uma moldura diferente; troque na lista de cada um. Os jogadores veem só o retrato, o nome e a silhueta do objeto, sem nenhuma descrição. Imagens enviadas viram uma silhueta clara e translúcida.'));
   };
   render();
   close = modal(h('h2', null, 'Quadro dos personagens'), h('p', null, 'Troca o mapa de todos por uma tela com os personagens em molduras e a névoa passando ao fundo.'), body,
     h('div', { class: 'acts' },
       h('button', { class: 'btn ghost', type: 'button', onclick: () => close() }, 'Fechar'),
       h('button', { class: 'btn primary', type: 'button', html: icon('users') + 'Mostrar para todos', onclick: () => { Quadro.so = false; Quadro.put(x => { x.on = true; }); close(); } })));
+}
+
+/* ---------- relógio da campanha: a luz de cada mapa segue a hora ---------- */
+const SUBSOLO = new Set(['mina-subterranea', 'monumento-subsolo', 'mansao-porao']);
+function horaMin() { const c = Store.data.vtt?.cal; if (!c || c.hh == null || c.hh === '') return null; return clampI(+c.hh, 0, 23) * 60 + clampI(+c.mm || 0, 0, 59); }
+/* 06h–17h só dia · 17h–18h dia ou entardecer · 18h–19h entardecer ou noite · 19h–05h noite ou breu · 05h–06h amanhecendo */
+function luzesDaHora(min) {
+  if (min == null) return null;
+  if (min >= 360 && min < 1020) return ['dia'];
+  if (min >= 1020 && min < 1080) return ['dia', 'tarde'];
+  if (min >= 1080 && min < 1140) return ['tarde', 'noite'];
+  if (min >= 300 && min < 360) return ['tarde', 'noite'];
+  return ['noite', 'breu'];
+}
+function luzOk(id) { const L = luzesDaHora(horaMin()); if (!L) return null; return SUBSOLO.has(id) && !L.includes('breu') ? [...L, 'breu'] : L; }
+/* a luz escolhida para o mapa, trocada pela mais próxima que combina com a hora */
+function luzAjustada(id, t) {
+  const ok = luzOk(id); if (!ok || ok.includes(t)) return t;
+  const ord = TIMES.map(x => x[0]), i = ord.indexOf(t);
+  return ok.slice().sort((a, b) => Math.abs(ord.indexOf(a) - i) - Math.abs(ord.indexOf(b) - i))[0];
+}
+function timeSeg(onPick, id) {
+  const ok = luzOk(CUR), cur = timeOf(CUR);
+  return h('div', { class: 'seg', role: 'group', id }, TIMES.map(([v, label]) => {
+    const off = !!ok && !ok.includes(v);
+    return h('button', { type: 'button', class: v === cur ? 'on' : null, 'aria-pressed': String(v === cur), disabled: off || null, title: off ? 'Às ' + Cal.hora() + ' não combina' : null, onclick: () => onPick(v) }, label);
+  }));
+}
+
+/* ---------- sons só para um jogador (o mestre e quem assiste também ouvem) ---------- */
+function somOuvePriv(to) { return ROLE === 'gm' || (typeof ESPECT !== 'undefined' && !!ESPECT) || (!!ME && ME === to); }
+/* o que deve ficar tocando neste aparelho: os ambientes de todos + os ambientes só para mim */
+function somWant() {
+  const a = Store.data.vtt.audio || {}, L = Object.assign({}, a.loops || {});
+  for (const [to, m] of Object.entries(a.priv || {})) if (m && typeof m === 'object' && somOuvePriv(to)) for (const [id, e] of Object.entries(m)) if (e && !L[id]) L[id] = e;
+  return L;
+}
+function somJogadores() { return Object.entries(Sheets.data || {}).filter(([, s]) => s && !isNpc(s) && String(s.nome || '').trim()).map(([id, s]) => ({ id, s })).sort((a, b) => String(a.s.nome).localeCompare(String(b.s.nome), 'pt')); }
+Som.privPad = function (to, id) {
+  const s = Store.data.sons?.[id]; if (!s || ROLE !== 'gm' || !Store.writable) return;
+  if (s.tipo === 'ambiente') {
+    const a = clone(Store.data.vtt.audio || {}); a.loops = a.loops || {}; a.priv = a.priv || {};
+    const m = a.priv[to] = a.priv[to] || {};
+    if (m[id]) delete m[id]; else m[id] = { t: Date.now() };
+    if (!Object.keys(m).length) delete a.priv[to];
+    a.t = Date.now(); Store.put('vtt/audio', a, 0);
+  } else { Live.emit('sfx', { id, to, n: uid() }); this.privOnce(id, to); }
+  if (UI.tab === 'sons') UI.renderRightSoon();
+};
+Som.privOnce = function (id, to) {
+  const s = Store.data.sons?.[id]; if (!s) return;
+  const key = 'O:p:' + to + ':' + uid(), P = this.make(s, false, () => this.playing.delete(key));
+  this.playing.set(key, P); P.apply(this.level(s));
+};
+Som.privStopOnes = function (to) { for (const [k, P] of [...this.playing]) if (k.startsWith('O:p:' + to + ':')) { this.playing.delete(k); P.stop(400); } };
+Som.privStop = function (to) {
+  if (ROLE === 'gm' && Store.writable) {
+    const a = clone(Store.data.vtt.audio || {});
+    if (a.priv?.[to]) { delete a.priv[to]; a.t = Date.now(); Store.put('vtt/audio', a, 0); }
+    Live.emit('sfx', { stop: true, to, n: uid() });
+  }
+  this.privStopOnes(to);
+  if (UI.tab === 'sons') UI.renderRightSoon();
+};
+const GMCFG = k => Store.data.hcfg?.[k] || {};
+function somPrivSection() {
+  const out = [h('h4', null, 'Só para um jogador'), h('p', { class: 'hint', style: { margin: '0' } }, 'Escolha antes os sons de cada jogador. Na hora, toque no som: só esse jogador ouve, junto com você e quem está assistindo. O som de todos continua tocando normalmente.')];
+  const js = somJogadores(), sons = somList(), pre = GMCFG('somPriv'), priv = Store.data.vtt.audio?.priv || {};
+  if (!js.length) { out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Quando houver fichas de jogadores, cada uma ganha um cartão aqui.')); return out; }
+  if (!sons.length) { out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Adicione sons ao soundpad primeiro (logo abaixo).')); return out; }
+  for (const { id, s } of js) {
+    const ids = (Array.isArray(pre[id]) ? pre[id] : []).filter(x => Store.data.sons?.[x]), loopsJ = priv[id] || {}, open = UI.somPrivEd === id;
+    const tocando = Object.keys(loopsJ).filter(x => Store.data.sons?.[x]).length || [...Som.playing.keys()].some(k => k.startsWith('O:p:' + id + ':'));
+    const setPre = fn => { const all = clone(GMCFG('somPriv')); const l = Array.isArray(all[id]) ? all[id] : []; all[id] = fn(l); if (!all[id].length) delete all[id]; Store.put('secret/gm/cfg/somPriv', all, 0); };
+    out.push(h('div', { class: 'spv-card' + (tocando ? ' on' : ''), style: { '--c': s.cor || '#4fa3a5' } },
+      h('div', { class: 'spv-h' },
+        h('span', { class: 'sh-av', style: { '--c': s.cor || '#4fa3a5' }, html: s.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(s.nome)) }),
+        h('div', { class: 'spv-n' }, h('b', null, firstName(s)), h('span', null, s.jogador ? 'jogador: ' + s.jogador : 'só essa pessoa ouve')),
+        tocando ? h('button', { class: 'btn sm danger', type: 'button', html: icon('stop') + 'Parar', title: 'Parar os sons só dele', onclick: () => Som.privStop(id) }) : null,
+        h('button', { class: 'btn sm ghost' + (open ? ' on' : ''), type: 'button', html: icon('edit') + (open ? 'Pronto' : 'Sons'), title: 'Escolher os sons deste jogador', onclick: () => { UI.somPrivEd = open ? null : id; UI.renderRight(); } })),
+      ids.length ? h('div', { class: 'spv-chips' }, ids.map(x => {
+        const so = Store.data.sons[x], on = !!loopsJ[x];
+        return h('button', { class: 'spv-chip' + (on ? ' on' : '') + (so.tipo === 'ambiente' ? ' amb' : ''), type: 'button', title: so.tipo === 'ambiente' ? (on ? 'Parar (só para ' + firstName(s) + ')' : 'Tocar repetindo só para ' + firstName(s)) : 'Tocar só para ' + firstName(s), onclick: () => Som.privPad(id, x) },
+          h('span', { class: 'som-ic', html: icon(on ? 'stop' : so.tipo === 'ambiente' ? 'repeat' : 'play') }), h('span', null, so.nome));
+      })) : h('p', { class: 'hint', style: { margin: '0' } }, 'Nenhum som escolhido para ' + firstName(s) + '. Toque em Sons para escolher.'),
+      open ? h('div', { class: 'spv-pick' }, sons.map(so => h('label', { class: 'chk' },
+        h('input', { type: 'checkbox', checked: ids.includes(so.id) || null, onchange: e => setPre(l => e.target.checked ? [...new Set([...l, so.id])] : l.filter(y => y !== so.id)) }),
+        so.nome + (so.tipo === 'ambiente' ? ' (ambiente)' : '')))) : null));
+  }
+  return out;
+}
+
+/* ---------- alertas do mestre: aparecem no meio da tela, como o alerta de estresse ---------- */
+const AL_ESTILOS = { aviso: ['Aviso', '#e9b45a'], perigo: ['Perigo', '#de6b58'], misterio: ['Mistério', '#8a7fd6'], sussurro: ['Sussurro', '#9fb0b3'], calma: ['Calma', '#4fa3a5'] };
+const Alertas = {
+  vistos: new Set(LS.get('alertasVistos', []) || []), fila: [],
+  lista() { const a = Store.data.vtt?.alertas; return Array.isArray(a?.lista) ? a.lista.filter(x => x && x.n) : []; },
+  prontos() { const p = GMCFG('alertas'); return Array.isArray(p.lista) ? p.lista.filter(x => x && x.id) : []; },
+  putProntos(fn) { const l = clone(this.prontos()); fn(l); Store.put('secret/gm/cfg/alertas', { lista: l.slice(0, 80), t: Date.now() }, 0); },
+  nomeDe(to) { if (!to) return 'todos'; const s = Sheets.data?.[to]; return s ? firstName(s) : 'jogador que saiu'; },
+  enviar(a) {
+    if (ROLE !== 'gm' || !Store.writable) return false;
+    const titulo = String(a.titulo || '').trim().slice(0, 80), txt = String(a.txt || '').trim().slice(0, 1200);
+    if (!titulo && !txt) { UI.toast('Escreva um título ou uma mensagem.', 'err'); return false; }
+    const al = { n: uid('a'), to: a.to || '', titulo, txt, estilo: AL_ESTILOS[a.estilo] ? a.estilo : 'aviso', t: Date.now() };
+    Store.put('vtt/alertas', { lista: [al, ...this.lista()].slice(0, 15), t: Date.now() }, 0);
+    UI.toast(al.to ? 'Alerta enviado só para ' + this.nomeDe(al.to) + '.' : 'Alerta enviado para todos.');
+    return true;
+  },
+  paraMim(a) { return !a.to || (!!ME && a.to === ME && !(typeof ESPECT !== 'undefined' && ESPECT)); },
+  scan() {
+    if (ROLE !== 'player') return;
+    const now = Date.now();
+    const novos = this.lista().filter(a => !this.vistos.has(a.n) && now - (+a.t || 0) < 30 * 60e3 && this.paraMim(a)).sort((x, y) => x.t - y.t);
+    if (!novos.length) return;
+    for (const a of novos) { this.vistos.add(a.n); this.fila.push(a); }
+    LS.set('alertasVistos', [...this.vistos].slice(-60));
+    this.next();
+  },
+  next() { if ($('#al-note') || !this.fila.length) return; this.show(this.fila.shift(), false); },
+  show(a, preview) {
+    const [nm, cor] = AL_ESTILOS[a.estilo] || AL_ESTILOS.aviso;
+    const close = () => { el.remove(); if (!preview) setTimeout(() => this.next(), 250); };
+    const el = h('div', { class: 'crise-note al-note al-' + (a.estilo || 'aviso'), id: 'al-note', role: 'alertdialog', 'aria-modal': 'true', 'aria-label': a.titulo || 'Mensagem do mestre', style: { '--c': cor } },
+      h('div', { class: 'crise-box' },
+        h('div', { class: 'crise-eye' }, (a.to ? 'Só para você' : 'Mensagem do mestre') + ' · ' + nm),
+        h('span', { class: 'al-ic', html: icon('bell') }),
+        a.titulo ? h('h2', null, a.titulo) : null,
+        a.txt ? h('p', { class: 'al-txt' }, a.txt) : null,
+        preview ? h('div', { class: 'crise-meta' }, 'Prévia: só você está vendo' + (a.to ? ' · vai para ' + this.nomeDe(a.to) : ' · vai para todos')) : null,
+        h('button', { class: 'btn primary', type: 'button', onclick: close }, preview ? 'Fechar' : 'Entendi')));
+    document.body.append(el);
+    setTimeout(() => el.querySelector('button')?.focus(), 50);
+    try { if (!preview && a.to) navigator.vibrate?.([120, 60, 120]); } catch {}
+    try { Crise.beep(); } catch {}
+  },
+};
+setTimeout(() => Alertas.scan(), 2500);
+Store.on(path => {
+  if (path === 'vtt/alertas') { Alertas.scan(); if (UI.tab === 'alertas') UI.renderRightSoon(); }
+  else if (path.startsWith('secret/gm/cfg/')) { if (UI.tab === 'sons' || UI.tab === 'alertas') { const a = document.activeElement; if (!(a && $('#pane')?.contains(a) && /^(INPUT|TEXTAREA)$/.test(a.tagName) && a.type !== 'checkbox')) UI.renderRightSoon(); } }
+});
+function paneAlertas() {
+  const f = (UI.alForm ||= { to: '', titulo: '', txt: '', estilo: 'aviso', edit: null }), js = somJogadores(), out = [];
+  if (f.to && !Sheets.data?.[f.to]) f.to = '';
+  const dest = (sel, id, on) => h('select', { class: 'inp', id, 'aria-label': 'Para quem', onchange: on },
+    h('option', { value: '', selected: !sel || null }, 'Todos os jogadores'), js.map(({ id: x, s }) => h('option', { value: x, selected: sel === x || null }, 'Só ' + firstName(s))));
+  out.push(h('div', null, h('h2', { class: 'loc-title' }, 'Alertas'), h('p', { class: 'loc-blurb' }, 'Aparece no meio da tela do jogador, como o alerta de estresse, e fica até ele tocar em Entendi. Mande para todos ou só para um.')));
+  out.push(h('h4', null, f.edit ? 'Editando alerta pronto' : 'Escrever alerta'));
+  out.push(h('label', { class: 'field', for: 'al-to' }, h('span', null, 'Para quem'), dest(f.to, 'al-to', e => { f.to = e.target.value; })));
+  out.push(h('label', { class: 'field', for: 'al-tt' }, h('span', null, 'Título'), h('input', { class: 'inp', id: 'al-tt', maxlength: 80, value: f.titulo, placeholder: 'Ex.: Você ouve passos', oninput: e => { f.titulo = e.target.value; } })));
+  out.push(h('label', { class: 'field', for: 'al-txt' }, h('span', null, 'Mensagem'), (() => { const t = h('textarea', { class: 'notes al-ta', id: 'al-txt', maxlength: 1200, placeholder: 'Ex.: Atrás de você, alguém chama seu nome. Só você ouviu.', oninput: e => { f.txt = e.target.value; } }); t.value = f.txt; return t; })()));
+  out.push(h('div', { class: 'field' }, h('span', null, 'Estilo'), seg(Object.entries(AL_ESTILOS).map(([k, [n]]) => [k, n]), f.estilo, v => { f.estilo = v; UI.renderRight(); }, 'al-est')));
+  const limpa = () => { UI.alForm = { to: f.to, titulo: '', txt: '', estilo: f.estilo, edit: null }; UI.renderRight(); };
+  out.push(h('div', { class: 'row al-acts' },
+    h('button', { class: 'btn primary', type: 'button', html: icon('bell') + 'Enviar agora', onclick: () => { if (Alertas.enviar(f)) { if (!f.edit) limpa(); else UI.renderRight(); } } }),
+    f.edit
+      ? h('button', { class: 'btn', type: 'button', onclick: () => { if (!f.titulo.trim() && !f.txt.trim()) return UI.toast('Escreva um título ou uma mensagem.', 'err'); Alertas.putProntos(l => { const p = l.find(x => x.id === f.edit); if (p) Object.assign(p, { to: f.to, titulo: f.titulo.trim(), txt: f.txt.trim(), estilo: f.estilo }); }); UI.toast('Alerta pronto atualizado.'); limpa(); } }, 'Salvar mudanças')
+      : h('button', { class: 'btn', type: 'button', html: icon('plus') + 'Guardar pronto', title: 'Guardar para mandar depois', onclick: () => { if (!f.titulo.trim() && !f.txt.trim()) return UI.toast('Escreva um título ou uma mensagem.', 'err'); Alertas.putProntos(l => { l.unshift({ id: uid('p'), to: f.to, titulo: f.titulo.trim().slice(0, 80), txt: f.txt.trim().slice(0, 1200), estilo: f.estilo }); }); UI.toast('Guardado nos alertas prontos.'); limpa(); } }),
+    h('button', { class: 'btn ghost', type: 'button', html: icon('eye') + 'Ver como fica', onclick: () => { if (!f.titulo.trim() && !f.txt.trim()) return UI.toast('Escreva um título ou uma mensagem.', 'err'); Alertas.show({ to: f.to, titulo: f.titulo.trim(), txt: f.txt.trim(), estilo: f.estilo }, true); } }),
+    f.edit ? h('button', { class: 'btn ghost', type: 'button', onclick: limpa }, 'Cancelar') : null));
+  // prontos
+  const pr = Alertas.prontos();
+  out.push(h('h4', null, 'Alertas prontos', h('span', { class: 'sp' }), pr.length ? h('span', { class: 'saved' }, String(pr.length)) : null));
+  if (!pr.length) out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Deixe escritos os alertas que você já sabe que vai usar. Na hora, é só tocar em Enviar.'));
+  const dsel = (UI.alDest ||= {});
+  for (const p of pr) {
+    const [nm, cor] = AL_ESTILOS[p.estilo] || AL_ESTILOS.aviso, to = dsel[p.id] ?? p.to ?? '';
+    out.push(h('div', { class: 'al-pr', style: { '--c': cor } },
+      h('div', { class: 'al-pr-t' }, h('b', null, p.titulo || '(sem título)'), h('span', { class: 'som-tag' }, nm)),
+      p.txt ? h('p', null, p.txt) : null,
+      h('div', { class: 'al-pr-a' },
+        dest(Sheets.data?.[to] || !to ? to : '', null, e => { dsel[p.id] = e.target.value; }),
+        h('button', { class: 'btn sm primary', type: 'button', html: icon('bell') + 'Enviar', onclick: () => { const t2 = dsel[p.id] ?? p.to ?? ''; Alertas.enviar(Object.assign({}, p, { to: Sheets.data?.[t2] ? t2 : '' })); if (UI.tab === 'alertas') UI.renderRightSoon(); } }),
+        h('button', { class: 'iconbtn', type: 'button', title: 'Editar', 'aria-label': 'Editar ' + (p.titulo || 'alerta'), html: icon('edit'), onclick: () => { UI.alForm = { to: Sheets.data?.[p.to] ? p.to : '', titulo: p.titulo || '', txt: p.txt || '', estilo: p.estilo || 'aviso', edit: p.id }; UI.renderRight(); $('#pane')?.closest('.scroll')?.scrollTo({ top: 0, behavior: 'smooth' }); } }),
+        h('button', { class: 'iconbtn', type: 'button', title: UI.alDel === p.id ? 'Toque de novo para apagar' : 'Apagar', 'aria-label': 'Apagar ' + (p.titulo || 'alerta'), html: icon('trash'), style: UI.alDel === p.id ? { color: '#de6b58' } : null, onclick: () => { if (UI.alDel === p.id) { UI.alDel = null; Alertas.putProntos(l => { const i = l.findIndex(x => x.id === p.id); if (i >= 0) l.splice(i, 1); }); } else { UI.alDel = p.id; UI.renderRight(); setTimeout(() => { if (UI.alDel === p.id) { UI.alDel = null; if (UI.tab === 'alertas') UI.renderRight(); } }, 3000); } } }))));
+  }
+  // enviados
+  const env = Alertas.lista().slice(0, 8);
+  if (env.length) {
+    out.push(h('h4', null, 'Enviados há pouco'));
+    out.push(h('div', { class: 'al-env' }, env.map(a => h('div', { class: 'al-env-r', style: { '--c': (AL_ESTILOS[a.estilo] || AL_ESTILOS.aviso)[1] } },
+      h('span', { class: 'saved' }, new Date(a.t).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })),
+      h('b', null, a.titulo || String(a.txt || '').slice(0, 40)),
+      h('span', { class: 'hint' }, a.to ? 'só ' + Alertas.nomeDe(a.to) : 'todos')))));
+  }
+  return out;
+}
+
+/* ---------- molduras do quadro dos personagens ---------- */
+const QD_MOLD = { ouro: 'Ouro velho', madeira: 'Madeira escura', prata: 'Prata', ebano: 'Ébano e ouro', cobre: 'Cobre', ferro: 'Ferro enferrujado', marfim: 'Marfim', barco: 'Madeira de barco' };
+const QD_MOLD_K = Object.keys(QD_MOLD);
+function qdMold(c, id, i) { const m = c.molduras?.[id]; return QD_MOLD[m] ? m : QD_MOLD_K[(i < 0 ? 0 : i) % QD_MOLD_K.length]; }
+function qdMoldCtl(c, id, render) {
+  const i = Quadro.cast(c).findIndex(x => x.id === id), auto = QD_MOLD_K[(i < 0 ? 0 : i) % QD_MOLD_K.length], cur = QD_MOLD[c.molduras?.[id]] ? c.molduras[id] : '';
+  return h('div', { class: 'qd-mrow' },
+    h('span', { class: 'qd-msw m-' + (cur || auto), 'aria-hidden': 'true' }),
+    h('select', { class: 'inp', 'aria-label': 'Moldura', onchange: e => { Quadro.put(x => { x.molduras = x.molduras || {}; if (e.target.value) x.molduras[id] = e.target.value; else delete x.molduras[id]; }); render(); } },
+      h('option', { value: '', selected: !cur || null }, 'Moldura: automática (' + QD_MOLD[auto] + ')'),
+      QD_MOLD_K.map(k => h('option', { value: k, selected: cur === k || null }, 'Moldura: ' + QD_MOLD[k]))));
+}
+
+/* ---------- rolagens dos jogadores no canto do mapa do mestre ---------- */
+function rollMeta(sid) { const s = sid && Sheets.data?.[sid]; return s ? { sid, cor: /^#[0-9a-f]{3,8}$/i.test(s.cor || '') ? s.cor : '', nome: shName(s) } : {}; }
+const RollFeed = {
+  box() {
+    let b = $('#rfeed');
+    if (!b) { const st = $('#stage'); if (!st) return null; b = h('div', { class: 'rfeed', id: 'rfeed', 'aria-live': 'polite' }); st.append(b); }
+    return b;
+  },
+  kind(r) { const o = String(r.out || ''); return /Perfeito|Sucesso|Acertou|segurou/i.test(o) ? 'ok' : /Fracasso|Falha|Errou/i.test(o) ? 'bad' : ''; },
+  av(s, nome, cor) { return h('span', { class: 'sh-av rf-av', style: { '--c': cor }, html: s?.retrato ? `<img src="${esc(imgSrc(s.retrato))}" alt="">` : esc(initials(nome || '?')) }); },
+  add(el, ms) {
+    const b = this.box(); if (!b) return;
+    const out = () => { if (el._gone) return; el._gone = true; el.classList.add('out'); setTimeout(() => el.remove(), 320); };
+    el._out = out; b.prepend(el);
+    [...b.children].slice(5).forEach(x => x._out ? x._out() : x.remove());
+    let t = setTimeout(out, ms);
+    el.addEventListener('mouseenter', () => clearTimeout(t));
+    el.addEventListener('mouseleave', () => { clearTimeout(t); t = setTimeout(out, 4000); });
+    return out;
+  },
+  push(r) {
+    if (ROLE !== 'gm') return;
+    const s = r.sid && Sheets.data?.[r.sid], cor = s?.cor || r.cor || '#9fb0b3';
+    const parts = String(r.why || '').split(' · '), nome = s ? shName(s) : r.nome || parts[0] || 'Jogador';
+    const lbl = r.lbl || parts.slice(1).filter(x => x !== r.out).join(' · ') || r.expr, k = this.kind(r), big = rollBig(r);
+    const el = h('div', { class: 'rf-card' + (k ? ' ' + k : ''), style: { '--c': cor }, role: 'status', title: 'Toque para fechar' },
+      this.av(s, nome, cor),
+      h('div', { class: 'rf-m' }, h('b', null, nome), h('span', null, lbl === 'dados' ? 'rolou ' + r.expr : lbl), r.out ? h('em', null, r.out) : h('span', { class: 'rf-ex' }, r.expr)),
+      h('div', { class: 'rf-tot' }, big, big !== String(r.total) ? h('small', null, '= ' + r.total) : null));
+    const out = this.add(el, 14000);
+    el.addEventListener('click', () => out?.());
+  },
+  group(title, rows, pub) {
+    if (!rows.length) return;
+    const sorted = rows.slice().sort((a, b) => b.total - a.total);
+    const el = h('div', { class: 'rf-card rf-grp', role: 'status' },
+      h('div', { class: 'rf-gh' }, h('span', { class: 'rf-gi', html: icon('dice') }), h('div', null, h('b', null, title), h('span', null, pub ? 'os jogadores também viram' : 'só você viu')),
+        h('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Fechar', title: 'Fechar', html: icon('x'), onclick: () => out?.() })),
+      sorted.map(r => {
+        const s = Sheets.data?.[r.sid], cor = s?.cor || r.cor || '#9fb0b3', k = this.kind(r);
+        return h('div', { class: 'rf-row' + (k ? ' ' + k : ''), style: { '--c': cor } }, this.av(s, r.nome, cor), h('span', { class: 'rf-rn' }, r.nome), r.out ? h('em', null, r.out.replace(/ contra DT \d+/, '')) : h('em'), h('b', { class: 'rf-rt' }, rollBig(r)));
+      }));
+    const out = this.add(el, 45000);
+  },
+};
+
+/* ---------- o mestre rola um atributo de todos os jogadores de uma vez ---------- */
+function rollTodosSection() {
+  const st = (UI.rtodos ||= { mode: 'norm', dt: 0, pub: false, fora: [] }), js = somJogadores(), out = [h('h4', null, 'Rolar para todos os jogadores')];
+  if (!js.length) { out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Quando houver fichas de jogadores, você rola um atributo de todos de uma vez aqui.')); return out; }
+  out.push(h('div', { class: 'rt-atr' }, ATRS.map(([k, n]) => h('button', { class: 'btn sm', type: 'button', title: 'Rolar ' + n + ' de todos os marcados', html: icon('dice') + n, onclick: () => rolarTodos(k) }))));
+  out.push(h('div', { class: 'field' }, h('span', null, 'Jeito'), seg([['norm', 'Normal'], ['adv', 'Vantagem'], ['dis', 'Desvantagem']], st.mode, v => { st.mode = v; UI.renderRight(); }, 'rt-mode')));
+  out.push(h('label', { class: 'kv', for: 'rt-dt' }, h('span', null, 'Dificuldade (DT, opcional)'), h('input', { class: 'inp', id: 'rt-dt', type: 'number', min: 0, max: 40, value: st.dt || '', placeholder: '—', style: { width: '80px' }, oninput: e => { st.dt = clampI(+e.target.value || 0, 0, 40); } })));
+  out.push(kvSwitch('Mostrar os resultados para os jogadores', st.pub, v => { st.pub = v; }, 'rt-pub'));
+  out.push(h('div', { class: 'rt-who', role: 'group', 'aria-label': 'Quem rola' }, js.map(({ id, s }) => h('label', { class: 'chk' },
+    h('input', { type: 'checkbox', checked: !st.fora.includes(id) || null, onchange: e => { st.fora = e.target.checked ? st.fora.filter(x => x !== id) : [...st.fora, id]; } }), firstName(s)))));
+  out.push(h('p', { class: 'hint', style: { margin: '0' } }, 'Cada um rola 1d20 + o próprio atributo. Os resultados aparecem juntos no canto do mapa, do maior para o menor.'));
+  return out;
+}
+function rolarTodos(k) {
+  if (ROLE !== 'gm') return;
+  const st = UI.rtodos || { mode: 'norm', dt: 0, pub: false, fora: [] }, js = somJogadores().filter(x => !st.fora.includes(x.id));
+  if (!js.length) { UI.toast('Marque pelo menos um jogador.', 'err'); return; }
+  const base = st.mode === 'adv' ? '2d20kh1' : st.mode === 'dis' ? '2d20kl1' : '1d20';
+  const lbl = ATRN[k] + (st.mode === 'adv' ? ' com Vantagem' : st.mode === 'dis' ? ' com Desvantagem' : ''), rows = [], t = Date.now();
+  for (const { id, s } of js) {
+    const val = +s.atr?.[k] || 0, expr = base + (val > 0 ? '+' + val : val < 0 ? String(val) : ''), res = rollExpr(expr), d = res.parts[0], nat = d.vals.find((v, i) => d.kept[i]);
+    let o = '';
+    if (nat === 20) o = 'Sucesso Perfeito'; else if (nat === 1) o = 'Fracasso Crítico'; else if (st.dt) o = res.total >= st.dt ? 'Sucesso contra DT ' + st.dt : 'Falha contra DT ' + st.dt;
+    const r = Object.assign({ id: uid('r'), expr: normExpr(expr), why: (shName(s) + ' · ' + lbl + (o ? ' · ' + o : '')).slice(0, 60), total: res.total, parts: res.parts, success: false, t, secret: !st.pub }, rollMeta(id), { lbl, out: o });
+    ROLLS_SEEN.add(r.id); rows.push(r);
+    if (st.pub && Store.writable) { Sheets.log(s, { l: lbl + ' (o mestre rolou para todos)', total: res.total, expr: normExpr(expr) + ` (d20: ${nat})`, o, parts: res.parts }); Sheets.save(id, 0); }
+  }
+  if (st.pub && Store.writable) Store.put('vtt/rolls', { list: [...rows, ...(Store.data.vtt.rolls?.list || [])].slice(0, 20) }, 0);
+  else { SECRET_ROLLS = [...rows, ...SECRET_ROLLS].slice(0, 30); LS.set('secretRolls', SECRET_ROLLS); }
+  RollFeed.group(lbl + ' de todos' + (st.dt ? ' · DT ' + st.dt : ''), rows, st.pub);
+  if (UI.tab === 'dados') UI.renderRightSoon();
 }
 
 /* ---------- crises de estresse (regra do livro, automática) ----------
@@ -11307,6 +11834,7 @@ const Dados = {
   publish(expr, res) {
     const why = (this.who() + ' · dados').slice(0, 60);
     const r = { id: uid('r'), expr: normExpr(expr), why, total: res.total, parts: res.parts, success: res.success, t: Date.now(), secret: false };
+    if (ROLE !== 'gm' && ME && Sheets.data?.[ME]) Object.assign(r, rollMeta(ME), { lbl: 'dados' });
     ROLLS_SEEN.add(r.id);
     if (ROLE === 'gm' && Store.writable) {
       if (this.secret) { r.secret = true; SECRET_ROLLS.unshift(r); SECRET_ROLLS = SECRET_ROLLS.slice(0, 30); LS.set('secretRolls', SECRET_ROLLS); }
@@ -11389,7 +11917,7 @@ function buildShell() {
       h('div', { class: 'loader', id: 'loader', hidden: true, role: 'status' }, h('i'), h('span', null, 'Carregando…')),
       h('div', { class: 'toasts', id: 'toasts', 'aria-live': 'polite' })),
     h('aside', { class: 'side side-right', 'aria-label': 'Painel do mestre' },
-      h('div', { class: 'tabs', role: 'tablist' }, [['fichas', 'Peças'], ['dados', 'Dados'], ['notas', 'Notas'], ['mapa', 'Mapa'], ['sons', 'Sons'], ['combate', 'Combate']].map(([id, label]) => h('button', { type: 'button', role: 'tab', 'data-tab': id, onclick: () => UI.setTab(id) }, label))),
+      h('div', { class: 'tabs', role: 'tablist' }, [['fichas', 'Peças'], ['dados', 'Dados'], ['notas', 'Notas'], ['mapa', 'Mapa'], ['sons', 'Sons'], ['combate', 'Combate'], ['alertas', 'Alertas']].map(([id, label]) => h('button', { type: 'button', role: 'tab', 'data-tab': id, onclick: () => UI.setTab(id) }, label))),
       h('div', { class: 'scroll' }, h('div', { class: 'pane', id: 'pane', role: 'tabpanel' }))),
     h('div', { class: 'drawer-back', onclick: () => UI.closeDrawers() }),
     h('section', { class: 'sheets', id: 'sheets', hidden: true, 'aria-label': 'Fichas dos personagens' }),
@@ -11420,7 +11948,7 @@ function wireStore() {
       if (Sheets.open) refreshSheetsSoon();
       if (origin === 'remote') { UI.renderRightSoon(); UI.renderLeftSoon(); }
     } else if (b === 'notes') {
-      if (k === CUR && origin === 'remote' && UI.tab === 'notas') { const ta = $('#notes-ta'); if (ta && document.activeElement !== ta) ta.value = val?.text || ''; }
+      if (origin === 'remote') Notas.remote(k, val);
     } else if (b === 'sons') {
       Som.applySoon(); Som.preloadSoon(); if (ROLE === 'gm') Som.autoSoon();
       Som.paneSoon();
@@ -11430,7 +11958,7 @@ function wireStore() {
       if (k === 'scene') { onScene(val); Som.autoSoon(); Som.paneSoon(); }
       if (k === 'audio') { Som.applySoon(); Som.paneSoon(); }
       if (k === 'init') Init.renderSoon();
-      if (k === 'cal') { Cal.render(); if (UI.tab === 'mapa' && origin === 'remote') UI.renderRightSoon(); }
+      if (k === 'cal') { afterLights(); if (ROLE === 'gm') Som.autoSoon(); if (UI.tab === 'mapa' && origin === 'remote') UI.renderRightSoon(); }
       if (k === 'sonsauto') { Som.autoSoon(); Som.paneSoon(); }
       if (k === 'travas') onTravas();
       if (k === 'quadro') Quadro.syncSoon();
@@ -11440,6 +11968,7 @@ function wireStore() {
     }
   });
   setTimeout(() => Quadro.sync(), 1200);
+  setTimeout(() => Notas.restore(), 2500);
   Live.on('scene', d => { if (VIEWMODE === 'players' && d && typeof d.map === 'string' && mapExists(d.map) && d.map !== CUR) goTo(d.map, { noScene: true }); });
   Live.on('cam', d => { if (VIEWMODE === 'players' && PL_FOLLOW && d && d.map === CUR && !Input.loading) applyCamRect(d.r); });
   Live.on('tok', d => {
@@ -11451,8 +11980,9 @@ function wireStore() {
   Live.on('ping', d => { if (d && d.map === CUR && isFinite(d.x) && isFinite(d.y)) showPing(+d.x, +d.y, String(d.id || '')); });
   Live.on('intro', d => Abertura.onRemote(d));
   Live.on('crise', d => Crise.onLive(d));
-  Live.on('sfx', d => { if (d?.stop) Som.stopOnes(); else if (d?.id) Som.once(String(d.id), true); });
-  Live.on('roll', d => { if (d && d.id && !ROLLS_SEEN.has(d.id)) { ROLLS_SEEN.add(d.id); if (ROLE === 'gm') { SECRET_ROLLS.unshift(Object.assign(sanitizeRoll(d), { secret: true })); SECRET_ROLLS = SECRET_ROLLS.slice(0, 30); LS.set('secretRolls', SECRET_ROLLS); } UI.rollToast(sanitizeRoll(d)); if (UI.tab === 'dados') UI.renderRightSoon(); } });
+  const SFX_N = new Set();
+  Live.on('sfx', d => { if (d?.n) { if (SFX_N.has(d.n)) return; SFX_N.add(d.n); } if (d?.to && !somOuvePriv(String(d.to))) return; if (d?.stop) { if (d.to) Som.privStopOnes(String(d.to)); else Som.stopOnes(); } else if (d?.id) { if (d.to) Som.privOnce(String(d.id), String(d.to)); else Som.once(String(d.id), true); } });
+  Live.on('roll', d => { if (d && d.id && !ROLLS_SEEN.has(d.id)) { ROLLS_SEEN.add(d.id); if (ROLE === 'gm') { SECRET_ROLLS.unshift(Object.assign(sanitizeRoll(d), { secret: true })); SECRET_ROLLS = SECRET_ROLLS.slice(0, 30); LS.set('secretRolls', SECRET_ROLLS); } if (ROLE === 'gm') RollFeed.push(sanitizeRoll(d)); else UI.rollToast(sanitizeRoll(d)); if (UI.tab === 'dados') UI.renderRightSoon(); } });
 }
 
 /* ---------- inicialização ---------- */
