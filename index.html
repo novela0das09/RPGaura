@@ -1100,8 +1100,8 @@ textarea.notes:focus { border-color: var(--lamp); }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="firebase-config.js?v=202610302041"></script>
-<script src="fb-adapter.js?v=202610302041"></script>
+<script src="firebase-config.js?v=202610302058"></script>
+<script src="fb-adapter.js?v=202610302058"></script>
 <script>
 /* ==========================================================
    Apogeo · motor de mapas táticos (núcleo: ruído e texturas)
@@ -3375,6 +3375,7 @@ function runLayer(ctx, list) {
 function renderMap(spec) {
   const { m, L, masonry, canopy, labels, lights } = makeBuilder(spec);
   spec.draw(m);
+  for (const s of (typeof RUAS !== 'undefined' && RUAS[spec.id]) || []) { const e = ruaSaida(spec.id, s); m.o('exitarrow', e.seta[0], e.seta[1], { rot: e.rot }); }
   const W = spec.w * CS, H = spec.h * CS, c = cv(W, H), ctx = c.getContext('2d');
   const reset = () => { ctx.setTransform(CS, 0, 0, CS, 0, 0); ctx.lineJoin = 'round'; ctx.lineCap = 'round'; };
   reset(); runLayer(ctx, L.ground);
@@ -5819,6 +5820,91 @@ MAPS.esconderijo = {
   },
 };
 
+/* penhasco escondido a leste do acampamento: sem trilha, só mata fechada até a borda */
+MAPS.penhasco = {
+  id: 'penhasco', w: 32, h: 24,
+  draw(m) {
+    m.ground('forest');
+    // a borda: daqui para o leste o chão some
+    const borda = [[19.2, -1], [20.6, 2.6], [19.4, 6.2], [21.6, 9.8], [20.4, 13.4], [22.2, 17], [21, 20.6], [22.4, 25]];
+    const abismo = [...borda, [33, 25], [33, -1]];
+    m.poly('grassdk', abismo);
+    m.poly('rgba(4,8,6,0.62)', abismo);
+    // mata lá embaixo, pequena e apagada pela distância
+    m.scatter({ poly: abismo.map(([x, y]) => [x + 2.4, y]) }, 70, { minDist: 0.9, seed: 81001 }, (x, y, R) => m.tree(x, y, 0.35 + R() * 0.3, R() < 0.3 ? 'light' : 'dark'));
+    // a face de pedra que despenca (vista de cima, uma faixa estreita e irregular)
+    const face = [...borda, ...borda.slice().reverse().map(([x, y], i) => [x + 2.8 + (i % 3) * 0.45, y])];
+    m.poly('cliff', face, { organic: 0.35, shadow: 0.45 });
+    m.path('rgba(170,164,148,0.55)', borda, 0.12, { organic: 0.3, layer: 'ground2' });
+    // pedras soltas na beirada e uma plataforma estreita lá embaixo, com uma fenda na rocha
+    for (const [x, y, r, s] of [[19.6, 4.4, 0.6, 1], [21, 8.6, 0.5, 2], [20.2, 12.2, 0.7, 3], [21.6, 15.6, 0.45, 4], [21.4, 19.6, 0.65, 5], [18.6, 1.6, 0.4, 6]]) m.o('rock', x, y, { r, seed: 81100 + s, moss: s % 2 === 0, color: '#6a665c' });
+    const plataforma = [[22.6, 10.6], [24.6, 10.2], [25.4, 11.6], [24.2, 12.8], [22.8, 12.4]];
+    m.poly('rock', plataforma, { organic: 0.3, shadow: 0.5 });
+    m.o('cave', 24.4, 10.9, { w: 1.2, h: 0.7 });
+    // corda velha amarrada numa árvore, descendo até a plataforma
+    m.tree(17.6, 11.2, 1.3, 'dark');
+    m.path('#b49a62', [[18.2, 11.4], [20.6, 11.5], [22.4, 11.6], [23.4, 11.4]], 0.07, { layer: 'props', smooth: true });
+    m.o('sack', 18.9, 12.3, { color: '#4a5a3a' });
+    // árvore caída, raízes e cogumelos
+    m.o('log', 13.4, 15.4, { w: 3.6, h: 0.6, rot: 28 }); m.o('roots', 15.2, 16.4, { n: 4, len: 1.2 }); m.o('mushrooms', 12.2, 14.4);
+    m.o('stump', 16.4, 6.8); m.o('rubble', 18.4, 20.4, { n: 8, s: 0.6 });
+    m.label('Penhasco', 15, 3.2, { size: 0.34 }); m.label('beirada', 18.6, 9.2, { size: 0.18 });
+    m.label('corda', 20.4, 12.2, { size: 0.16 }); m.label('plataforma', 24, 13.4, { size: 0.16 }); m.label('queda', 27.5, 18, { size: 0.24 });
+    // mata fechada, sem caminho
+    const avoid = [{ poly: [[18, -1], ...borda.map(([x, y]) => [x - 0.6, y]), [33, 25], [33, -1]] }, { c: [17.6, 11.2], r: 1.6 }, [12, 14, 4.4, 3]];
+    m.trees([0, 0, 22, 24], 40, { kinds: ['dark', 'broad', 'dark', 'mango', 'dead'], rmin: 0.9, rmax: 1.8, avoid, margin: 0.2, minDist: 1.9, seed: 81201 });
+    m.scatter([0, 0, 21, 24], 60, { avoid, minDist: 0.8, seed: 81202 }, (x, y, R) => m.tree(x, y, 0.3 + R() * 0.35, R() < 0.55 ? 'fern' : 'bush'));
+    // névoa subindo do fundo
+    m.poly('rgba(4,10,8,0.5)', abismo.map(([x, y]) => [x + 2.2, y]), { layer: 'top' });
+    m.poly('rgba(205,214,216,0.14)', abismo.map(([x, y]) => [x + 1.6, y]), { layer: 'top', organic: 0.4 });
+  },
+};
+
+/* ruas e trilhas que levam de um mapa ao vizinho: [borda, posição na borda, largura, destino] */
+const RUAS = {
+  'praia-banhistas': [['O', 1.6, 2.4, 'padaria'], ['L', 1.6, 2.4, 'praia-surf']],
+  'entrada-cidade': [['O', 11.5, 4.4, 'cidade'], ['N', 27, 4.4, 'parte-alta'], ['S', 27, 4.4, 'parte-baixa'], ['L', 11.5, 4.4, 'praca']],
+  'parte-alta': [['O', 14.9, 4.4, 'entrada-cidade'], ['L', 11.3, 4.4, 'prefeitura'], ['N', 22, 4, 'mirante']],
+  mirante: [['L', 19, 1.8, 'parte-alta'], ['L', 1.5, 1.6, 'mansao']],
+  mansao: [['O', 36.4, 4.4, 'parte-alta'], ['L', 36.4, 4.4, 'prefeitura']],
+  prefeitura: [['O', 20, 4.2, 'parte-alta'], ['L', 20, 4.2, 'galeria']],
+  galeria: [['O', 19.2, 3.2, 'prefeitura'], ['L', 19.2, 3.2, 'floricultura']],
+  praca: [['N', 17, 2.6, 'prefeitura'], ['L', 12, 2.6, 'igreja'], ['S', 17, 2.6, 'barbearia'], ['O', 12, 2.6, 'entrada-cidade']],
+  igreja: [['S', 14, 2.2, 'casa-medica']],
+  escola: [['O', 24.3, 4.4, 'igreja'], ['L', 24.3, 4.4, 'floricultura']],
+  floricultura: [['O', 16.3, 4.4, 'escola'], ['L', 16.3, 4.4, 'entrada-floresta']],
+  'parte-baixa': [['O', 10.2, 4.2, 'padaria'], ['L', 10.2, 4.2, 'praca'], ['N', 21.2, 4.2, 'entrada-cidade'], ['S', 21.2, 4.2, 'praia-banhistas']],
+  padaria: [['O', 15.7, 2.7, 'parte-baixa'], ['L', 15.7, 2.7, 'mercadinho']],
+  mercadinho: [['O', 16.4, 4.2, 'padaria'], ['L', 16.4, 4.2, 'farmacia']],
+  farmacia: [['O', 14.4, 4.2, 'mercadinho'], ['L', 14.4, 4.2, 'barbearia']],
+  barbearia: [['O', 12.6, 4, 'farmacia'], ['L', 12.6, 4, 'cemiterio']],
+  cemiterio: [['O', 22.8, 4.2, 'barbearia'], ['L', 22.8, 4.2, 'delegacia']],
+  'casa-medica': [['O', 20.6, 4.2, 'praca'], ['L', 20.6, 4.2, 'delegacia']],
+  delegacia: [['O', 22.7, 4.2, 'casa-medica'], ['L', 22.7, 4.2, 'praia-surf']],
+  'praia-surf': [['O', 1.5, 2, 'praia-banhistas'], ['L', 4.2, 1.8, 'farol']],
+  farol: [['O', 17.6, 1.8, 'praia-surf']],
+  'entrada-floresta': [['O', 12, 3, 'floricultura'], ['L', 3, 1.8, 'cachoeira'], ['L', 20.8, 1.8, 'monumento']],
+  cachoeira: [['O', 14.3, 1.8, 'entrada-floresta'], ['S', 20.2, 1.8, 'monumento']],
+  monumento: [['O', 12.5, 1.8, 'entrada-floresta']],
+};
+/* retângulo clicável e posição da seta para cada saída (em quadrados) */
+function ruaSaida(id, [lado, p, w]) {
+  const S = MAPS[id], L = Math.min(5, Math.max(1.8, w)), d = 2.2;
+  if (lado === 'O') return { r: [0, p - L / 2, d, p + L / 2], seta: [1.1, p], rot: -90 };
+  if (lado === 'L') return { r: [S.w - d, p - L / 2, S.w, p + L / 2], seta: [S.w - 1.1, p], rot: 90 };
+  if (lado === 'N') return { r: [p - L / 2, 0, p + L / 2, d], seta: [p, 1.1], rot: 0 };
+  return { r: [p - L / 2, S.h - d, p + L / 2, S.h], seta: [p, S.h - 1.1], rot: 180 };
+}
+PROPS.exitarrow = function (ctx) { // setas pintadas no chão indicando a saída
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (const y of [-0.28, 0.06]) {
+    ctx.beginPath(); ctx.moveTo(-0.3, y + 0.24); ctx.lineTo(0, y); ctx.lineTo(0.3, y + 0.24);
+    ctx.strokeStyle = 'rgba(20,16,10,0.45)'; ctx.lineWidth = 0.13; ctx.stroke();
+    ctx.strokeStyle = 'rgba(246,240,222,0.75)'; ctx.lineWidth = 0.075; ctx.stroke();
+  }
+};
+PROP_LAYER.exitarrow = 'props';
+
 </script>
 <script>
 /* ==========================================================
@@ -5964,9 +6050,10 @@ const LOCS = [
   { id: 'farol-topo', cat: 'farol', sub: 'farol', name: 'Topo do Farol', blurb: 'Sala da lanterna com a lente de Fresnel e a galeria aberta sobre o mar e o costão.' },
   { id: 'entrada-floresta', cat: 'floresta', name: 'Entrada da Floresta', blurb: 'Fim da estrada, portal das trilhas, cabana do guarda-parque e a bifurcação no riacho.', hs: [[1046, 344], [1236, 344], [1236, 420], [1046, 420]] },
   { id: 'cachoeira', cat: 'floresta', name: 'Cachoeira do Véu', blurb: 'Queda d\'água do penhasco, poço fundo, prainha de cascalho e uma gruta atrás do véu.', hs: [[1338, 118], [1458, 118], [1458, 304], [1338, 304]] },
-  { id: 'mina-entrada', cat: 'floresta', name: 'Mina de Carvão', blurb: 'Boca da mina na encosta, trilhos e vagonetes, escritório do capataz e o depósito de explosivos.', hs: [[1452, 22], [1524, 22], [1524, 104], [1452, 104]] },
+  { id: 'mina-entrada', cat: 'floresta', name: 'Mina de Carvão', blurb: 'Boca da mina na encosta, trilhos e vagonetes, escritório do capataz e o depósito de explosivos.', hs: [[1452, 22], [1507, 22], [1507, 104], [1452, 104]] },
   { id: 'mina-subterranea', cat: 'floresta', sub: 'mina-entrada', name: 'Galerias da Mina', blurb: 'Galerias escoradas com trilhos, câmara de extração, galeria alagada, passagem desabada e um poço que desce mais fundo.' },
-  { id: 'esconderijo', cat: 'floresta', name: 'Acampamento escondido', blurb: 'Clareira na mata depois da mina: barracas, fogueira, mesa de planejamento sob a lona, depósito na pedra, posto de vigia e arame com latas.', hs: [[1478, 124], [1524, 124], [1524, 172], [1478, 172]] },
+  { id: 'esconderijo', cat: 'floresta', name: 'Acampamento escondido', blurb: 'Clareira na mata depois da mina: barracas, fogueira, mesa de planejamento sob a lona, depósito na pedra, posto de vigia e arame com latas.', hs: [[1476, 124], [1507, 124], [1507, 172], [1476, 172]] },
+  { id: 'penhasco', cat: 'floresta', name: 'Penhasco escondido', blurb: 'Borda de pedra no meio da mata fechada, a leste do acampamento: queda livre, uma corda velha amarrada numa árvore e uma plataforma estreita lá embaixo. Não há trilha.', hs: [[1508, 48], [1526, 48], [1526, 200], [1508, 200]] },
   { id: 'monumento', cat: 'floresta', name: 'Monumento', blurb: 'Ruína de pedra com câmara central, altar entalhado, escada que desce e um obelisco marcado.', hs: [[1298, 452], [1408, 452], [1408, 568], [1298, 568]] },
   { id: 'monumento-subsolo', cat: 'floresta', sub: 'monumento', name: 'Subsolo do Monumento', blurb: 'Câmara do altar sob as ruínas, ossuário com nichos, cisterna alagada e uma passagem desabada.' },
   { id: 'monumento-topo', cat: 'floresta', sub: 'monumento', name: 'Plataforma do Monumento', blurb: 'O alto das ruínas: círculo de pedras gravadas, uma bacia ritual e a vista sobre a mata.' },
@@ -5983,9 +6070,10 @@ const SUB_HS = (() => {
     'monumento-topo': [a('sub-topo-desce', 'monumento', sq(6.2, 5.5, 7.8, 7.7))],
     farol: [a('sub-farol-sobe', 'farol-topo', sq(17.9, 8.8, 21.3, 12.2))],
     cachoeira: [a('sub-cachoeira-mina', 'mina-entrada', sq(27.6, 9.8, 30, 13.4))],
-    [CITY_ID]: ['mina-entrada', 'mansao', 'esconderijo'].map(id => ({ id: 'h-' + id, to: id, pts: LOC[id].hs })), // aparecem mesmo se o mestre já tiver mexido nas áreas da cidade
+    [CITY_ID]: ['mina-entrada', 'mansao', 'esconderijo', 'penhasco'].map(id => ({ id: 'h-' + id, to: id, pts: LOC[id].hs })), // aparecem mesmo se o mestre já tiver mexido nas áreas da cidade
     'mina-entrada': [a('sub-mina-entra', 'mina-subterranea', sq(12.4, 6.8, 16.4, 9.4)), a('sub-mina-volta', 'cachoeira', sq(0, 16.8, 2.4, 20.4)), a('sub-mina-esconderijo', 'esconderijo', sq(28.4, 11.6, 30, 14.2))],
-    esconderijo: [a('sub-esconderijo-mina', 'mina-entrada', sq(0, 15.6, 2.6, 19.6))],
+    esconderijo: [a('sub-esconderijo-mina', 'mina-entrada', sq(0, 15.6, 2.6, 19.6)), a('sub-esconderijo-penhasco', 'penhasco', sq(34.2, 11.4, 36, 17.4))],
+    penhasco: [a('sub-penhasco-volta', 'esconderijo', sq(0, 8, 2.4, 16))],
     mansao: [a('sub-mansao-sobe', 'mansao-2', sq(18.8, 19.8, 21.2, 23.2)), a('sub-mansao-porao', 'mansao-porao', sq(13.7, 12.4, 15.3, 15.1))],
     'mansao-2': [a('sub-mansao2-desce', 'mansao', sq(18.8, 19.8, 21.2, 23.2)), a('sub-mansao2-sotao', 'mansao-sotao', sq(21.9, 13.7, 23.1, 16.7))],
     'mansao-sotao': [a('sub-sotao-desce', 'mansao-2', sq(21.9, 13.7, 23.1, 16.7))],
@@ -5996,6 +6084,13 @@ const SUB_HS = (() => {
     'prefeitura-2': [a('sub-prefeitura2-desce', 'prefeitura', sq(17.1, 1.7, 19.4, 5.1))],
   };
 })();
+/* saídas das ruas para o mapa vizinho */
+for (const [id, list] of Object.entries(RUAS)) {
+  SUB_HS[id] = [...(SUB_HS[id] || []), ...list.map((s, i) => {
+    const [x0, y0, x1, y1] = ruaSaida(id, s).r;
+    return { id: 'rua-' + id + '-' + i, to: s[3], pts: [[x0, y0], [x1, y0], [x1, y1], [x0, y1]].map(([x, y]) => [Math.round(x * CS), Math.round(y * CS)]) };
+  })];
+}
 const TOKEN_COLORS = ['#e9b45a', '#4fa3a5', '#d0604f', '#7fb069', '#8a7fd6', '#e07ab0', '#5b8fd8', '#c98a4a', '#9fb0b3', '#2f2f2f'];
 const KINDS = { pj: 'Jogador', npc: 'NPC', inimigo: 'Inimigo' };
 
