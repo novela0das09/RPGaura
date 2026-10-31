@@ -40,6 +40,7 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const GOOGLE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.3-1.6 3.9-5.4 3.9-3.3 0-5.9-2.7-5.9-6s2.6-6 5.9-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6H12z"/></svg>';
   const CHAT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/><path d="M9 12h.01M12 12h.01M15 12h.01"/></svg>';
+  const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
   const discordBtn = () => (DISCORD ? `<a class="gate-btn" href="${esc(DISCORD)}" target="_blank" rel="noopener">${CHAT}Entrar no Discord da mesa</a>` : '');
   let gateEl = null;
   function gate(html) {
@@ -129,7 +130,13 @@
         FB.mestres = ms; FB.isGM = ms[u.uid] === true;
         const ban = FB.isGM ? null : (await rtdb.ref('mesa/banidos/' + u.uid).once('value').catch(() => null))?.val();
         if (ban === true) { banGate(); return; }
-        rtdb.ref('users/' + u.uid).set({ nome: u.displayName || u.email || 'Sem nome', foto: u.photoURL || '', visto: Date.now() }).catch(() => {});
+        /* espectador: escolhido na entrada ("Entrar só para assistir") ou na tela de Conta; fica salvo na conta */
+        const prev = (await rtdb.ref('users/' + u.uid).once('value').catch(() => null))?.val() || {};
+        let esp = prev.esp === true;
+        try { const want = sessionStorage.getItem('apogeu.esp'); if (want) { esp = want === '1'; sessionStorage.removeItem('apogeu.esp'); } } catch {}
+        FB.espectador = !FB.isGM && esp;
+        const me = { nome: u.displayName || u.email || 'Sem nome', foto: u.photoURL || '', visto: Date.now() }; if (esp) me.esp = true;
+        rtdb.ref('users/' + u.uid).set(me).catch(() => {});
         let asPlayer = false; try { asPlayer = sessionStorage.getItem('apogeu.asPlayer') === u.uid; sessionStorage.removeItem('apogeu.asPlayer'); } catch {}
         if (!Object.keys(ms).length && !asPlayer) { askGM(start); return; }
         go(start);
@@ -153,10 +160,11 @@
   }
   function showLogin(start, err) {
     const g = gate(`<p>Entre com a sua conta do Google para abrir o mapa, as fichas e o mural da mesa.</p>
-      <div class="gate-row"><button class="gate-btn primary" type="button" id="g-in">${GOOGLE}Entrar com Google</button>${discordBtn()}</div>
+      <div class="gate-row"><button class="gate-btn primary" type="button" id="g-in">${GOOGLE}Entrar com Google</button><button class="gate-btn" type="button" id="g-esp">${EYE}Entrar só para assistir</button>${discordBtn()}</div>
       ${err ? `<p class="gate-err">${esc(friendly(err))}</p>` : ''}
-      <p class="gate-small">O Google só informa seu nome e foto para a mesa.</p>`);
-    g.querySelector('#g-in').onclick = async () => {
+      <p class="gate-small">O Google só informa seu nome e foto para a mesa. Quem entra só para assistir vê o mapa e ouve a call, sem ficha e sem falar.</p>`);
+    const signIn = async esp => {
+      try { sessionStorage.setItem('apogeu.esp', esp ? '1' : '0'); } catch {}
       const prov = new firebase.auth.GoogleAuthProvider();
       try { await auth.signInWithPopup(prov); }
       catch (e) {
@@ -164,6 +172,8 @@
         if (!/popup-closed/i.test(e.code || '')) showLogin(start, e);
       }
     };
+    g.querySelector('#g-in').onclick = () => signIn(false);
+    g.querySelector('#g-esp').onclick = () => signIn(true);
   }
   function friendly(e) {
     const c = String(e.code || e.message || e);
@@ -198,10 +208,17 @@
     try { sessionStorage.setItem('apogeu.asPlayer', u.uid); } catch {}
     location.reload();
   }
+  FB.setEspectador = async v => {
+    const u = FB.user; if (!u || FB.isGM) return;
+    await rtdb.ref('users/' + u.uid + '/esp').set(v ? true : null);
+    try { sessionStorage.setItem('apogeu.esp', v ? '1' : '0'); } catch {}
+    location.reload();
+  };
   FB.account = async function () {
     const u = FB.user; if (!u || typeof modal !== 'function') return;
     let close;
-    const me = h('div', { class: 'acc-row' }, u.photoURL ? h('img', { src: u.photoURL, alt: '' }) : h('span', { class: 'ph' }), h('span', { class: 'nm' }, u.displayName || u.email, h('small', null, (FB.isGM ? 'Mestre' : 'Jogador') + ' · ' + (u.email || ''))));
+    const me = h('div', { class: 'acc-row' }, u.photoURL ? h('img', { src: u.photoURL, alt: '' }) : h('span', { class: 'ph' }), h('span', { class: 'nm' }, u.displayName || u.email, h('small', null, (FB.isGM ? 'Mestre' : FB.espectador ? 'Espectador' : 'Jogador') + ' · ' + (u.email || ''))));
+    const espBtn = FB.isGM ? null : h('button', { class: 'btn' + (FB.espectador ? ' primary' : ''), type: 'button', style: { width: '100%' }, onclick: async e => { e.currentTarget.disabled = true; try { await FB.setEspectador(!FB.espectador); } catch { e.currentTarget.disabled = false; UI.toast('Não foi possível trocar agora. Tente de novo.', 'err'); } } }, FB.espectador ? 'Voltar a jogar como jogador' : 'Só assistir (entrar como espectador)');
     const list = h('div', { class: 'acc-list' }, h('p', { class: 'hint' }, 'Carregando…'));
     let armed = false;
     const leave = h('button', { class: 'btn danger', type: 'button', style: { width: '100%' }, onclick: async () => {
@@ -212,7 +229,8 @@
     close = modal(
       h('h2', null, FB.isGM ? 'Mestre e jogadores' : 'Sua conta'),
       me,
-      FB.isGM ? h('p', null, 'Para outra pessoa assumir, toque em ', h('b', null, 'Passar o posto'), ' ao lado do nome dela: ela vira mestre e você vira jogador. ', h('b', null, 'Tornar mestre'), ' deixa vocês dois como mestres. ', h('b', null, 'Expulsar'), ' tira a pessoa da mesa na hora; ela só volta se você tocar em ', h('b', null, 'Readmitir'), '.') : h('p', null, 'Você está na mesa como jogador. Só o mestre mexe no mapa, no mural e nas notas.'),
+      FB.isGM ? h('p', null, 'Para outra pessoa assumir, toque em ', h('b', null, 'Passar o posto'), ' ao lado do nome dela: ela vira mestre e você vira jogador. ', h('b', null, 'Tornar mestre'), ' deixa vocês dois como mestres. ', h('b', null, 'Expulsar'), ' tira a pessoa da mesa na hora; ela só volta se você tocar em ', h('b', null, 'Readmitir'), '.') : h('p', null, FB.espectador ? 'Você está como espectador: vê o mapa, as fichas e as rolagens e ouve a call, mas não tem ficha nem fala na call.' : 'Você está na mesa como jogador. Só o mestre mexe no mapa, no mural e nas notas.'),
+      espBtn,
       FB.isGM ? list : null,
       FB.isGM ? leave : null,
       FB.isGM ? h('p', { class: 'hint', style: { margin: '0' } }, 'Se não sobrar nenhum mestre, a próxima pessoa que entrar no site pode assumir a mesa.') : null,
@@ -238,7 +256,7 @@
       list.replaceChildren(...rows.map(([uid, x]) => {
         const isM = mest[uid] === true, isB = !isM && bans[uid] === true, nome = x.nome || 'Sem nome';
         return h('div', { class: 'acc-row' + (isB ? ' banned' : '') }, x.foto ? h('img', { src: x.foto, alt: '' }) : h('span', { class: 'ph' }),
-          h('span', { class: 'nm' }, nome, h('small', null, isM ? 'Mestre' : isB ? 'Expulso da mesa' : 'Jogador')),
+          h('span', { class: 'nm' }, nome, h('small', null, isM ? 'Mestre' : isB ? 'Expulso da mesa' : x.esp ? 'Espectador' : 'Jogador')),
           isM ? act('Tirar de mestre', ' danger', () => rtdb.ref('mesa/mestres/' + uid).remove())
             : isB ? act('Readmitir', ' primary', () => rtdb.ref('mesa/banidos/' + uid).remove())
               : [act('Tornar mestre', '', () => rtdb.ref('mesa/mestres/' + uid).set(true)), act('Passar o posto', ' primary', () => stepDown(uid)), kick(uid, nome)]);
